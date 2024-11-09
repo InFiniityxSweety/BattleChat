@@ -100,6 +100,26 @@ object ConfigScreenImpl {
             ) { Config.values.jumpToMessageMode = it },
             entryBuilder.linePriorityField("chatPlus.linePriority.selectChat", Config.values.selectChatLinePriority)
             { Config.values.selectChatLinePriority = it },
+            entryBuilder.startSubCategory(Component.translatable("chatPlus.chatSettings.inputOverFlowAutoFill")).with(
+                entryBuilder.booleanToggle(
+                    "chatPlus.chatSettings.inputOverFlowAutoFill.enabled",
+                    Config.values.inputOverFlowAutoFillSettings.enabled
+                ) { Config.values.inputOverFlowAutoFillSettings.enabled = it },
+                entryBuilder.booleanToggle(
+                    "chatPlus.chatSettings.inputOverFlowAutoFill.onlyCycleOnEnter",
+                    Config.values.inputOverFlowAutoFillSettings.onlyOnEnter
+                ) { Config.values.inputOverFlowAutoFillSettings.onlyOnEnter = it },
+                entryBuilder.enumSelector(
+                    "chatPlus.chatSettings.inputOverFlowAutoFill.autoFillCommandInteraction",
+                    InputOverFlowAutoFill.AutoFillCommandInteraction::class.java,
+                    Config.values.inputOverFlowAutoFillSettings.autoFillCommandInteraction
+                ) { Config.values.inputOverFlowAutoFillSettings.autoFillCommandInteraction = it },
+                entryBuilder.enumSelector(
+                    "chatPlus.chatSettings.inputOverFlowAutoFill.queueMode",
+                    InputOverFlowAutoFill.QueueMode::class.java,
+                    Config.values.inputOverFlowAutoFillSettings.queueMode
+                ) { Config.values.inputOverFlowAutoFillSettings.queueMode = it },
+            ).build()
         )
     }
 

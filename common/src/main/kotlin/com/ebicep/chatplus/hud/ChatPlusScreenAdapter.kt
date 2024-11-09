@@ -3,8 +3,8 @@ package com.ebicep.chatplus.hud
 import com.ebicep.chatplus.IChatScreen
 import com.ebicep.chatplus.config.Config
 import com.ebicep.chatplus.events.EventBus
+import com.ebicep.chatplus.features.InputOverFlowAutoFill
 import com.ebicep.chatplus.hud.ChatManager.sentMessages
-import com.ebicep.chatplus.hud.ChatPlusScreen.messagesToSend
 import com.ebicep.chatplus.hud.ChatPlusScreen.splitChatMessage
 import com.ebicep.chatplus.mixin.IMixinChatScreen
 import com.ebicep.chatplus.mixin.IMixinScreen
@@ -159,7 +159,9 @@ object ChatPlusScreenAdapter {
             minecraft.player!!.connection.sendCommand(messageToSend.substring(1))
         } else {
             minecraft.player!!.connection.sendChat(messageToSend)
-            messagesToSend.addAll(messages.subList(1, messages.size))
+            if (messages.size > 1) {
+                InputOverFlowAutoFill.addToQueue(messages.subList(1, messages.size))
+            }
         }
         return minecraft.screen === chatScreen
     }
