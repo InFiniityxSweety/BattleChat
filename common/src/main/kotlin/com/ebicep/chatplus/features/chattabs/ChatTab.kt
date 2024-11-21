@@ -87,6 +87,8 @@ class ChatTab : MessageFilterFormatted {
 
     var temporary = false
 
+    var serverIP = ""
+
     @Transient
     var isAutoTab = false
 
