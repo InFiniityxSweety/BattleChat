@@ -1,16 +1,15 @@
 package com.ebicep.chatplus.util
 
 import com.ebicep.chatplus.mixin.IMixinGuiGraphics
-import com.mojang.blaze3d.systems.RenderSystem
-import com.mojang.blaze3d.vertex.*
+import com.mojang.blaze3d.vertex.PoseStack
+import com.mojang.blaze3d.vertex.VertexConsumer
 import net.minecraft.client.gui.Font
 import net.minecraft.client.gui.GuiGraphics
-import net.minecraft.client.renderer.GameRenderer
 import net.minecraft.client.renderer.RenderType
 import net.minecraft.resources.ResourceLocation
-import net.minecraft.util.FastColor
 import net.minecraft.util.FormattedCharSequence
 import org.joml.Matrix4f
+import java.util.function.Function
 
 object GraphicsUtil {
 
@@ -113,16 +112,12 @@ object GraphicsUtil {
             j = l
             l = o
         }
-        val f = FastColor.ARGB32.alpha(n) / 255.0f
-        val g = FastColor.ARGB32.red(n) / 255.0f
-        val h = FastColor.ARGB32.green(n) / 255.0f
-        val p = FastColor.ARGB32.blue(n) / 255.0f
+
         val vertexConsumer = this.bufferSource.getBuffer(renderType)
-        vertexConsumer.addVertex(matrix4f, i, j, m.toFloat()).setColor(g, h, p, f)
-        vertexConsumer.addVertex(matrix4f, i, l, m.toFloat()).setColor(g, h, p, f)
-        vertexConsumer.addVertex(matrix4f, k, l, m.toFloat()).setColor(g, h, p, f)
-        vertexConsumer.addVertex(matrix4f, k, j, m.toFloat()).setColor(g, h, p, f)
-        this.callFlushIfUnmanaged()
+        vertexConsumer.addVertex(matrix4f, i, j, m.toFloat()).setColor(n)
+        vertexConsumer.addVertex(matrix4f, i, l, m.toFloat()).setColor(n)
+        vertexConsumer.addVertex(matrix4f, k, l, m.toFloat()).setColor(n)
+        vertexConsumer.addVertex(matrix4f, k, j, m.toFloat()).setColor(n)
     }
 
     fun GuiGraphics.renderOutline(
@@ -237,13 +232,11 @@ object GraphicsUtil {
             color,
             bl,
             this.pose().last().pose(),
-            this.bufferSource(),
+            this.bufferSource,
             Font.DisplayMode.NORMAL,
             0,
-            0xF000F0,
-            font.isBidirectional
+            0xF000F0
         )
-        this.callFlushIfUnmanaged()
         return l
     }
 
@@ -260,82 +253,140 @@ object GraphicsUtil {
             color,
             bl,
             this.pose().last().pose(),
-            this.bufferSource(),
+            this.bufferSource,
             Font.DisplayMode.NORMAL,
             0,
             0xF000F0
         )
-        this.callFlushIfUnmanaged()
         return l
     }
 
-    fun playerFaceRendererDraw(guiGraphics: GuiGraphics, resourceLocation: ResourceLocation, i: Float, j: Float, k: Float) {
-        this.playerFaceRendererDraw(guiGraphics, resourceLocation, i, j, k, renderHat = true, renderUpsideDown = false)
-    }
-
-    fun playerFaceRendererDraw(guiGraphics: GuiGraphics, resourceLocation: ResourceLocation, i: Float, j: Float, k: Float, renderHat: Boolean, renderUpsideDown: Boolean) {
-        val l = 8 + (if (renderUpsideDown) 8 else 0)
-        val m = 8 * (if (renderUpsideDown) -1 else 1)
-        guiGraphics.blit0(resourceLocation, i, j, k, k, 8.0f, l.toFloat(), 8f, m.toFloat(), 64f, 64f)
-        if (renderHat) {
-            playerFaceRendererDrawHat(guiGraphics, resourceLocation, i, j, k, renderUpsideDown)
-        }
-    }
-
-    private fun GuiGraphics.blit0(resourceLocation: ResourceLocation, i: Float, j: Float, k: Float, l: Float, f: Float, g: Float, m: Float, n: Float, o: Float, p: Float) {
-        blit0(resourceLocation, i, i + k, j, j + l, 0f, m, n, f, g, o, p)
-    }
-
-    private fun GuiGraphics.blit0(
+    fun GuiGraphics.blit0(
+        function: (ResourceLocation) -> RenderType,
         resourceLocation: ResourceLocation,
-        i: Float,
-        j: Float,
-        k: Float,
-        l: Float,
-        m: Float,
-        n: Float,
-        o: Float,
-        f: Float,
-        g: Float,
-        p: Float,
-        q: Float
+        i: Float, // starting x-coordinate for the blit.
+        j: Float, // starting y-coordinate for the blit.
+        f: Float, // starting u-coordinate in the texture.
+        g: Float, // starting v-coordinate in the texture.
+        k: Float, // width of the area to be blitted.
+        l: Float, // height of the area to be blitted.
+        m: Float, // width of the texture.
+        n: Float, // height of the texture.
+        o: Float, // total width of the texture.
+        p: Float, // total height of the texture.
+        q: Int // color to be applied to the vertices.
     ) {
-        innerBlit0(resourceLocation, i, j, k, l, m, (f + 0.0f) / p, (f + n) / p, (g + 0.0f) / q, (g + o) / q)
+        innerBlit0(
+            function,
+            resourceLocation,
+            i,
+            i + k,
+            j,
+            j + l,
+            f / o,
+            (f + m) / o,
+            g / p,
+            (g + n) / p,
+            q
+        )
     }
 
-    private fun playerFaceRendererDrawHat(guiGraphics: GuiGraphics, resourceLocation: ResourceLocation, i: Float, j: Float, k: Float, bl: Boolean) {
-        val l = 8 + (if (bl) 8 else 0)
-        val m = 8 * (if (bl) -1 else 1)
-        RenderSystem.enableBlend()
-        guiGraphics.blit0(resourceLocation, i, j, k, k, 40.0f, l.toFloat(), 8f, m.toFloat(), 64f, 64f)
-        RenderSystem.disableBlend()
-    }
-
-    private fun GuiGraphics.innerBlit0(resourceLocation: ResourceLocation, i: Float, j: Float, k: Float, l: Float, m: Float, f: Float, g: Float, h: Float, n: Float) {
-        RenderSystem.setShaderTexture(0, resourceLocation)
-        RenderSystem.setShader { GameRenderer.getPositionTexShader() }
+    private fun GuiGraphics.innerBlit0(
+        function: Function<ResourceLocation, RenderType>,
+        resourceLocation: ResourceLocation,
+        i: Float, // starting x-coordinate for the blit.
+        j: Float, // ending x-coordinate for the blit.
+        k: Float, // starting y-coordinate for the blit.
+        l: Float, // ending y-coordinate for the blit.
+        f: Float, // starting u-coordinate in the texture.
+        g: Float, // ending u-coordinate in the texture.
+        h: Float, // starting v-coordinate in the texture.
+        m: Float, // ending v-coordinate in the texture.
+        n: Int // color to be applied to the vertices.
+    ) {
+        this as IMixinGuiGraphics
         val matrix4f: Matrix4f = this.pose().last().pose()
-        val bufferBuilder = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX)
-        bufferBuilder.addVertex(matrix4f, i, k, m).setUv(f, h)
-        bufferBuilder.addVertex(matrix4f, i, l, m).setUv(f, n)
-        bufferBuilder.addVertex(matrix4f, j, l, m).setUv(g, n)
-        bufferBuilder.addVertex(matrix4f, j, k, m).setUv(g, h)
-        BufferUploader.drawWithShader(bufferBuilder.buildOrThrow())
+        val vertexConsumer: VertexConsumer = this.bufferSource.getBuffer(function.apply(resourceLocation))
+        vertexConsumer.addVertex(matrix4f, i, k, 0.0f).setUv(f, h).setColor(n)
+        vertexConsumer.addVertex(matrix4f, i, l, 0.0f).setUv(f, m).setColor(n)
+        vertexConsumer.addVertex(matrix4f, j, l, 0.0f).setUv(g, m).setColor(n)
+        vertexConsumer.addVertex(matrix4f, j, k, 0.0f).setUv(g, h).setColor(n)
     }
 
     fun GuiGraphics.drawImage(resources: Resources) {
         this.innerBlit0(
+            { resLoc -> RenderType.guiTextured(resLoc) },
             resources.resourceLocation,
             0f,
             resources.width.toFloat(),
             0f,
             resources.height.toFloat(),
             0f,
-            0f,
             1f,
             0f,
-            1f
+            1f,
+            -1
         )
+    }
+
+    object PlayerHeadUtils {
+
+        fun playerFaceRendererDraw(guiGraphics: GuiGraphics, resourceLocation: ResourceLocation, i: Float, j: Float, k: Float) {
+            this.playerFaceRendererDraw(guiGraphics, resourceLocation, i, j, k, renderHat = true, renderUpsideDown = false, l = -1)
+        }
+
+        fun playerFaceRendererDraw(
+            guiGraphics: GuiGraphics,
+            resourceLocation: ResourceLocation,
+            i: Float,
+            j: Float,
+            k: Float,
+            renderHat: Boolean,
+            renderUpsideDown: Boolean,
+            l: Int
+        ) {
+            val m = 8 + (if (renderUpsideDown) 8 else 0)
+            val n = 8 * (if (renderUpsideDown) -1 else 1)
+            guiGraphics.blit0(
+                { resLoc -> RenderType.guiTextured(resLoc) },
+                resourceLocation,
+                i,
+                j,
+                8.0f,
+                m.toFloat(),
+                k,
+                k,
+                8f,
+                n.toFloat(),
+                64f,
+                64f,
+                l
+            )
+            if (renderHat) {
+                playerFaceRendererDrawHat(guiGraphics, resourceLocation, i, j, k, renderUpsideDown, l)
+            }
+        }
+
+        private fun playerFaceRendererDrawHat(guiGraphics: GuiGraphics, resourceLocation: ResourceLocation, i: Float, j: Float, k: Float, bl: Boolean, l: Int) {
+            val m = 8 + (if (bl) 8 else 0)
+            val n = 8 * (if (bl) -1 else 1)
+            guiGraphics.blit0(
+                { resLoc -> RenderType.guiTextured(resLoc) },
+                resourceLocation,
+                i,
+                j,
+                40.0f,
+                m.toFloat(),
+                k,
+                k,
+                8f,
+                n.toFloat(),
+                64f,
+                64f,
+                l
+            )
+        }
+
     }
 
 }

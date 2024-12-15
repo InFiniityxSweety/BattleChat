@@ -6,9 +6,11 @@ import com.ebicep.chatplus.features.chattabs.MessageAtType
 import com.ebicep.chatplus.hud.*
 import com.ebicep.chatplus.util.GraphicsUtil
 import com.ebicep.chatplus.util.GraphicsUtil.createPose
+import com.ebicep.chatplus.util.GraphicsUtil.drawImage
 import com.ebicep.chatplus.util.GraphicsUtil.drawString0
 import com.ebicep.chatplus.util.GraphicsUtil.guiForward
 import com.ebicep.chatplus.util.GraphicsUtil.translate0
+import com.ebicep.chatplus.util.Resources
 import net.minecraft.client.Minecraft
 import kotlin.math.roundToInt
 
@@ -55,6 +57,10 @@ object Debug {
                     mouseY - 5,
                     0xFF00FF
                 )
+            }
+            // test image draw
+            pose.createPose {
+                guiGraphics.drawImage(Resources.NOTIFICATION_BADGE)
             }
         }
         // chat box dimensions

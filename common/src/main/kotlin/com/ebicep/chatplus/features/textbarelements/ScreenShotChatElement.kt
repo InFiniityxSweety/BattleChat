@@ -4,7 +4,6 @@ import com.ebicep.chatplus.events.Event
 import com.ebicep.chatplus.events.EventBus
 import com.ebicep.chatplus.features.ScreenshotChat.SCREENSHOT_COLOR
 import com.ebicep.chatplus.features.ScreenshotChat.onCooldown
-import com.ebicep.chatplus.mixin.IMixinScreen
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.gui.screens.ChatScreen
@@ -29,7 +28,7 @@ class ScreenShotChatElement(private val chatPlusScreen: ChatScreen) : TextBarEle
 
     override fun onHover(guiGraphics: GuiGraphics, pMouseX: Int, pMouseY: Int) {
         guiGraphics.renderTooltip(
-            (chatPlusScreen as IMixinScreen).font,
+            chatPlusScreen.font,
             Component.translatable("chatPlus.screenshotChat.tooltip"),
             pMouseX,
             pMouseY

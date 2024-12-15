@@ -10,9 +10,9 @@ import com.ebicep.chatplus.features.chattabs.MessageAtType
 import com.ebicep.chatplus.features.chatwindows.ChatWindow
 import com.ebicep.chatplus.hud.ChatManager
 import com.ebicep.chatplus.hud.ChatRenderLineTextEvent
+import com.ebicep.chatplus.util.GraphicsUtil.PlayerHeadUtils.playerFaceRendererDraw
 import com.ebicep.chatplus.util.GraphicsUtil.createPose
 import com.ebicep.chatplus.util.GraphicsUtil.guiForward
-import com.ebicep.chatplus.util.GraphicsUtil.playerFaceRendererDraw
 import com.ebicep.chatplus.util.GraphicsUtil.translate0
 import com.mojang.blaze3d.systems.RenderSystem
 import net.minecraft.client.Minecraft
@@ -115,7 +115,8 @@ object PlayerHeadChatDisplay {
                     it.verticalTextOffset,
                     PlayerFaceRenderer.SKIN_HEAD_WIDTH.toFloat(),
                     headData.showHat,
-                    false
+                    false,
+                    -1
                 )
                 RenderSystem.setShaderColor(1f, 1f, 1f, 1f)
                 RenderSystem.disableBlend()
