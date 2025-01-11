@@ -181,6 +181,7 @@ data class ConfigVariables(
     var copyMessageKey: KeyWithModifier = KeyWithModifier(InputConstants.getKey("key.keyboard.c"), 2),
     var copyMessageLinePriority: Int = 50,
     var copyNoFormatting: Boolean = true,
+    var copyMessageSeparator: String = "\n",
     // screen shot chat
     var screenshotChatEnabled: Boolean = true,
     var screenshotChatTextBarElementEnabled: Boolean = true,

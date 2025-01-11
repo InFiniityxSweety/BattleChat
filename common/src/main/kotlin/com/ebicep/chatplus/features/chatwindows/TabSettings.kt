@@ -164,7 +164,10 @@ class TabSettings {
                     it.xStart = translateX
                     it.yStart = translatedY
 
-                    if (!hideTabs && !chatWindow.generalSettings.disabled) {
+                    val renderTab = !hideTabs &&
+                            !chatWindow.generalSettings.disabled &&
+                            (it.serverIP.isEmpty() || it.serverIP == "TODO")
+                    if (renderTab) {
                         renderTab(it, guiGraphics)
                     }
 

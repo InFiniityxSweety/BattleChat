@@ -781,7 +781,8 @@ object ConfigScreenImpl {
             entryBuilder.keyCodeOptionWithModifier(
                 "chatPlus.copyMessage.key",
                 Config.values.copyMessageKey
-            )
+            ),
+            entryBuilder.stringField("chatPlus.copyMessage.separator", Config.values.copyMessageSeparator) { Config.values.copyMessageSeparator = it }
         )
     }
 

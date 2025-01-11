@@ -138,7 +138,7 @@ object ChatPlusScreenAdapter {
         if (rawMessage != newMessage) {
             sentMessage = splitChatMessage(rawMessage)[0]
         }
-        val messageToSend = messages[0]
+        val messageToSend = chatScreen.normalizeChatMessage(messages[0])
 
         if (EventBus.post(
                 ChatScreenSendMessagePostEvent(
