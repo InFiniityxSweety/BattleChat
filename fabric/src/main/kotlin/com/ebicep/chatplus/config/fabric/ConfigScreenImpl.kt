@@ -8,6 +8,7 @@ import com.ebicep.chatplus.features.FilterMessages.DEFAULT_COLOR
 import com.ebicep.chatplus.features.MovableChat.MOVABLE_CHAT_COLOR
 import com.ebicep.chatplus.features.chattabs.AutoTabCreator
 import com.ebicep.chatplus.features.chattabs.ChatTab
+import com.ebicep.chatplus.features.chattabs.ServerTabPattern
 import com.ebicep.chatplus.features.chatwindows.ChatWindow
 import com.ebicep.chatplus.features.chatwindows.OutlineSettings
 import com.ebicep.chatplus.features.internal.MessageFilter
@@ -394,6 +395,26 @@ object ConfigScreenImpl {
                             value.formatted
                         ) { value.formatted = it },
                         entryBuilder.stringField("chatPlus.chatWindow.tabSettings.chatTabs.autoPrefix", value.autoPrefix) { value.autoPrefix = it },
+                        getCustomListOption(
+                            "chatPlus.chatWindow.tabSettings.chatTabs.serverTabPatterns",
+                            value.serverTabPatterns,
+                            { value.serverTabPatterns = it },
+                            true,
+                            { ServerTabPattern("", "") },
+                            { v ->
+                                listOf(
+                                    entryBuilder.stringField("chatPlus.chatWindow.tabSettings.chatTabs.serverTabPattern", v.pattern) { v.pattern = it },
+                                    entryBuilder.stringField("chatPlus.chatWindow.tabSettings.chatTabs.pattern", v.chatPattern.pattern) { v.chatPattern.pattern = it },
+                                    entryBuilder.booleanToggle(
+                                        "chatPlus.chatWindow.tabSettings.chatTabs.formatted.toggle",
+                                        v.chatPattern.formatted
+                                    ) { v.chatPattern.formatted = it },
+                                    entryBuilder.stringField("chatPlus.chatWindow.tabSettings.chatTabs.autoPrefix", v.autoPrefix) { v.autoPrefix = it },
+                                )
+                            },
+                            { Component.literal(it.pattern) },
+                            false
+                        ),
                         entryBuilder.intField(
                             "chatPlus.chatWindow.tabSettings.chatTabs.priority",
                             value.priority
