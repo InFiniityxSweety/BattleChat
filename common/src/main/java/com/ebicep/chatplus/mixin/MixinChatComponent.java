@@ -8,21 +8,19 @@ import com.ebicep.chatplus.features.chattabs.ChatTab;
 import com.ebicep.chatplus.features.chattabs.SkipNewMessageEvent;
 import com.ebicep.chatplus.features.chatwindows.ChatWindowsManager;
 import com.ebicep.chatplus.hud.ChatManager;
-import com.llamalad7.mixinextras.sugar.Share;
-import com.llamalad7.mixinextras.sugar.ref.LocalRef;
+import com.llamalad7.mixinextras.sugar.Local;
+import net.minecraft.client.GuiMessage;
 import net.minecraft.client.GuiMessageTag;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ChatComponent;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.MessageSignature;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.ArrayList;
@@ -44,27 +42,18 @@ public class MixinChatComponent {
         ci.cancel();
     }
 
-    @ModifyArg(
-            method = "addMessageToDisplayQueue",
-            at = @At(value = "INVOKE", target = "Ljava/util/List;add(ILjava/lang/Object;)V"),
-            index = 0
-    )
-    private FormattedText components(FormattedText arg3, @Share("chatplus$component") LocalRef<Component> component) {
-        if (arg3 instanceof Component c) {
-            component.set(c);
-        }
-        return arg3;
-    }
-
     @Inject(method = "addMessage(Lnet/minecraft/network/chat/Component;Lnet/minecraft/network/chat/MessageSignature;Lnet/minecraft/client/GuiMessageTag;)V", at = @At("RETURN"))
-    public void addMessage(Component component, MessageSignature messageSignature, GuiMessageTag guiMessageTag,
+    public void addMessage(
+            Component component, MessageSignature messageSignature, GuiMessageTag guiMessageTag,
             CallbackInfo ci,
-            @Share("chatplus$component") LocalRef<Component> c
+            @Local GuiMessage guiMessage
     ) {
         if (!ChatPlus.INSTANCE.isEnabled() && !Config.INSTANCE.getValues().getAddMessagesIfDisabled()) {
             return;
         }
-        component = c.get();
+        component = guiMessage.content();
+        messageSignature = guiMessage.signature();
+        guiMessageTag = guiMessage.tag();
         List<ChatTab> addMessagesTo = new ArrayList<>();
 
         Integer lastPriority = null;
