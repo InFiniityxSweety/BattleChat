@@ -1,6 +1,7 @@
 package com.ebicep.chatplus.mixin;
 
 import com.ebicep.chatplus.ChatPlus;
+import com.ebicep.chatplus.config.Config;
 import com.ebicep.chatplus.events.EventBus;
 import com.ebicep.chatplus.features.chattabs.AddNewMessageEvent;
 import com.ebicep.chatplus.features.chattabs.ChatTab;
@@ -58,7 +59,7 @@ public class MixinChatComponent {
             CallbackInfo ci,
             @Share("chatplus$component") LocalRef<Component> c
     ) {
-        if (!ChatPlus.INSTANCE.isEnabled()) {
+        if (!ChatPlus.INSTANCE.isEnabled() && !Config.INSTANCE.getValues().getAddMessagesIfDisabled()) {
             return;
         }
         component = c.get();
