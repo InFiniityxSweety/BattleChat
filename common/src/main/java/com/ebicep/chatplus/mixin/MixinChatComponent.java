@@ -1,12 +1,15 @@
 package com.ebicep.chatplus.mixin;
 
 import com.ebicep.chatplus.ChatPlus;
+import com.ebicep.chatplus.config.Config;
 import com.ebicep.chatplus.events.EventBus;
 import com.ebicep.chatplus.features.chattabs.AddNewMessageEvent;
 import com.ebicep.chatplus.features.chattabs.ChatTab;
 import com.ebicep.chatplus.features.chattabs.SkipNewMessageEvent;
 import com.ebicep.chatplus.features.chatwindows.ChatWindowsManager;
 import com.ebicep.chatplus.hud.ChatManager;
+import com.llamalad7.mixinextras.sugar.Local;
+import net.minecraft.client.GuiMessage;
 import net.minecraft.client.GuiMessageTag;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -23,7 +26,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.util.ArrayList;
 import java.util.List;
 
-@Mixin(ChatComponent.class)
+@Mixin(value = ChatComponent.class, priority = Integer.MAX_VALUE)
 public class MixinChatComponent {
 
     @Final
@@ -40,10 +43,17 @@ public class MixinChatComponent {
     }
 
     @Inject(method = "addMessage(Lnet/minecraft/network/chat/Component;Lnet/minecraft/network/chat/MessageSignature;Lnet/minecraft/client/GuiMessageTag;)V", at = @At("RETURN"))
-    public void addMessage(Component component, MessageSignature messageSignature, GuiMessageTag guiMessageTag, CallbackInfo ci) {
-        if (!ChatPlus.INSTANCE.isEnabled()) {
+    public void addMessage(
+            Component component, MessageSignature messageSignature, GuiMessageTag guiMessageTag,
+            CallbackInfo ci,
+            @Local GuiMessage guiMessage
+    ) {
+        if (!ChatPlus.INSTANCE.isEnabled() && !Config.INSTANCE.getValues().getAddMessagesIfDisabled()) {
             return;
         }
+        component = guiMessage.content();
+        messageSignature = guiMessage.signature();
+        guiMessageTag = guiMessage.tag();
         List<ChatTab> addMessagesTo = new ArrayList<>();
 
         Integer lastPriority = null;
