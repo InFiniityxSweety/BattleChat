@@ -782,7 +782,13 @@ object ConfigScreenImpl {
                 "chatPlus.copyMessage.key",
                 Config.values.copyMessageKey
             ),
-            entryBuilder.stringField("chatPlus.copyMessage.separator", Config.values.copyMessageSeparator) { Config.values.copyMessageSeparator = it }
+            entryBuilder.stringField(
+                "chatPlus.copyMessage.separator",
+                Config.values.copyMessageSeparator.replace("\\", "\\\\")
+                    .replace("\n", "\\n")
+                    .replace("\t", "\\t")
+                    .replace("\r", "\\r")
+            ) { Config.values.copyMessageSeparator = it.translateEscapes() }
         )
     }
 
