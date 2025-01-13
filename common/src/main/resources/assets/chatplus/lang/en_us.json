@@ -28,6 +28,8 @@
   "chatPlus.chatSettings.toggle.tooltip": "Enables/Disables ChatPlus.",
   "chatPlus.chatSettings.addMessagesIfDisabled": "Add Messages If Disabled",
   "chatPlus.chatSettings.addMessagesIfDisabled.tooltip": "Enables/Disables adding messages to the ChatPlus chat if ChatPlus is disabled.",
+  "chatPlus.chatSettings.showVanillaWhenUnfocused": "Show Vanilla Chat When Unfocused",
+  "chatPlus.chatSettings.showVanillaWhenUnfocused.tooltip": "Enables/Disables showing the vanilla chat when unfocused.",
   "chatPlus.vanillaInputBox.toggle": "Vanilla Input Box",
   "chatPlus.vanillaInputBox.toggle.tooltip": "Enables/Disables using the vanilla input box appearance.",
   "chatPlus.chatSettings.wrappedMessageLineIndent": "Wrapped Message Line Indent",

@@ -113,6 +113,7 @@ data class ConfigVariables(
     // general
     var enabled: Boolean = true,
     var addMessagesIfDisabled: Boolean = false,
+    var showVanillaWhenUnfocused: Boolean = false,
     var vanillaInputBox: Boolean = false,
     var wrappedMessageLineIndent: Int = 0,
     var maxMessages: Int = -1,
