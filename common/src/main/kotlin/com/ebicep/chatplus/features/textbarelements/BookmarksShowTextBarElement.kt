@@ -1,35 +1,31 @@
 package com.ebicep.chatplus.features.textbarelements
 
+import com.ebicep.chatplus.config.Config
 import com.ebicep.chatplus.events.Event
-import com.ebicep.chatplus.events.EventBus
-import com.ebicep.chatplus.features.ScreenshotChat.SCREENSHOT_COLOR
-import com.ebicep.chatplus.features.ScreenshotChat.onCooldown
+import com.ebicep.chatplus.features.BookmarkMessages
 import com.ebicep.chatplus.mixin.IMixinScreen
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.gui.screens.ChatScreen
 
-class ScreenShotChatElement(private val chatPlusScreen: ChatScreen) : TextBarElement {
+class ShowBookmarksBarElement(private val chatPlusScreen: ChatScreen) : TextBarElement {
 
     override fun getWidth(): Int {
-        return Minecraft.getInstance().font.width("S")
+        return Minecraft.getInstance().font.width("B")
     }
 
     override fun getText(): String {
-        return "S"
+        return "B"
     }
 
     override fun onClick() {
-        if (onCooldown()) {
-            return
-        }
-        EventBus.post(ScreenShotChatEvent())
+        BookmarkMessages.toggle(chatPlusScreen)
     }
 
     override fun onHover(guiGraphics: GuiGraphics, pMouseX: Int, pMouseY: Int) {
         guiGraphics.renderTooltip(
             (chatPlusScreen as IMixinScreen).font,
-            tooltip("chatPlus.screenshotChat.tooltip"),
+            tooltip("chatPlus.bookmark.textBarElement"),
             pMouseX,
             pMouseY
         )
@@ -37,13 +33,12 @@ class ScreenShotChatElement(private val chatPlusScreen: ChatScreen) : TextBarEle
 
     override fun onRender(guiGraphics: GuiGraphics, currentX: Int, currentY: Int, mouseX: Int, mouseY: Int) {
         fill(guiGraphics, currentX, currentY)
-        val onCooldown = onCooldown()
-        drawCenteredString(guiGraphics, currentX, currentY, if (onCooldown) SCREENSHOT_COLOR else 0xFFFFFF)
-        if (onCooldown) {
-            renderOutline(guiGraphics, currentX, currentY, SCREENSHOT_COLOR)
+        drawCenteredString(guiGraphics, currentX, currentY, if (BookmarkMessages.showingBookmarks) Config.values.bookmarkColor else -1)
+        if (BookmarkMessages.showingBookmarks) {
+            renderOutline(guiGraphics, currentX, currentY, Config.values.bookmarkColor)
         }
     }
 
 }
 
-class ScreenShotChatEvent : Event
+data class ShowBookmarksToggleEvent(val enabled: Boolean) : Event

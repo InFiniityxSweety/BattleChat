@@ -6,7 +6,6 @@ import com.ebicep.chatplus.mixin.IMixinScreen
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.gui.screens.ChatScreen
-import net.minecraft.network.chat.Component
 
 class FindTextBarElement(private val chatPlusScreen: ChatScreen) : TextBarElement {
 
@@ -25,7 +24,7 @@ class FindTextBarElement(private val chatPlusScreen: ChatScreen) : TextBarElemen
     override fun onHover(guiGraphics: GuiGraphics, pMouseX: Int, pMouseY: Int) {
         guiGraphics.renderTooltip(
             (chatPlusScreen as IMixinScreen).font,
-            Component.translatable("chatPlus.findMessage.highlightInputBox.tooltip"),
+            tooltip("chatPlus.findMessage.highlightInputBox.tooltip"),
             pMouseX,
             pMouseY
         )

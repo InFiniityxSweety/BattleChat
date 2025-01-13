@@ -1,8 +1,11 @@
 package com.ebicep.chatplus.features.textbarelements
 
 import com.ebicep.chatplus.hud.ChatPlusScreen.EDIT_BOX_DISPLAY_HEIGHT
+import com.ebicep.chatplus.util.ComponentUtil
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.network.chat.Component
+import net.minecraft.util.FormattedCharSequence
 
 interface TextBarElement {
 
@@ -53,11 +56,15 @@ interface TextBarElement {
     fun renderOutline(guiGraphics: GuiGraphics, currentX: Int, currentY: Int, color: Int) {
         guiGraphics.renderOutline(
             currentX,
-            currentY,
+            currentY - 1,
             getPaddedWidth(),
             EDIT_BOX_DISPLAY_HEIGHT,
             color
         )
+    }
+
+    fun tooltip(translatable: String): List<FormattedCharSequence> {
+        return ComponentUtil.splitLines(Component.translatable(translatable)).map { it.visualOrderText }
     }
 
 }

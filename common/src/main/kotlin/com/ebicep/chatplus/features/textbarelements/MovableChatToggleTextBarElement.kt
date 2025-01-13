@@ -1,32 +1,30 @@
 package com.ebicep.chatplus.features.textbarelements
 
 import com.ebicep.chatplus.config.Config
-import com.ebicep.chatplus.events.Event
-import com.ebicep.chatplus.features.BookmarkMessages
+import com.ebicep.chatplus.features.MovableChat.MOVABLE_CHAT_COLOR
 import com.ebicep.chatplus.mixin.IMixinScreen
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.gui.screens.ChatScreen
-import net.minecraft.network.chat.Component
 
-class ShowBookmarksBarElement(private val chatPlusScreen: ChatScreen) : TextBarElement {
+class MovableChatToggleTextBarElement(private val chatPlusScreen: ChatScreen) : TextBarElement {
 
     override fun getWidth(): Int {
-        return Minecraft.getInstance().font.width("B")
+        return Minecraft.getInstance().font.width("M")
     }
 
     override fun getText(): String {
-        return "B"
+        return "M"
     }
 
     override fun onClick() {
-        BookmarkMessages.toggle(chatPlusScreen)
+        Config.values.movableChatEnabled = !Config.values.movableChatEnabled
     }
 
     override fun onHover(guiGraphics: GuiGraphics, pMouseX: Int, pMouseY: Int) {
         guiGraphics.renderTooltip(
             (chatPlusScreen as IMixinScreen).font,
-            Component.translatable("chatPlus.bookmark.textBarElement"),
+            tooltip("chatPlus.movableChat.textBarElement.toggle.tooltip"),
             pMouseX,
             pMouseY
         )
@@ -34,12 +32,10 @@ class ShowBookmarksBarElement(private val chatPlusScreen: ChatScreen) : TextBarE
 
     override fun onRender(guiGraphics: GuiGraphics, currentX: Int, currentY: Int, mouseX: Int, mouseY: Int) {
         fill(guiGraphics, currentX, currentY)
-        drawCenteredString(guiGraphics, currentX, currentY, if (BookmarkMessages.showingBookmarks) Config.values.bookmarkColor else -1)
-        if (BookmarkMessages.showingBookmarks) {
-            renderOutline(guiGraphics, currentX, currentY, Config.values.bookmarkColor)
+        drawCenteredString(guiGraphics, currentX, currentY, if (Config.values.movableChatEnabled) MOVABLE_CHAT_COLOR else -1)
+        if (Config.values.movableChatEnabled) {
+            renderOutline(guiGraphics, currentX, currentY, MOVABLE_CHAT_COLOR)
         }
     }
 
 }
-
-data class ShowBookmarksToggleEvent(val enabled: Boolean) : Event

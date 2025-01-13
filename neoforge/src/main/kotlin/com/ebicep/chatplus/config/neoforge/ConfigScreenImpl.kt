@@ -609,6 +609,10 @@ object ConfigScreenImpl {
                 "chatPlus.movableChat.selectedColor",
                 Config.values.movableChatSelectedColor
             ) { Config.values.movableChatSelectedColor = it },
+            entryBuilder.booleanToggle(
+                "chatPlus.movableChat.textBarElement.toggle",
+                Config.values.movableChatToggleTextBarElement
+            ) { Config.values.movableChatToggleTextBarElement = it },
         )
     }
 

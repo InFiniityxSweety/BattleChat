@@ -9,7 +9,6 @@ import com.ebicep.chatplus.mixin.IMixinScreen
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.gui.screens.ChatScreen
-import net.minecraft.network.chat.Component
 
 class TranslateSpeakTextBarElement(private val chatPlusScreen: ChatScreen) : TextBarElement {
 
@@ -40,7 +39,7 @@ class TranslateSpeakTextBarElement(private val chatPlusScreen: ChatScreen) : Tex
         chatPlusScreen as IMixinScreen
         guiGraphics.renderTooltip(
             chatPlusScreen.font,
-            Component.translatable("chatPlus.translator.translateSpeak.chat.tooltip"),
+            tooltip("chatPlus.translator.translateSpeak.chat.tooltip"),
             pMouseX,
             pMouseY
         )
