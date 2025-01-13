@@ -317,7 +317,7 @@ object ConfigScreenImpl {
                         getAutoTabCreatorCategory(entryBuilder, window).build()
                     )
                 },
-                { Component.literal("Window").withColor(it.generalSettings.backgroundColor) }
+                { Component.literal("Window").withStyle(ChatFormatting.GREEN) }
             )
         )
     }
