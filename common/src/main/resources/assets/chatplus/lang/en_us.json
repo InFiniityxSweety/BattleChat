@@ -32,6 +32,8 @@
   "chatPlus.chatSettings.showVanillaWhenUnfocused.tooltip": "Enables/Disables showing the vanilla chat when unfocused.",
   "chatPlus.vanillaInputBox.toggle": "Vanilla Input Box",
   "chatPlus.vanillaInputBox.toggle.tooltip": "Enables/Disables using the vanilla input box appearance.",
+  "chatPlus.saveInputBoxMessage.toggle": "Save Input Box Message",
+  "chatPlus.saveInputBoxMessage.toggle.tooltip": "Enables/Disables the input box prepopulating with the message it contained the last time you closed the chat.",
   "chatPlus.chatSettings.wrappedMessageLineIndent": "Wrapped Message Line Indent",
   "chatPlus.chatSettings.wrappedMessageLineIndent.tooltip": "Indentation of wrapped message lines.\nThis may cause some lines to overflow the width of the chat box.",
   "chatPlus.chatSettings.maxMessages": "Max Messages",

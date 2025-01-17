@@ -35,6 +35,7 @@ object FeatureManager {
         TimestampMessages
         ChatPadding
         WrappedMessageLineIndent
+        SaveInputBoxMessage
 //        AlternatingColorBackground
     }
 

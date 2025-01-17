@@ -115,6 +115,7 @@ data class ConfigVariables(
     var addMessagesIfDisabled: Boolean = false,
     var showVanillaWhenUnfocused: Boolean = false,
     var vanillaInputBox: Boolean = false,
+    var saveInputBoxMessage: Boolean = false,
     var wrappedMessageLineIndent: Int = 0,
     var maxMessages: Int = -1,
     var maxCommandSuggestions: Int = 15,

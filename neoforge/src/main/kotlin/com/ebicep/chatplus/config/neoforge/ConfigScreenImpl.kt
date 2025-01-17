@@ -75,6 +75,7 @@ object ConfigScreenImpl {
             entryBuilder.booleanToggle("chatPlus.chatSettings.addMessagesIfDisabled", Config.values.addMessagesIfDisabled) { Config.values.addMessagesIfDisabled = it },
             entryBuilder.booleanToggle("chatPlus.chatSettings.showVanillaWhenUnfocused", Config.values.showVanillaWhenUnfocused) { Config.values.showVanillaWhenUnfocused = it },
             entryBuilder.booleanToggle("chatPlus.vanillaInputBox.toggle", Config.values.vanillaInputBox) { Config.values.vanillaInputBox = it },
+            entryBuilder.booleanToggle("chatPlus.saveInputBoxMessage.toggle", Config.values.saveInputBoxMessage) { Config.values.saveInputBoxMessage = it },
             entryBuilder.intSlider(
                 "chatPlus.chatSettings.wrappedMessageLineIndent",
                 Config.values.wrappedMessageLineIndent,
