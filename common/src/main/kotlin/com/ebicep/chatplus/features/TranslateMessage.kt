@@ -119,7 +119,7 @@ object TranslateMessage {
                 if (Config.values.vanillaInputBox) 2 else 0,
                 height - EDIT_BOX_HEIGHT,
                 if (Config.values.vanillaInputBox) 63 else 65,
-                EDIT_BOX_DISPLAY_HEIGHT,
+                EDIT_BOX_DISPLAY_HEIGHT - (if (Config.values.vanillaInputBox) 0 else 1),
                 0xFF55FF55.toInt()
             )
             val mouseX = it.mouseX
