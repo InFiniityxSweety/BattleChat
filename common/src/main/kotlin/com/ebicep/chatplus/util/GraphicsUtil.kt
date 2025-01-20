@@ -262,7 +262,7 @@ object GraphicsUtil {
             this.pose().last().pose(),
             this.bufferSource(),
             Font.DisplayMode.NORMAL,
-            0,
+            0, // highlights text
             0xF000F0
         )
         this.callFlushIfUnmanaged()

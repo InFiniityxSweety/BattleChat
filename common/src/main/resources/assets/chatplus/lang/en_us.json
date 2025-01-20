@@ -170,6 +170,8 @@
   "chatPlus.chatWindow.generalSettings.messageAlignment.left": "Left",
   "chatPlus.chatWindow.generalSettings.messageAlignment.center": "Center",
   "chatPlus.chatWindow.generalSettings.messageAlignment.right": "Right",
+  "chatPlus.chatWindow.generalSettings.textShadow": "Text Shadow",
+  "chatPlus.chatWindow.generalSettings.textShadow.tooltip": "Enables/Disables the shadow effect of text.",
   "chatPlus.chatWindow.outlineSettings.outline": "Outline",
   "chatPlus.chatWindow.outlineSettings.outline.toggle": "Enabled",
   "chatPlus.chatWindow.outlineSettings.outline.toggle.tooltip": "Enables/Disables the outline of the chat window.",

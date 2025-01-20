@@ -567,6 +567,10 @@ object ConfigScreenImpl {
                 "chatPlus.chatWindow.generalSettings.textOpacity",
                 (window.generalSettings.textOpacity - .1f) / .9f
             ) { window.generalSettings.textOpacity = (it * .9f) + .1f },
+            entryBuilder.booleanToggle(
+                "chatPlus.chatWindow.generalSettings.textShadow",
+                window.generalSettings.textShadow
+            ) { window.generalSettings.textShadow = it },
             entryBuilder.percentSlider(
                 "chatPlus.chatWindow.generalSettings.unfocusedTextOpacityReduction",
                 1 - window.generalSettings.unfocusedTextOpacityMultiplier
@@ -588,7 +592,7 @@ object ConfigScreenImpl {
                 "chatPlus.chatWindow.generalSettings.messageDirection",
                 MessageDirection::class.java,
                 window.generalSettings.messageDirection
-            ) { window.generalSettings.messageDirection = it }
+            ) { window.generalSettings.messageDirection = it },
         )
     }
 
