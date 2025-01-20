@@ -810,17 +810,40 @@ object ConfigScreenImpl {
                 "chatPlus.screenshotChat.toggle",
                 Config.values.screenshotChatEnabled
             ) { Config.values.screenshotChatEnabled = it },
-            entryBuilder.linePriorityField("chatPlus.linePriority.screenshotChat", Config.values.screenshotChatLinePriority)
-            { Config.values.screenshotChatLinePriority = it },
-            entryBuilder.keyCodeOptionWithModifier("chatPlus.screenshotChat.line.key", Config.values.screenshotChatLine),
             entryBuilder.booleanToggle(
-                "chatPlus.screenshotChatTextBarElement.toggle",
-                Config.values.screenshotChatTextBarElementEnabled
-            ) { Config.values.screenshotChatTextBarElementEnabled = it },
+                "chatPlus.screenshotChatCopyToClipboard.toggle",
+                Config.values.screenshotChatCopyToClipboard
+            ) { Config.values.screenshotChatCopyToClipboard = it },
+            entryBuilder.booleanToggle(
+                "chatPlus.screenshotChatSaveToFile.toggle",
+                Config.values.screenshotChatSaveToFile
+            ) { Config.values.screenshotChatSaveToFile = it },
             entryBuilder.booleanToggle(
                 "chatPlus.screenshotChatAutoUpload.toggle",
                 Config.values.screenshotChatAutoUpload
-            ) { Config.values.screenshotChatAutoUpload = it }
+            ) { Config.values.screenshotChatAutoUpload = it },
+            entryBuilder.linePriorityField("chatPlus.linePriority.screenshotChat", Config.values.screenshotChatLinePriority)
+            { Config.values.screenshotChatLinePriority = it },
+            entryBuilder.keyCodeOptionWithModifier("chatPlus.screenshotChat.key", Config.values.screenshotChatKey),
+            entryBuilder.enumSelector(
+                "chatPlus.screenshotMode",
+                ScreenshotChat.ScreenshotMode::class.java,
+                Config.values.screenshotDefaultScreenShotMode
+            ) { Config.values.screenshotDefaultScreenShotMode = it },
+            entryBuilder.enumSelector(
+                "chatPlus.screenshotBackgroundMode",
+                ScreenshotChat.ScreenshotBackgroundMode::class.java,
+                Config.values.screenshotDefaultScreenBackgroundMode
+            ) { Config.values.screenshotDefaultScreenBackgroundMode = it },
+            entryBuilder.enumSelector(
+                "chatPlus.screenshotScreenShotWindowsMode",
+                ScreenshotChat.ScreenshotWindowsMode::class.java,
+                Config.values.screenshotDefaultScreenShotWindowsMode
+            ) { Config.values.screenshotDefaultScreenShotWindowsMode = it },
+            entryBuilder.booleanToggle(
+                "chatPlus.screenshotChatTextBarElement.toggle",
+                Config.values.screenshotChatTextBarElementEnabled
+            ) { Config.values.screenshotChatTextBarElementEnabled = it }
         )
     }
 

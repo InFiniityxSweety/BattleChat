@@ -10,10 +10,7 @@ import com.ebicep.chatplus.MOD_ID
 import com.ebicep.chatplus.config.migration.MigrationManager
 import com.ebicep.chatplus.config.serializers.KeySerializer
 import com.ebicep.chatplus.config.serializers.KeyWithModifier
-import com.ebicep.chatplus.features.CompactMessages
-import com.ebicep.chatplus.features.FilterMessages
-import com.ebicep.chatplus.features.HoverHighlight
-import com.ebicep.chatplus.features.InputOverFlowAutoFill
+import com.ebicep.chatplus.features.*
 import com.ebicep.chatplus.features.chattabs.TabNotificationSettings
 import com.ebicep.chatplus.features.chatwindows.ChatWindow
 import com.ebicep.chatplus.features.chatwindows.ChatWindowsManager.createDefaultWindow
@@ -188,10 +185,15 @@ data class ConfigVariables(
     var copyMessageSeparator: String = "\n",
     // screen shot chat
     var screenshotChatEnabled: Boolean = true,
-    var screenshotChatTextBarElementEnabled: Boolean = true,
-    var screenshotChatLinePriority: Int = 200,
-    var screenshotChatLine: KeyWithModifier = KeyWithModifier(InputConstants.getKey("key.keyboard.s"), 2),
+    var screenshotChatCopyToClipboard: Boolean = true,
+    var screenshotChatSaveToFile: Boolean = true, // TODO
     var screenshotChatAutoUpload: Boolean = true,
+    var screenshotChatLinePriority: Int = 200,
+    var screenshotChatKey: KeyWithModifier = KeyWithModifier(InputConstants.getKey("key.keyboard.s"), 2),
+    var screenshotDefaultScreenShotMode: ScreenshotChat.ScreenshotMode = ScreenshotChat.ScreenshotMode.CURRENT_WINDOW,
+    var screenshotDefaultScreenBackgroundMode: ScreenshotChat.ScreenshotBackgroundMode = ScreenshotChat.ScreenshotBackgroundMode.TRANSPARENT,
+    var screenshotDefaultScreenShotWindowsMode: ScreenshotChat.ScreenshotWindowsMode = ScreenshotChat.ScreenshotWindowsMode.SPLIT,
+    var screenshotChatTextBarElementEnabled: Boolean = true,
     // player head chat display
     var playerHeadChatDisplayEnabled: Boolean = true,
     var playerHeadChatDisplayShowOnWrapped: Boolean = false,

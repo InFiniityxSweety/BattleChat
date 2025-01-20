@@ -31,7 +31,10 @@ class TranslateSpeakTextBarElement(private val chatPlusScreen: ChatScreen) : Tex
         return Config.values.translateSpeak
     }
 
-    override fun onClick() {
+    override fun onClick(button: Int) {
+        if (button != 0) {
+            return
+        }
         toggleTranslateSpeak(chatPlusScreen)
     }
 

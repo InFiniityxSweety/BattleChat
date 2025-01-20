@@ -18,7 +18,7 @@ interface TextBarElement {
 
     fun getText(): String?
 
-    fun onClick()
+    fun onClick(button: Int)
 
     fun onHover(guiGraphics: GuiGraphics, pMouseX: Int, pMouseY: Int) {
 

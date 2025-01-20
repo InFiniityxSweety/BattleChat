@@ -18,7 +18,10 @@ class ShowBookmarksBarElement(private val chatPlusScreen: ChatScreen) : TextBarE
         return "B"
     }
 
-    override fun onClick() {
+    override fun onClick(button: Int) {
+        if (button != 0) {
+            return
+        }
         BookmarkMessages.toggle(chatPlusScreen)
     }
 
