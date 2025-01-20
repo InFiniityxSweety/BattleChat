@@ -61,6 +61,7 @@ object ConfigScreenImpl {
         addBookmarkOption(builder, entryBuilder)
         addFindMessageOption(builder, entryBuilder)
         addCopyMessageOption(builder, entryBuilder)
+        addDeleteMessageOption(builder, entryBuilder)
         addChatScreenShotOption(builder, entryBuilder)
         addPlayerHeadChatDisplayOption(builder, entryBuilder)
         addKeyBindOptions(builder, entryBuilder)
@@ -801,6 +802,19 @@ object ConfigScreenImpl {
                     .replace("\\t", "\t")
                     .replace("\\r", "\r")
             }
+        )
+    }
+
+    private fun addDeleteMessageOption(builder: ConfigBuilder, entryBuilder: ConfigEntryBuilder) {
+        builder.getOrCreateCategory(Component.translatable("chatPlus.deleteMessage.title").withColor(DeleteMessages.DEFAULT_COLOR)).with(
+            entryBuilder.booleanToggle(
+                "chatPlus.deleteMessage.toggle",
+                Config.values.deleteMessageEnabled
+            ) { Config.values.deleteMessageEnabled = it },
+            entryBuilder.keyCodeOptionWithModifier(
+                "chatPlus.deleteMessage.key",
+                Config.values.deleteMessageKey
+            ),
         )
     }
 

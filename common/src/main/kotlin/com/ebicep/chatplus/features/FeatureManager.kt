@@ -36,6 +36,7 @@ object FeatureManager {
         ChatPadding
         WrappedMessageLineIndent
         SaveInputBoxMessage
+        DeleteMessages
 //        AlternatingColorBackground
     }
 

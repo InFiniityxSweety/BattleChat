@@ -183,6 +183,9 @@ data class ConfigVariables(
     var copyMessageLinePriority: Int = 50,
     var copyNoFormatting: Boolean = true,
     var copyMessageSeparator: String = "\n",
+    // delete message
+    var deleteMessageEnabled: Boolean = true,
+    var deleteMessageKey: KeyWithModifier = KeyWithModifier(InputConstants.getKey("key.keyboard.d"), 2),
     // screen shot chat
     var screenshotChatEnabled: Boolean = true,
     var screenshotChatCopyToClipboard: Boolean = true,
