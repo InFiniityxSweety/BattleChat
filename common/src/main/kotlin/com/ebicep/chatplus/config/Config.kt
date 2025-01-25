@@ -116,9 +116,9 @@ data class ConfigVariables(
     var wrappedMessageLineIndent: Int = 0,
     var maxMessages: Int = -1,
     var maxCommandSuggestions: Int = 15,
-    var chatTimestampMode: TimestampMode = TimestampMode.HR_12_SECOND,
     var jumpToMessageMode: JumpToMessageMode = JumpToMessageMode.CURSOR,
     var selectChatLinePriority: Int = 100,
+    var timestampSettings: TimestampMessages.TimestampSettings = TimestampMessages.TimestampSettings(),
     var inputOverFlowAutoFillSettings: InputOverFlowAutoFill.InputOverFlowAutoFillSettings = InputOverFlowAutoFill.InputOverFlowAutoFillSettings(),
     // hide chat
     var hideChatEnabled: Boolean = false,

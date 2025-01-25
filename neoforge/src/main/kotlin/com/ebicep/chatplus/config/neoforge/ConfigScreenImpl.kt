@@ -94,17 +94,29 @@ object ConfigScreenImpl {
                 30
             ) { Config.values.maxCommandSuggestions = it },
             entryBuilder.enumSelector(
-                "chatPlus.chatSettings.chatTimestampMode",
-                TimestampMode::class.java,
-                Config.values.chatTimestampMode
-            ) { Config.values.chatTimestampMode = it },
-            entryBuilder.enumSelector(
                 "chatPlus.chatSettings.jumpToMessageMode",
                 JumpToMessageMode::class.java,
                 Config.values.jumpToMessageMode
             ) { Config.values.jumpToMessageMode = it },
             entryBuilder.linePriorityField("chatPlus.linePriority.selectChat", Config.values.selectChatLinePriority)
             { Config.values.selectChatLinePriority = it },
+            entryBuilder.startSubCategory(Component.translatable("chatPlus.chatSettings.timestampSettings")).with(
+                entryBuilder.booleanToggle(
+                    "chatPlus.chatSettings.timestampSettings.enabled",
+                    Config.values.timestampSettings.enabled
+                ) { Config.values.timestampSettings.enabled = it },
+                entryBuilder.stringField(
+                    "chatPlus.chatSettings.timestampSettings.format",
+                    Config.values.timestampSettings.timestampFormat,
+                    { Config.values.timestampSettings.timestampFormat = it },
+                    500
+                ),
+                entryBuilder.enumSelector(
+                    "chatPlus.chatSettings.timestampSettings.chatTimestampModeType",
+                    TimestampMessages.TimestampModeType::class.java,
+                    Config.values.timestampSettings.chatTimestampModeType
+                ) { Config.values.timestampSettings.chatTimestampModeType = it },
+            ).build(),
             entryBuilder.startSubCategory(Component.translatable("chatPlus.chatSettings.inputOverFlowAutoFill")).with(
                 entryBuilder.booleanToggle(
                     "chatPlus.chatSettings.inputOverFlowAutoFill.enabled",
@@ -392,13 +404,13 @@ object ConfigScreenImpl {
                 { ChatTab(window, "", "") },
                 { value ->
                     listOf(
-                        entryBuilder.stringField("chatPlus.chatWindow.tabSettings.chatTabs.name", value.name) { value.name = it },
-                        entryBuilder.stringField("chatPlus.chatWindow.tabSettings.chatTabs.pattern", value.pattern) { value.pattern = it },
+                        entryBuilder.stringField("chatPlus.chatWindow.tabSettings.chatTabs.name", value.name, { value.name = it }),
+                        entryBuilder.stringField("chatPlus.chatWindow.tabSettings.chatTabs.pattern", value.pattern, { value.pattern = it }),
                         entryBuilder.booleanToggle(
                             "chatPlus.chatWindow.tabSettings.chatTabs.formatted.toggle",
                             value.formatted
                         ) { value.formatted = it },
-                        entryBuilder.stringField("chatPlus.chatWindow.tabSettings.chatTabs.autoPrefix", value.autoPrefix) { value.autoPrefix = it },
+                        entryBuilder.stringField("chatPlus.chatWindow.tabSettings.chatTabs.autoPrefix", value.autoPrefix, { value.autoPrefix = it }),
                         getCustomListOption(
                             "chatPlus.chatWindow.tabSettings.chatTabs.serverTabPatterns",
                             value.serverTabPatterns,
@@ -407,13 +419,13 @@ object ConfigScreenImpl {
                             { ServerTabPattern("", "") },
                             { v ->
                                 listOf(
-                                    entryBuilder.stringField("chatPlus.chatWindow.tabSettings.chatTabs.serverTabPattern", v.pattern) { v.pattern = it },
-                                    entryBuilder.stringField("chatPlus.chatWindow.tabSettings.chatTabs.pattern", v.chatPattern.pattern) { v.chatPattern.pattern = it },
+                                    entryBuilder.stringField("chatPlus.chatWindow.tabSettings.chatTabs.serverTabPattern", v.pattern, { v.pattern = it }),
+                                    entryBuilder.stringField("chatPlus.chatWindow.tabSettings.chatTabs.pattern", v.chatPattern.pattern, { v.chatPattern.pattern = it }),
                                     entryBuilder.booleanToggle(
                                         "chatPlus.chatWindow.tabSettings.chatTabs.formatted.toggle",
                                         v.chatPattern.formatted
                                     ) { v.chatPattern.formatted = it },
-                                    entryBuilder.stringField("chatPlus.chatWindow.tabSettings.chatTabs.autoPrefix", v.autoPrefix) { v.autoPrefix = it },
+                                    entryBuilder.stringField("chatPlus.chatWindow.tabSettings.chatTabs.autoPrefix", v.autoPrefix, { v.autoPrefix = it }),
                                 )
                             },
                             { Component.literal(it.pattern) },
@@ -463,16 +475,19 @@ object ConfigScreenImpl {
                     autoTabOptions.with(
                         entryBuilder.stringField(
                             "chatPlus.chatWindow.autoTabCreator.autoTabOptions.regexFormatter",
-                            value.regexFormatter
-                        ) { value.regexFormatter = it },
+                            value.regexFormatter,
+                            { value.regexFormatter = it }
+                        ),
                         entryBuilder.stringField(
                             "chatPlus.chatWindow.autoTabCreator.autoTabOptions.tabNameFormatter",
-                            value.tabNameFormatter
-                        ) { value.tabNameFormatter = it },
+                            value.tabNameFormatter,
+                            { value.tabNameFormatter = it }
+                        ),
                         entryBuilder.stringField(
                             "chatPlus.chatWindow.autoTabCreator.autoTabOptions.autoPrefixFormatter",
-                            value.autoPrefixFormatter
-                        ) { value.autoPrefixFormatter = it },
+                            value.autoPrefixFormatter,
+                            { value.autoPrefixFormatter = it }
+                        ),
                         entryBuilder.intField(
                             "chatPlus.chatWindow.autoTabCreator.autoTabOptions.priority",
                             value.priority
@@ -501,8 +516,9 @@ object ConfigScreenImpl {
                         ) { value.skipOthersOnCreation = it },
                         entryBuilder.stringField(
                             "chatPlus.chatWindow.autoTabCreator.autoTabOptions.pattern",
-                            value.pattern
-                        ) { value.pattern = it },
+                            value.pattern,
+                            { value.pattern = it }
+                        ),
                         entryBuilder.booleanToggle(
                             "chatPlus.chatWindow.autoTabCreator.autoTabOptions.formatted.toggle",
                             value.formatted
@@ -641,8 +657,9 @@ object ConfigScreenImpl {
                     soundCategory.add(
                         entryBuilder.stringField(
                             "chatPlus.messageFilter.sound.sound",
-                            value.sound.sound
-                        ) { value.sound.sound = it }
+                            value.sound.sound,
+                            { value.sound.sound = it }
+                        )
                     )
                     soundCategory.add(
                         entryBuilder.enumSelector(
@@ -667,8 +684,9 @@ object ConfigScreenImpl {
                     listOf(
                         entryBuilder.stringField(
                             "chatPlus.messageFilter.pattern",
-                            value.pattern
-                        ) { value.pattern = it },
+                            value.pattern,
+                            { value.pattern = it }
+                        ),
                         entryBuilder.booleanToggle(
                             "chatPlus.messageFilter.formatted.toggle",
                             value.formatted
@@ -747,7 +765,7 @@ object ConfigScreenImpl {
                 { MessageFilterFormatted("") },
                 { value ->
                     listOf(
-                        entryBuilder.stringField("chatPlus.bookmark.auto.pattern", value.pattern) { value.pattern = it },
+                        entryBuilder.stringField("chatPlus.bookmark.auto.pattern", value.pattern, { value.pattern = it }),
                         entryBuilder.booleanToggle(
                             "chatPlus.messageFilter.formatted.toggle",
                             value.formatted
@@ -799,13 +817,14 @@ object ConfigScreenImpl {
                 Config.values.copyMessageSeparator.replace("\\", "\\\\")
                     .replace("\n", "\\n")
                     .replace("\t", "\\t")
-                    .replace("\r", "\\r")
-            ) {
-                Config.values.copyMessageSeparator = it.replace("\\\\", "\\")
-                    .replace("\\n", "\n")
-                    .replace("\\t", "\t")
-                    .replace("\\r", "\r")
-            }
+                    .replace("\r", "\\r"),
+                {
+                    Config.values.copyMessageSeparator = it.replace("\\\\", "\\")
+                        .replace("\\n", "\n")
+                        .replace("\\t", "\t")
+                        .replace("\\r", "\r")
+                }
+            )
         )
     }
 
@@ -954,7 +973,7 @@ object ConfigScreenImpl {
                 { MessageFilter("") },
                 { value ->
                     listOf(
-                        entryBuilder.stringField("chatPlus.bookmark.auto.pattern", value.pattern) { value.pattern = it }
+                        entryBuilder.stringField("chatPlus.bookmark.auto.pattern", value.pattern, { value.pattern = it })
                     )
                 },
                 { Component.literal(it.regex.toString()) }
@@ -1051,10 +1070,10 @@ object ConfigScreenImpl {
     }
 
 
-    private fun ConfigEntryBuilder.stringField(translatable: String, variable: String, saveConsumer: Consumer<String>): StringListEntry {
+    private fun ConfigEntryBuilder.stringField(translatable: String, variable: String, saveConsumer: Consumer<String>, maxWidth: Int? = null): StringListEntry {
         return startStrField(Component.translatable(translatable), variable)
             .setDefaultValue(variable)
-            .setTooltip(Optional.of(ComponentUtil.splitLines(Component.translatable("$translatable.tooltip")).toTypedArray()))
+            .setTooltip(Optional.of(ComponentUtil.splitLines(Component.translatable("$translatable.tooltip"), maxWidth).toTypedArray()))
             .setSaveConsumer {
                 saveConsumer.accept(it)
                 queueUpdateConfig = true
