@@ -32,10 +32,8 @@ object SaveInputBoxMessage {
                 lastMessage = screen.input.value
             }
         }
-        EventBus.register<ChatScreenSendMessagePostEvent>({ -5 }) {
-            if (!it.dontSendMessage) {
-                saveLastMessage = false
-            }
+        EventBus.register<ChatScreenSendMessagePostEvent>({ 10 }) {
+            saveLastMessage = false // dont save message if sent/consumed
         }
     }
 

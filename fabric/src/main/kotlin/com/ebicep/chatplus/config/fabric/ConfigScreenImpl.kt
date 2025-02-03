@@ -6,6 +6,7 @@ import com.ebicep.chatplus.config.serializers.KeyWithModifier
 import com.ebicep.chatplus.features.*
 import com.ebicep.chatplus.features.FilterMessages.DEFAULT_COLOR
 import com.ebicep.chatplus.features.MovableChat.MOVABLE_CHAT_COLOR
+import com.ebicep.chatplus.features.SendNote.NOTE_COLOR
 import com.ebicep.chatplus.features.chattabs.AutoTabCreator
 import com.ebicep.chatplus.features.chattabs.ChatTab
 import com.ebicep.chatplus.features.chattabs.ServerTabPattern
@@ -56,6 +57,7 @@ object ConfigScreenImpl {
         addAnimationOption(builder, entryBuilder)
         addMovableChatOption(builder, entryBuilder)
         addChatWindowsTabsOption(builder, entryBuilder)
+        addSendNoteOption(builder, entryBuilder)
         addMessageFilterOption(builder, entryBuilder)
         addHoverHighlightOption(builder, entryBuilder)
         addBookmarkOption(builder, entryBuilder)
@@ -713,8 +715,39 @@ object ConfigScreenImpl {
         )
     }
 
+    private fun addSendNoteOption(builder: ConfigBuilder, entryBuilder: ConfigEntryBuilder) {
+        builder.getOrCreateCategory(Component.translatable("chatPlus.sendNote.title").withColor(NOTE_COLOR)).with(
+            entryBuilder.booleanToggle(
+                "chatPlus.sendNote.toggle",
+                Config.values.sendNoteEnabled
+            ) { Config.values.sendNoteEnabled = it },
+            entryBuilder.keyCodeOptionWithModifier("chatPlus.sendNote.key", Config.values.sendNoteKey),
+            entryBuilder.enumSelector(
+                "chatPlus.sendNote.clickMode",
+                SendNote.NoteClickMode::class.java,
+                Config.values.sendNoteClickMode
+            ) { Config.values.sendNoteClickMode = it },
+            entryBuilder.enumSelector(
+                "chatPlus.sendNote.selectMode",
+                SendNote.NoteSelectMode::class.java,
+                Config.values.sendNoteSelectMode
+            ) { Config.values.sendNoteSelectMode = it },
+            entryBuilder.keyCodeOption("chatPlus.sendNote.selectKey", Config.values.sendNoteSelectKey) { Config.values.sendNoteSelectKey = it },
+            entryBuilder.enumSelector(
+                "chatPlus.sendNote.selectModeKey",
+                SendNote.NoteSelectMode::class.java,
+                Config.values.sendNoteSelectModeKey
+            ) { Config.values.sendNoteSelectModeKey = it },
+            entryBuilder.booleanToggle(
+                "chatPlus.sendNote.textBarElement.toggle",
+                Config.values.sendNoteTextBarElementEnabled
+            ) { Config.values.sendNoteTextBarElementEnabled = it }
+        )
+    }
+
     private fun addHoverHighlightOption(builder: ConfigBuilder, entryBuilder: ConfigEntryBuilder) {
-        builder.getOrCreateCategory(Component.translatable("chatPlus.hoverHighlight.title").withColor(Config.values.hoverHighlightColor)).with(
+        val color = if (Config.values.hoverHighlightMode == HoverHighlight.HighlightMode.CUSTOM_COLOR) Config.values.hoverHighlightColor else 0xDDDDDD
+        builder.getOrCreateCategory(Component.translatable("chatPlus.hoverHighlight.title").withColor(color)).with(
             entryBuilder.booleanToggle(
                 "chatPlus.hoverHighlight.toggle",
                 Config.values.hoverHighlightEnabled

@@ -16,10 +16,11 @@ class TranslateSpeakTextBarElement(private val chatPlusScreen: ChatScreen) : Tex
         fun toggleTranslateSpeak(chatPlusScreen: ChatScreen) {
             languageSpeakEnabled = !languageSpeakEnabled
             EventBus.post(TranslateToggleEvent(languageSpeakEnabled))
-            chatPlusScreen as IMixinChatScreen
-            chatPlusScreen.initial = chatPlusScreen.input!!.value
             chatPlusScreen as IMixinScreen
+            chatPlusScreen as IMixinChatScreen
+            val lastInput = chatPlusScreen.input!!.value
             chatPlusScreen.callRebuildWidgets()
+            chatPlusScreen.input.value = lastInput
         }
     }
 

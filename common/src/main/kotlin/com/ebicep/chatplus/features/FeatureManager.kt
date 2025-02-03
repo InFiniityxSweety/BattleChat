@@ -37,6 +37,7 @@ object FeatureManager {
         WrappedMessageLineIndent
         SaveInputBoxMessage
         DeleteMessages
+        SendNote
 //        AlternatingColorBackground
     }
 

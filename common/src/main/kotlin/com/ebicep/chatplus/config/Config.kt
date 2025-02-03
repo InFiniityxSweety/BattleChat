@@ -154,7 +154,15 @@ data class ConfigVariables(
     var movableChatToggleKey: InputConstants.Key = InputConstants.getKey("key.keyboard.right.control"),
     var movableChatColor: Int = Color(255, 255, 255, 200).rgb,
     var movableChatSelectedColor: Int = Color(0, 255, 0, 200).rgb,
-    var movableChatToggleTextBarElement: Boolean = false,
+    var movableChatToggleTextBarElement: Boolean = false, // TODO add enabled
+    // notes
+    var sendNoteEnabled: Boolean = true,
+    var sendNoteKey: KeyWithModifier = KeyWithModifier(InputConstants.getKey("key.keyboard.enter"), 4),
+    var sendNoteClickMode: SendNote.NoteClickMode = SendNote.NoteClickMode.APPEND_INPUT,
+    var sendNoteSelectMode: SendNote.NoteSelectMode = SendNote.NoteSelectMode.LINE,
+    var sendNoteSelectKey: InputConstants.Key = InputConstants.getKey("key.keyboard.left.shift"),
+    var sendNoteSelectModeKey: SendNote.NoteSelectMode = SendNote.NoteSelectMode.WHOLE_MESSAGE,
+    var sendNoteTextBarElementEnabled: Boolean = true,
     // filter highlight
     var filterMessagesEnabled: Boolean = true,
     var filterMessagesLinePriority: Int = 150,

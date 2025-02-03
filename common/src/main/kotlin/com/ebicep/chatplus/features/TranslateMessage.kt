@@ -166,12 +166,16 @@ object TranslateMessage {
             languageSpeakEnabled = true
             EventResult.interruptTrue()
         }
+        var translateKeyPressed = false
         EventBus.register<ChatScreenKeyPressedEvent> {
-            if (Config.values.translateToggleKey.isDown()) {
+            if (Config.values.translateToggleKey.isDown() && !translateKeyPressed) {
+                translateKeyPressed = true
                 TranslateSpeakTextBarElement.toggleTranslateSpeak(it.screen)
             }
         }
-
+        EventBus.register<ChatScreenKeyReleasedEvent> {
+            translateKeyPressed = false
+        }
         var translateClickCooldown = 0L
         EventBus.register<ChatScreenMouseClickedEvent>({ 100 }) {
             if (!Config.values.translatorEnabled || !Config.values.translateClickEnabled) {

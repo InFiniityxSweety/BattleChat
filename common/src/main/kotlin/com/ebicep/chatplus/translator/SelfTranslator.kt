@@ -23,7 +23,7 @@ class SelfTranslator(val toTranslate: String, val prefix: String) : Thread() {
                     connection.sendChat(translatedMessage)
                 }
             } else if (prefix.startsWith("/")) {
-                connection.sendCommand("${prefix.substring(1)} $translatedMessage")
+                connection.sendCommand("${prefix.substring(1).trim()}$translatedMessage")
             } else {
                 connection.sendChat("$prefix $translatedMessage")
             }
