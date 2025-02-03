@@ -366,7 +366,7 @@
   "chatPlus.findMessage.key.tooltip": "Shortcut to toggling finding message.",
   "chatPlus.copyMessage.title": "Copy Message",
   "chatPlus.copyMessage.noFormatting.toggle": "Copy Unformatted",
-  "chatPlus.copyMessage.noFormatting.toggle.tooltip": "Enable/Disable removing formatting when copying messages, relevant for older servers that use formatting codes.",
+  "chatPlus.copyMessage.noFormatting.toggle.tooltip": "Default copy mode, relevant for older servers that use formatting codes. Using shift while copying will copy using the other mode (formatted/unformatted).",
   "chatPlus.copyMessage.key": "Copy Message Shortcut",
   "chatPlus.copyMessage.key.tooltip": "Copies currently selected messages or message hovered over.",
   "chatPlus.copyMessage.separator": "Separator",
