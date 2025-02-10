@@ -5,7 +5,6 @@ import com.ebicep.chatplus.features.FindMessage
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.gui.screens.ChatScreen
-import net.minecraft.network.chat.Component
 
 class FindTextBarElement(private val chatPlusScreen: ChatScreen) : TextBarElement {
 
@@ -17,14 +16,17 @@ class FindTextBarElement(private val chatPlusScreen: ChatScreen) : TextBarElemen
         return "F"
     }
 
-    override fun onClick() {
+    override fun onClick(button: Int) {
+        if (button != 0) {
+            return
+        }
         FindMessage.toggle(chatPlusScreen)
     }
 
     override fun onHover(guiGraphics: GuiGraphics, pMouseX: Int, pMouseY: Int) {
         guiGraphics.renderTooltip(
             chatPlusScreen.font,
-            Component.translatable("chatPlus.findMessage.highlightInputBox.tooltip"),
+            tooltip("chatPlus.findMessage.highlightInputBox.tooltip"),
             pMouseX,
             pMouseY
         )

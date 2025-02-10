@@ -2,13 +2,13 @@ import net.fabricmc.loom.api.LoomGradleExtensionAPI
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 
+
 buildscript {
     repositories { mavenCentral() }
 
     dependencies {
-        val kotlinVersion = "2.1.0"
-        classpath(kotlin("gradle-plugin", version = kotlinVersion))
-        classpath(kotlin("serialization", version = kotlinVersion))
+        classpath(kotlin("gradle-plugin", version = "2.1.0"))
+        classpath(kotlin("serialization", version = "2.1.0"))
     }
 }
 
@@ -68,7 +68,8 @@ allprojects {
 
     dependencies {
         compileOnly("org.jetbrains.kotlin:kotlin-stdlib")
-        implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.0-RC")
+        implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.0")
+        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.1")
         implementation("net.java.dev.jna:jna:5.14.0")
         implementation("com.alphacephei:vosk:0.3.45")
         compileOnly("io.github.llamalad7:mixinextras-common:0.3.6")
