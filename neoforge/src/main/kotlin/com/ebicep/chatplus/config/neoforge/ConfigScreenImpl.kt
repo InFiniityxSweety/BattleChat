@@ -846,6 +846,11 @@ object ConfigScreenImpl {
                 Config.values.copyMessageKey
             ),
             entryBuilder.stringField(
+                "chatPlus.copyMessage.formattingSymbolOverride",
+                Config.values.copyMessageFormattingSymbolOverride,
+                { Config.values.copyMessageFormattingSymbolOverride = it }
+            ),
+            entryBuilder.stringField(
                 "chatPlus.copyMessage.separator",
                 Config.values.copyMessageSeparator.replace("\\", "\\\\")
                     .replace("\n", "\\n")

@@ -190,6 +190,7 @@ data class ConfigVariables(
     var copyMessageKey: KeyWithModifier = KeyWithModifier(InputConstants.getKey("key.keyboard.c"), 2),
     var copyMessageLinePriority: Int = 50,
     var copyNoFormatting: Boolean = true,
+    var copyMessageFormattingSymbolOverride: String = "",
     var copyMessageSeparator: String = "\n",
     // delete message
     var deleteMessageEnabled: Boolean = true,
