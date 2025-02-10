@@ -7,13 +7,14 @@
     "AWTHackMixin",
     "IMixinChatScreen",
     "IMixinGuiGraphics",
+    "IMixinNativeImage",
     "IMixinScreen",
     "MixinChatComponent",
     "MixinChatScreen",
     "MixinGuiGraphics",
+    "MixinNativeImage",
     "MixinScreen",
-    "MixinServerList",
-    "NativeImagePointerAccessor"
+    "MixinServerList"
   ],
   "mixins": [
   ],

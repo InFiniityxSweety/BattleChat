@@ -16,6 +16,7 @@ import com.ebicep.chatplus.features.textbarelements.AddTextBarElementEvent
 import com.ebicep.chatplus.features.textbarelements.ScreenShotChatElement
 import com.ebicep.chatplus.features.textbarelements.ScreenShotChatEvent
 import com.ebicep.chatplus.hud.*
+import com.ebicep.chatplus.mixin.IMixinNativeImage
 import com.ebicep.chatplus.util.GraphicsUtil.createPose
 import com.ebicep.chatplus.util.GraphicsUtil.drawString0
 import com.ebicep.chatplus.util.GraphicsUtil.fill0
@@ -40,6 +41,7 @@ import net.minecraft.network.chat.ClickEvent
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.HoverEvent
 import net.minecraft.network.chat.Style
+import org.lwjgl.stb.STBImage
 import java.awt.Color
 import java.awt.Image
 import java.awt.Toolkit
@@ -54,6 +56,7 @@ import java.io.*
 import java.net.HttpURLConnection
 import java.net.URL
 import java.net.URLEncoder
+import java.nio.channels.Channels
 import java.util.*
 import javax.imageio.ImageIO
 
@@ -182,9 +185,9 @@ object ScreenshotChat {
             ScreenshotWindowsMode.STACK -> linesOrdered.map { it.value }.flatten().size * lineHeight
             ScreenshotWindowsMode.SPLIT -> linesOrdered.maxOf { it.value.size } * lineHeight
         }
-        val renderTarget: RenderTarget = TextureTarget(width.toInt(), height.toInt(), true, false)
+        val renderTarget: RenderTarget = TextureTarget(width.toInt(), height.toInt(), true)
         renderTarget.setClearColor(TRANSPARENCY_COLOR.red / 255f, TRANSPARENCY_COLOR.green / 255f, TRANSPARENCY_COLOR.blue / 255f, 0f)
-        renderTarget.clear(false)
+        renderTarget.clear()
         renderTarget.bindWrite(false)
         val minecraft = Minecraft.getInstance()
         val guiGraphics = GuiGraphics(minecraft, minecraft.renderBuffers().bufferSource())
@@ -319,7 +322,7 @@ object ScreenshotChat {
     }
 
     private fun getImage(nativeImage: NativeImage): Image {
-        val imageProducer: ImageProducer = ImageIO.read(ByteArrayInputStream(nativeImage.asByteArray())).source
+        val imageProducer: ImageProducer = ImageIO.read(ByteArrayInputStream(asByteArray(nativeImage))).source
         return Toolkit.getDefaultToolkit().createImage(
             FilteredImageSource(
                 imageProducer,
@@ -333,6 +336,19 @@ object ScreenshotChat {
                 }
             )
         )
+    }
+
+    @Throws(IOException::class)
+    fun asByteArray(nativeImage: NativeImage): ByteArray {
+        nativeImage as IMixinNativeImage
+        ByteArrayOutputStream().use { byteArrayOutputStream ->
+            Channels.newChannel(byteArrayOutputStream).use { writableByteChannel ->
+                if (!nativeImage.callWriteToChannel(writableByteChannel)) {
+                    throw IOException("Could not write image to byte array: ${STBImage.stbi_failure_reason()}")
+                }
+            }
+            return byteArrayOutputStream.toByteArray()
+        }
     }
 
     private fun getTransferableImage(bufferedImage: BufferedImage): Transferable {

@@ -2,7 +2,6 @@ package com.ebicep.chatplus.features.textbarelements
 
 import com.ebicep.chatplus.config.Config
 import com.ebicep.chatplus.features.MovableChat.MOVABLE_CHAT_COLOR
-import com.ebicep.chatplus.mixin.IMixinScreen
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.gui.screens.ChatScreen
@@ -26,7 +25,7 @@ class MovableChatToggleTextBarElement(private val chatPlusScreen: ChatScreen) : 
 
     override fun onHover(guiGraphics: GuiGraphics, pMouseX: Int, pMouseY: Int) {
         guiGraphics.renderTooltip(
-            (chatPlusScreen as IMixinScreen).font,
+            chatPlusScreen.font,
             tooltip("chatPlus.movableChat.textBarElement.toggle.tooltip"),
             pMouseX,
             pMouseY
