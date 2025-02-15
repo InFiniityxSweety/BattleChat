@@ -1,20 +1,19 @@
 package com.ebicep.chatplus
 
 import com.ebicep.chatplus.config.Config
-import com.ebicep.chatplus.events.EventBus.post
 import com.ebicep.chatplus.events.Events
 import com.ebicep.chatplus.features.FeatureManager
-import com.ebicep.chatplus.features.chattabs.AddNewMessageEvent
-import com.ebicep.chatplus.features.chattabs.ChatTab
-import com.ebicep.chatplus.features.chattabs.SkipNewMessageEvent
-import com.ebicep.chatplus.hud.ChatManager.globalSortedTabs
 import com.ebicep.chatplus.translator.LanguageManager
-import com.ebicep.chatplus.util.ComponentUtil.withColor
+import com.mojang.blaze3d.platform.NativeImage
 import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
+import net.minecraft.client.Screenshot
+import net.minecraft.client.renderer.texture.DynamicTexture
 import net.minecraft.network.chat.Component
+import net.minecraft.resources.ResourceLocation
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
+import java.io.File
 
 const val MOD_ID = "chatplus"
 const val MOD_COLOR = 0xFF12e3DB.toInt()
@@ -36,57 +35,101 @@ object ChatPlus {
     }
 
     fun doTest() {
-        val component = Component.literal("[You -> Bob_123] hello")
-//        val component = Component.literal("[Bob_123 -> You] hello")
-//        val component = Component.literal("[GameManager] hello")
-        val addMessagesTo: MutableList<ChatTab> = ArrayList()
-        var lastPriority: Int? = null
-        for (chatTab in globalSortedTabs) {
-            val priority = chatTab.priority
-            val alwaysAdd = chatTab.alwaysAdd
-            if (lastPriority != null && lastPriority > priority && !alwaysAdd) {
-                continue
-            }
-            if (chatTab.matches(component.string)) {
-                addMessagesTo.add(chatTab)
-                if (chatTab.skipOthers) {
-                    break
-                }
-                if (!alwaysAdd) {
-                    lastPriority = priority
-                }
-            }
-        }
-        if (!addMessagesTo.isEmpty()) {
-            val messageEvent = AddNewMessageEvent(
-                component.copy(),
-                component,
-                null,
-                null,
-                Minecraft.getInstance().gui.guiTicks,
-                null,
-            )
-            post(AddNewMessageEvent::class.java, messageEvent)
-            if (messageEvent.returnFunction) {
-                return
-            }
-            for (chatTab in addMessagesTo) {
-                chatTab.addNewMessage(messageEvent)
-            }
-        } else {
-            val messageEvent = SkipNewMessageEvent(
-                component.copy(),
-                component,
-                null,
-                null,
-                Minecraft.getInstance().gui.guiTicks,
-                null,
-            )
-            post(SkipNewMessageEvent::class.java, messageEvent)
-        }
-        for (i in 1..500_000) {
-//            ChatManager.globalSelectedTab.addNewMessage(Component.literal("Test $i"), null, 0, null)
-        }
+    }
+
+    fun renderTest2() {
+        Minecraft.getInstance().mainRenderTarget.unbindWrite()
+        val nativeImage: NativeImage = Screenshot.takeScreenshot(Minecraft.getInstance().mainRenderTarget)
+        val dynamicTexture = DynamicTexture(nativeImage)
+        dynamicTexture.dumpContents(
+            ResourceLocation.fromNamespaceAndPath(MOD_ID, "test3"),
+            File(Minecraft.getInstance().gameDirectory, Screenshot.SCREENSHOT_DIR).toPath()
+        )
+    }
+
+    fun renderTest() {
+//        LOGGER.info("Rendering test")
+//        val minecraft = Minecraft.getInstance()
+//        val TRANSPARENCY_COLOR = Color(54, 57, 63, 255)
+//        val width = 1000f
+//        val height = 500f
+//        RenderSystem.disableDepthTest()
+//
+////        val renderTarget: RenderTarget = TextureTarget(width.toInt(), height.toInt(), false)
+//        renderTarget.setClearColor(TRANSPARENCY_COLOR.red / 255f, TRANSPARENCY_COLOR.green / 255f, TRANSPARENCY_COLOR.blue / 255f, 0f)
+////        renderTarget.clear()
+//
+//        GlStateManager._glBindFramebuffer(GL30C.GL_DRAW_FRAMEBUFFER_BINDING, renderTarget.frameBufferId)
+//
+//        renderTarget.bindWrite(true)
+////        RenderSystem.setShader(CoreShaders.POSITION_COLOR_TEX_LIGHTMAP)
+////        RenderSystem.setShaderTexture(0, renderTarget.colorTextureId)
+//        LOGGER.info("Render target: ${renderTarget.frameBufferId}")
+//        LOGGER.info("Render target: ${renderTarget.colorTextureId}")
+//        LOGGER.info("Render target: ${renderTarget.depthTextureId}")
+//
+////        RenderSystem.enableBlend()
+////        RenderSystem.defaultBlendFunc()
+////        RenderSystem.setShader(CoreShaders.POSITION_COLOR_TEX_LIGHTMAP)
+////        RenderSystem.setShaderTexture(0, renderTarget.colorTextureId)
+////
+//
+//
+////        val window: Window = minecraft.window
+////        RenderSystem.clear(256)
+////        val matrix4f = (Matrix4f()).setOrtho(
+////            0.0f,
+////            (width.toDouble() / window.guiScale).toFloat(),
+////            (height.toDouble() / window.guiScale).toFloat(),
+////            0.0f,
+////            1000.0f,
+////            21000.0f
+////        )
+////        RenderSystem.setProjectionMatrix(matrix4f, ProjectionType.ORTHOGRAPHIC)
+////        val matrix4fStack = RenderSystem.getModelViewStack()
+////        matrix4fStack.pushMatrix()
+////        matrix4fStack.translation(0.0f, 0.0f, -11000.0f)
+////
+////        val guiGraphics = GuiGraphics(minecraft, minecraft.renderBuffers().bufferSource())
+////        val poseStack = guiGraphics.pose()
+////        poseStack.scale((minecraft.window.guiScaledWidth / width).toFloat(), (minecraft.window.guiScaledHeight / height).toFloat(), 1f)
+////        poseStack.pushPose()
+////        guiGraphics.fill(0, 0, 100, 100, Color(255, 0, 0, 255).rgb)
+////        poseStack.guiForward()
+////        guiGraphics.drawString(
+////            Minecraft.getInstance().font,
+////            "Hello",
+////            0,
+////            0,
+////            0xFFFF00,
+////        )
+////        guiGraphics.flush()
+////        matrix4fStack.popMatrix()
+////        RenderSystem.clear(256)
+////        poseStack.popPose()
+////        val matrix = Matrix4f().setOrtho(0f, width, height, 0f, -1f, 1f)
+////        RenderSystem.setProjectionMatrix(matrix, ProjectionType.ORTHOGRAPHIC)
+////
+////        val tesselator = Tesselator.getInstance()
+////        val buffer: BufferBuilder = tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR)
+////        buffer.addVertex(0.0f, 0.0f, 0.0f).setColor(1f, 0f, 0f, 1f)
+////        buffer.addVertex(width, 0.0f, 0.0f).setColor(1f, 0f, 0f, 1f)
+////        buffer.addVertex(width, height, 0.0f).setColor(1f, 0f, 0f, 1f)
+////        buffer.addVertex(0.0f, height, 0.0f).setColor(1f, 0f, 0f, 1f)
+////        BufferUploader.drawWithShader(buffer.buildOrThrow())
+//
+//        renderTarget.unbindWrite()
+//        val nativeImage: NativeImage = Screenshot.takeScreenshot(renderTarget)
+//        val dynamicTexture = DynamicTexture(nativeImage)
+//        dynamicTexture.dumpContents(
+//            ResourceLocation.fromNamespaceAndPath(MOD_ID, "test3"),
+//            File(Minecraft.getInstance().gameDirectory, Screenshot.SCREENSHOT_DIR).toPath()
+//        )
+//        renderTarget.destroyBuffers();
+//
+//        GlStateManager._glBindFramebuffer(GL30C.GL_DRAW_FRAMEBUFFER_BINDING, minecraft.mainRenderTarget.frameBufferId)
+////        val image: Image = getImage(nativeImage)
+//        minecraft.mainRenderTarget.bindWrite(false)
     }
 
     fun isEnabled(): Boolean {
@@ -103,4 +146,5 @@ object ChatPlus {
             false
         )
     }
+
 }
