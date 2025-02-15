@@ -24,7 +24,6 @@ import com.ebicep.chatplus.util.GraphicsUtil.guiForward
 import com.ebicep.chatplus.util.GraphicsUtil.translate0
 import com.google.gson.JsonParser
 import com.mojang.blaze3d.pipeline.RenderTarget
-import com.mojang.blaze3d.pipeline.TextureTarget
 import com.mojang.blaze3d.platform.NativeImage
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
@@ -185,11 +184,18 @@ object ScreenshotChat {
             ScreenshotWindowsMode.STACK -> linesOrdered.map { it.value }.flatten().size * lineHeight
             ScreenshotWindowsMode.SPLIT -> linesOrdered.maxOf { it.value.size } * lineHeight
         }
-        val renderTarget: RenderTarget = TextureTarget(width.toInt(), height.toInt(), true)
-        renderTarget.setClearColor(TRANSPARENCY_COLOR.red / 255f, TRANSPARENCY_COLOR.green / 255f, TRANSPARENCY_COLOR.blue / 255f, 0f)
-        renderTarget.clear()
-        renderTarget.bindWrite(false)
+        ChatPlus.LOGGER.info("screenshotting = width: $width, height: $height")
         val minecraft = Minecraft.getInstance()
+//        val renderTarget: RenderTarget = TextureTarget(width.toInt(), height.toInt(), true) TODO use this
+        val mainRenderTarget = minecraft.mainRenderTarget
+        val oldWidth = mainRenderTarget.width
+        val oldHeight = mainRenderTarget.height
+        mainRenderTarget.resize(width.toInt(), height.toInt())
+        mainRenderTarget.setClearColor(TRANSPARENCY_COLOR.red / 255f, TRANSPARENCY_COLOR.green / 255f, TRANSPARENCY_COLOR.blue / 255f, 0f)
+        mainRenderTarget.clear()
+//        renderTarget.setClearColor(TRANSPARENCY_COLOR.red / 255f, TRANSPARENCY_COLOR.green / 255f, TRANSPARENCY_COLOR.blue / 255f, 0f)
+//        renderTarget.clear()
+//        renderTarget.bindWrite(true)
         val guiGraphics = GuiGraphics(minecraft, minecraft.renderBuffers().bufferSource())
         val poseStack = guiGraphics.pose()
         poseStack.scale((minecraft.window.guiScaledWidth / width).toFloat(), (minecraft.window.guiScaledHeight / height).toFloat(), 1f)
@@ -218,9 +224,23 @@ object ScreenshotChat {
                 }
             }
         }
-        renderTarget.unbindWrite()
+        guiGraphics.flush()
+
+//        renderTarget.unbindWrite()
+//        renderTarget.blitToScreen(width.toInt(), height.toInt())
+//        screenshotRenderTarget(renderTarget)
+        screenshotRenderTarget(minecraft.mainRenderTarget)
+
+        mainRenderTarget.resize(oldWidth, oldHeight)
+        mainRenderTarget.setClearColor(0f, 0f, 0f, 0f)
+        mainRenderTarget.clear()
+//        minecraft.mainRenderTarget.bindWrite(true)
+    }
+
+    @OptIn(DelicateCoroutinesApi::class)
+    private fun screenshotRenderTarget(target: RenderTarget) {
         try {
-            val nativeImage: NativeImage = Screenshot.takeScreenshot(renderTarget)
+            val nativeImage: NativeImage = Screenshot.takeScreenshot(target)
             val image: Image = getImage(nativeImage)
             val bufferedImage: BufferedImage = imageToBufferedImage(image)
             ChatPlus.sendMessage(Component.literal("Screenshot Taken").withStyle { it.withColor(ChatFormatting.GRAY) })
@@ -242,7 +262,6 @@ object ScreenshotChat {
         } catch (e: Exception) {
             ChatPlus.LOGGER.error(e)
         }
-        minecraft.mainRenderTarget.bindWrite(true)
     }
 
     private fun renderLines(

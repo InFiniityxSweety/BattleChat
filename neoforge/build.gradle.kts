@@ -44,7 +44,9 @@ dependencies {
     shadowCommon(project(":common", "transformProductionNeoForge")) { isTransitive = false }
 
     // Kotlin For Forge
-    implementation("thedarkcolour:kotlinforforge-neoforge:${rootProject.property("kotlin_for_forge_version")}")
+    implementation("thedarkcolour:kotlinforforge-neoforge:${rootProject.property("kotlin_for_forge_version")}") {
+        exclude(group = "net.neoforged.fancymodloader", module = "loader")
+    }
 
     forgeRuntimeLibrary("net.java.dev.jna:jna:5.14.0")
     forgeRuntimeLibrary("com.alphacephei:vosk:0.3.45")
