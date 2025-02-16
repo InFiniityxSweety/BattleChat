@@ -19,7 +19,6 @@ import com.ebicep.chatplus.hud.ChatManager
 import com.ebicep.chatplus.hud.ChatManager.resetGlobalSortedTabs
 import com.ebicep.chatplus.translator.LanguageManager
 import com.ebicep.chatplus.util.ComponentUtil
-import com.ebicep.chatplus.util.ComponentUtil.withColor
 import com.mojang.blaze3d.platform.InputConstants
 import me.shedaniel.clothconfig2.api.*
 import me.shedaniel.clothconfig2.gui.entries.*
@@ -430,8 +429,7 @@ object ConfigScreenImpl {
                                     entryBuilder.stringField("chatPlus.chatWindow.tabSettings.chatTabs.autoPrefix", v.autoPrefix, { v.autoPrefix = it }),
                                 )
                             },
-                            { Component.literal(it.pattern) },
-                            false
+                            { Component.literal(it.pattern) }
                         ),
                         entryBuilder.intField(
                             "chatPlus.chatWindow.tabSettings.chatTabs.priority",
@@ -455,8 +453,7 @@ object ConfigScreenImpl {
                         ) { value.temporary = it },
                     )
                 },
-                { Component.literal(it.name) },
-                false
+                { Component.literal(it.name) }
             )
         )
     }
@@ -528,8 +525,7 @@ object ConfigScreenImpl {
                         autoTabOptions.build(),
                     )
                 },
-                { Component.literal(it.pattern) },
-                false
+                { Component.literal(it.pattern) }
             )
         )
     }
