@@ -47,13 +47,16 @@ object SendNote {
                 addNote(it.message)
             }
         }
-        EventBus.register<ChatScreenSendMessagePostEvent>({ 5 }, { true }) {
+        var sendNote = false
+        EventBus.register<ChatScreenSendMessagePostEvent>({ 5 }, { sendNote }) {
+            sendNote = false
             if (!Config.values.sendNoteEnabled) {
                 return@register
             }
             if (!Config.values.sendNoteKey.isDown()) {
                 return@register
             }
+            sendNote = true
             EventBus.post(SendNoteEvent(it.messages.joinToString("")))
             (it.screen as IMixinChatScreen).input.value = ""
             it.dontSendMessage = true
