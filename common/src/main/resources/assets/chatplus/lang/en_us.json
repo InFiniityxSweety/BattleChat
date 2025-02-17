@@ -394,7 +394,7 @@
   "chatPlus.screenshotMode.tooltip": "Default Screenshot Mode when using shortcut.\n \n§nCurrent Window:§r\nOnly screenshot the current window.\n \n§nAll Windows:§r\nScreenshot all windows.",
   "chatPlus.screenshotBackgroundMode": "Default Screenshot Background Mode",
   "chatPlus.screenshotBackgroundMode.tooltip": "Default Screenshot Background Mode when using shortcut.\n \n§nKeep Background:§r\nUses background color of the chat.\n \n§nKeep Background + Show Line Color:§r\nUses background color of the chat and shows custom line colors.\n \n§nTransparent:§r\nBackground is completely transparent.\n \n§nShow Line Color:§r\nShows custom line color background from highlight/bookmark/select/etc.",
-  "chatPlus.screenshotScreenShotWindowsMode": "Default Screenshot Widows Mode",
+  "chatPlus.screenshotScreenShotWindowsMode": "Default Screenshot Windows Mode",
   "chatPlus.screenshotScreenShotWindowsMode.tooltip": "Default Screenshot Windows Mode when using shortcut. Used when screenshotting multiple windows.\n \n§nStack:§r\nChats are stacked vertically.\n \n§nSplit:§r\nChats are stacked horizontally.",
   "chatPlus.screenshotChatTextBarElement.toggle": "Show Screenshot Text Bar Element",
   "chatPlus.screenshotChatTextBarElement.toggle.tooltip": "Enables/Disables the screenshot text bar element (Box with 'S' to the right of input box).",
