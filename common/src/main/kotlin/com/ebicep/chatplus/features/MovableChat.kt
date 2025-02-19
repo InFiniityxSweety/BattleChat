@@ -33,6 +33,7 @@ import com.ebicep.chatplus.util.GraphicsUtil.createPose
 import com.ebicep.chatplus.util.GraphicsUtil.fill0
 import com.ebicep.chatplus.util.GraphicsUtil.guiForward
 import com.ebicep.chatplus.util.GraphicsUtil.translate0
+import com.ebicep.chatplus.util.KeyUtil.getDisplayName
 import com.ebicep.chatplus.util.KeyUtil.isDown
 import com.mojang.blaze3d.vertex.PoseStack
 import kotlinx.serialization.Serializable
@@ -414,14 +415,7 @@ object MovableChat {
             if (!Config.values.movableChatEnabled || !Config.values.movableChatShowEnabledOnScreen || !ChatManager.isChatFocused()) {
                 return@register
             }
-            val component = Component.literal("Movable Chat Enabled").withColor(MOVABLE_CHAT_COLOR)
-            val toggleKey = Config.values.movableChatToggleKey
-            if (toggleKey.value != -1) {
-                component.append(Component.literal(" ("))
-                component.append(toggleKey.displayName)
-                component.append(Component.literal(")"))
-            }
-            it.components.add(component)
+            it.components.add(Component.literal("Movable Chat Enabled").withColor(MOVABLE_CHAT_COLOR).append(Config.values.movableChatToggleKey.getDisplayName(true)))
         }
     }
 
