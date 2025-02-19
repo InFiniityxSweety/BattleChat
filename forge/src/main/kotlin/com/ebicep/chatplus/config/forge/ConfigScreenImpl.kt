@@ -8,10 +8,12 @@ import com.ebicep.chatplus.features.FilterMessages.DEFAULT_COLOR
 import com.ebicep.chatplus.features.MovableChat.MOVABLE_CHAT_COLOR
 import com.ebicep.chatplus.features.SendNote.NOTE_COLOR
 import com.ebicep.chatplus.features.chattabs.AutoTabCreator
+import com.ebicep.chatplus.features.chattabs.CHAT_TAB_HEIGHT
 import com.ebicep.chatplus.features.chattabs.ChatTab
 import com.ebicep.chatplus.features.chattabs.ServerTabPattern
 import com.ebicep.chatplus.features.chatwindows.ChatWindow
 import com.ebicep.chatplus.features.chatwindows.OutlineSettings
+import com.ebicep.chatplus.features.chatwindows.TabSettings.Position
 import com.ebicep.chatplus.features.internal.MessageFilter
 import com.ebicep.chatplus.features.internal.MessageFilterFormatted
 import com.ebicep.chatplus.features.speechtotext.SpeechToText
@@ -386,6 +388,20 @@ object ConfigScreenImpl {
                 "chatPlus.chatWindow.tabSettings.showTabsWhenChatNotOpen",
                 window.tabSettings.showTabsWhenChatNotOpen
             ) { window.tabSettings.showTabsWhenChatNotOpen = it },
+            entryBuilder.enumSelector(
+                "chatPlus.chatWindow.tabSettings.position",
+                Position::class.java,
+                window.tabSettings.position
+            ) {
+                val oldPosition = window.tabSettings.position
+                window.tabSettings.position = it
+                if (oldPosition != it) {
+                    when (oldPosition) {
+                        Position.TOP -> window.renderer.y -= CHAT_TAB_HEIGHT
+                        Position.BOTTOM -> window.renderer.y += CHAT_TAB_HEIGHT
+                    }
+                }
+            },
             entryBuilder.percentSlider(
                 "chatPlus.chatWindow.tabSettings.unfocusedTabOpacityReduction",
                 1 - window.tabSettings.unfocusedTabOpacityMultiplier

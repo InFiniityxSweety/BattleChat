@@ -27,6 +27,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.util.Mth
 import kotlin.math.ceil
+import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
 
@@ -485,11 +486,11 @@ class ChatRenderer {
     }
 
     fun getLinesPerPageScaled(heightType: HeightType = HeightType.ADJUSTED): Int {
-        return (getUpdatedHeight(heightType) / getUpdatedLineHeight().toDouble() / getUpdatedScale()).toInt() + 1
+        return max((getUpdatedHeight(heightType) / getUpdatedLineHeight().toDouble() / getUpdatedScale()).toInt(), 1)
     }
 
-    fun getTotalLineHeight(): Float {
-        val lineCount = if (Config.values.movableChatEnabled) {
+    fun getTotalLineHeight(wholeWindow: Boolean = Config.values.movableChatEnabled): Float {
+        val lineCount = if (wholeWindow) {
             getLinesPerPageScaled(HeightType.ADJUSTED)
         } else {
             min(chatWindow.tabSettings.selectedTab.displayedMessages.size, getLinesPerPageScaled(HeightType.ADJUSTED))
@@ -503,8 +504,12 @@ class ChatRenderer {
     }
 
     fun getMaxHeightScaled(heightType: HeightType = HeightType.RAW): Int {
-        val maxHeight = EventBus.post(GetMaxHeightEvent(chatWindow, heightType, internalY - 1)).maxHeight
+        val maxHeight = EventBus.post(GetMaxHeightEvent(chatWindow, heightType, internalY)).maxHeight
         return getNormalizedHeight(maxHeight)
+    }
+
+    fun getMinYScaled(): Int {
+        return EventBus.post(GetMinYEvent(chatWindow, getTotalLineHeight().roundToInt())).minY
     }
 
     fun getMaxYScaled(): Int {
