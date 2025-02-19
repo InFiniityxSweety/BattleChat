@@ -397,13 +397,18 @@ object MovableChat {
             }
 
             if (movingInputBox) {
-                Config.values.inputBoxSettings.startY = Mth.clamp(
+                val inputBoxSettings = Config.values.inputBoxSettings
+                val maxY = Minecraft.getInstance().window.guiScaledHeight - PADDED_INPUT_BOX_HEIGHT
+                inputBoxSettings.startY = Mth.clamp(
                     (mouseY - yDisplacement).roundToInt(),
                     INPUT_BOX_PADDING,
-                    Minecraft.getInstance().window.guiScaledHeight - PADDED_INPUT_BOX_HEIGHT
+                    maxY
                 )
+                if (inputBoxSettings.startY == maxY) {
+                    inputBoxSettings.startY = -PADDED_INPUT_BOX_HEIGHT
+                }
                 it.screen as IMixinChatScreen
-                it.screen.input.y = Config.values.inputBoxSettings.startY
+                it.screen.input.y = inputBoxSettings.startY
             }
         }
         EventBus.register<OnScreenDisplayEvent> {
@@ -683,9 +688,6 @@ object MovableChat {
         paddingX: Int = MOVE_PADDING_X,
         paddingY: Int = MOVE_PADDING_Y
     ): RelativeMouseTabBarPosition {
-        if (mouseY > Minecraft.getInstance().window.guiScaledHeight - EDIT_BOX_HEIGHT) {
-            return RelativeMouseTabBarPosition.OUTSIDE_SCREEN
-        }
         val renderer = chatWindow.renderer
         val barStartX = renderer.internalX - paddingX
         val barEndX =

@@ -468,10 +468,13 @@ class ChatRenderer {
 
     fun getUpdatedY(startingY: Int): Int {
         var y = startingY
+        if (y == -1) {
+            y = Minecraft.getInstance().window.guiScaledHeight
+        }
         if (y < 0) {
             y += Minecraft.getInstance().window.guiScaledHeight
         }
-        if (y >= Minecraft.getInstance().window.guiScaledHeight - EDIT_BOX_HEIGHT) {
+        if (y >= Minecraft.getInstance().window.guiScaledHeight) {
             y = getMaxYScaled()
         }
         return y
@@ -500,7 +503,7 @@ class ChatRenderer {
     }
 
     fun getDefaultY(): Int {
-        return EventBus.post(GetDefaultYEvent(chatWindow, -EDIT_BOX_HEIGHT)).y
+        return EventBus.post(GetDefaultYEvent(chatWindow, -1)).y
     }
 
     fun getMaxHeightScaled(heightType: HeightType = HeightType.RAW): Int {
@@ -513,7 +516,7 @@ class ChatRenderer {
     }
 
     fun getMaxYScaled(): Int {
-        return EventBus.post(GetMaxYEvent(chatWindow, Minecraft.getInstance().window.guiScaledHeight - EDIT_BOX_HEIGHT)).maxY
+        return EventBus.post(GetMaxYEvent(chatWindow, Minecraft.getInstance().window.guiScaledHeight)).maxY
     }
 
     fun getUpdatedScale(): Float {
