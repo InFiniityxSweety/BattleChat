@@ -2,6 +2,7 @@ package com.ebicep.chatplus.features.textbarelements
 
 import com.ebicep.chatplus.IChatScreen
 import com.ebicep.chatplus.config.Config
+import com.ebicep.chatplus.config.Config.values
 import com.ebicep.chatplus.events.Event
 import com.ebicep.chatplus.events.EventBus
 import com.ebicep.chatplus.features.FindMessage
@@ -61,7 +62,7 @@ object TextBarElements {
             val mouseX = it.mouseX
             val mouseY = it.mouseY
             val height = chatPlusScreen.height
-            val currentY = height - EDIT_BOX_HEIGHT
+            val currentY = if (values.vanillaInputBox) height - EDIT_BOX_HEIGHT else values.inputBoxSettings.getCalculatedStartY() - 4
             textBarElements.forEach { element ->
                 val elementStartX = textBarElementsStartX[element]!!
                 element.onRender(guiGraphics, elementStartX, currentY, mouseX, mouseY)

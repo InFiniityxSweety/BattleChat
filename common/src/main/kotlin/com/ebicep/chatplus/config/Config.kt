@@ -11,6 +11,7 @@ import com.ebicep.chatplus.config.migration.MigrationManager
 import com.ebicep.chatplus.config.serializers.KeySerializer
 import com.ebicep.chatplus.config.serializers.KeyWithModifier
 import com.ebicep.chatplus.features.*
+import com.ebicep.chatplus.features.MovableChat.InputBoxSettings
 import com.ebicep.chatplus.features.chattabs.TabNotificationSettings
 import com.ebicep.chatplus.features.chatwindows.ChatWindow
 import com.ebicep.chatplus.features.chatwindows.ChatWindowsManager.createDefaultWindow
@@ -155,6 +156,7 @@ data class ConfigVariables(
     var movableChatColor: Int = Color(255, 255, 255, 200).rgb,
     var movableChatSelectedColor: Int = Color(0, 255, 0, 200).rgb,
     var movableChatToggleTextBarElement: Boolean = false, // TODO add enabled
+    var inputBoxSettings: InputBoxSettings = InputBoxSettings(),
     // notes
     var sendNoteEnabled: Boolean = true,
     var sendNoteKey: KeyWithModifier = KeyWithModifier(InputConstants.getKey("key.keyboard.enter"), 4),
