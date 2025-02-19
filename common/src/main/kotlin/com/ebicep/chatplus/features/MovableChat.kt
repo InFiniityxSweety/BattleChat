@@ -49,7 +49,6 @@ import kotlin.math.roundToInt
 object MovableChat {
 
     val MOVABLE_CHAT_COLOR = Color(255, 255, 255).rgb
-    private val MOVABLE_CHAT_ENABLED_COMPONENT = Component.literal("Movable Chat Enabled").withColor(MOVABLE_CHAT_COLOR)
 
     // moving chat box
     private const val RENDER_MOVING_SIZE = 5f // width/length of box when rendering moving chat
@@ -415,7 +414,14 @@ object MovableChat {
             if (!Config.values.movableChatEnabled || !Config.values.movableChatShowEnabledOnScreen || !ChatManager.isChatFocused()) {
                 return@register
             }
-            it.components.add(MOVABLE_CHAT_ENABLED_COMPONENT)
+            val component = Component.literal("Movable Chat Enabled").withColor(MOVABLE_CHAT_COLOR)
+            val toggleKey = Config.values.movableChatToggleKey
+            if (toggleKey.value != -1) {
+                component.append(Component.literal(" ("))
+                component.append(toggleKey.displayName)
+                component.append(Component.literal(")"))
+            }
+            it.components.add(component)
         }
     }
 
