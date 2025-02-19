@@ -107,7 +107,7 @@ class TabSettings {
                 }
                 totalWidth += it.width + CHAT_TAB_X_SPACE
             }
-            if (totalWidth >= Minecraft.getInstance().window.guiScaledWidth) {
+            if (tabs.first().xStart + totalWidth >= Minecraft.getInstance().window.guiScaledWidth) {
                 startRenderTabIndex++
             }
         }
