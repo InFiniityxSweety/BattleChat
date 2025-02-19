@@ -231,7 +231,7 @@ class ChatRenderer {
     }
 
     fun render(chatWindow: ChatWindow, guiGraphics: GuiGraphics, guiTicks: Int, mouseX: Int, mouseY: Int) {
-        if (internalY != getUpdatedY(y)) {
+        if (EventBus.post(RenderValidateYEvent(this, internalY)).internalY != getUpdatedY(y)) {
             updateCachedDimension()
         }
         handleScreenResize()
@@ -535,6 +535,8 @@ class ChatRenderer {
         return height - (height % (lineHeight * scale).toInt())
     }
 
-    data class GetMinHeightEvent(val chatWindow: ChatWindow, var minHeight: Int)
-
 }
+
+data class GetMinHeightEvent(val chatWindow: ChatWindow, var minHeight: Int)
+
+data class RenderValidateYEvent(val renderer: ChatRenderer, var internalY: Int)

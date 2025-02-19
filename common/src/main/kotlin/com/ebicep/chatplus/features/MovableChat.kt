@@ -794,7 +794,6 @@ object MovableChat {
 
     }
 
-
 }
 
 data class MovableChatTabToWindowEvent(

@@ -300,6 +300,10 @@ object ConfigScreenImpl {
                 Config.values.arrowCycleTabEnabled
             ) { Config.values.arrowCycleTabEnabled = it },
             entryBuilder.booleanToggle(
+                "chatPlus.chatWindow.tabSettings.chatTabs.inputBoxAutoAdjustChatWindowEnabled.toggle",
+                Config.values.inputBoxAutoAdjustChatWindowEnabled
+            ) { Config.values.inputBoxAutoAdjustChatWindowEnabled = it },
+            entryBuilder.booleanToggle(
                 "chatPlus.chatWindow.tabSettings.chatTabs.moveToTabWhenCycling.toggle",
                 Config.values.moveToTabWhenCycling
             ) { Config.values.moveToTabWhenCycling = it },

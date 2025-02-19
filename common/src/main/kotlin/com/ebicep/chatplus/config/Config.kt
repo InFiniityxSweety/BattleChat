@@ -147,6 +147,7 @@ data class ConfigVariables(
     var scrollCycleTabEnabled: Boolean = true,
     var arrowCycleTabEnabled: Boolean = true,
     var moveToTabWhenCycling: Boolean = true,
+    var inputBoxAutoAdjustChatWindowEnabled: Boolean = true,
     var tabNotificationSettings: TabNotificationSettings = TabNotificationSettings(),
     var chatWindows: MutableList<ChatWindow> = mutableListOf(),
     // moving chat

@@ -222,6 +222,8 @@
   "chatPlus.chatWindow.tabSettings.chatTabs.scrollCycleTabEnabled.toggle.tooltip": "Enables/Disables scrolling left/right to cycle through tabs.",
   "chatPlus.chatWindow.tabSettings.chatTabs.arrowCycleTabEnabled.toggle": "Arrow Through Tabs Enabled",
   "chatPlus.chatWindow.tabSettings.chatTabs.arrowCycleTabEnabled.toggle.tooltip": "Enables/Disables using the left/right arrow keys to cycle through tabs.",
+  "chatPlus.chatWindow.tabSettings.chatTabs.inputBoxAutoAdjustChatWindowEnabled.toggle": "Input Box Auto Adjust Chat Window",
+  "chatPlus.chatWindow.tabSettings.chatTabs.inputBoxAutoAdjustChatWindowEnabled.toggle.tooltip": "Enables/Disables auto moving the chat window above/below the input box if they overlap when opening the chat.",
   "chatPlus.chatWindowsTabs.tabNotification.title": "Tab Notifications",
   "chatPlus.chatWindowsTabs.tabNotification.enabled": "Enabled",
   "chatPlus.chatWindowsTabs.tabNotification.enabled.tooltip": "Enables/Disables tab notification badges.",

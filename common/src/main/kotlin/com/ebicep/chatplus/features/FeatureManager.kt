@@ -38,6 +38,7 @@ object FeatureManager {
         SaveInputBoxMessage
         DeleteMessages
         SendNote
+        InputBoxAutoAdjustChatWindow
 //        AlternatingColorBackground
     }
 
