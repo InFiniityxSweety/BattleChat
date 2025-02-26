@@ -140,7 +140,19 @@ object ConfigScreenImpl {
                     InputOverFlowAutoFill.QueueMode::class.java,
                     Config.values.inputOverFlowAutoFillSettings.queueMode
                 ) { Config.values.inputOverFlowAutoFillSettings.queueMode = it },
-            ).build()
+            ).build(),
+            entryBuilder.startSubCategory(Component.translatable("chatPlus.chatSettings.messageImagePreview")).with(
+                entryBuilder.booleanToggle(
+                    "chatPlus.chatSettings.messageImagePreview.enabled",
+                    Config.values.messageImagePreviewSettings.enabled
+                ) { Config.values.messageImagePreviewSettings.enabled = it },
+                entryBuilder.linePriorityField("chatPlus.linePriority.messageImagePreview", Config.values.messageImagePreviewSettings.hasPreviewLinePriority)
+                { Config.values.messageImagePreviewSettings.hasPreviewLinePriority = it },
+                entryBuilder.alphaField(
+                    "chatPlus.chatSettings.messageImagePreview.color",
+                    Config.values.messageImagePreviewSettings.previewLineColor
+                ) { Config.values.messageImagePreviewSettings.previewLineColor = it },
+            ).build(),
         )
     }
 

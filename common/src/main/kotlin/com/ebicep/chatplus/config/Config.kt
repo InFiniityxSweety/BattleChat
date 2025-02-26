@@ -121,6 +121,7 @@ data class ConfigVariables(
     var selectChatLinePriority: Int = 100,
     var timestampSettings: TimestampMessages.TimestampSettings = TimestampMessages.TimestampSettings(),
     var inputOverFlowAutoFillSettings: InputOverFlowAutoFill.InputOverFlowAutoFillSettings = InputOverFlowAutoFill.InputOverFlowAutoFillSettings(),
+    var messageImagePreviewSettings: MessageImagePreview.MessageImagePreviewSettings = MessageImagePreview.MessageImagePreviewSettings(),
     // hide chat
     var hideChatEnabled: Boolean = false,
     var hideChatShowWhenFocused: Boolean = true,

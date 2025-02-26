@@ -39,6 +39,7 @@ object FeatureManager {
         DeleteMessages
         SendNote
         InputBoxAutoAdjustChatWindow
+        MessageImagePreview
 //        AlternatingColorBackground
     }
 
