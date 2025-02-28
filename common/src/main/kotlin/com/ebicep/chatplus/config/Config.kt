@@ -17,6 +17,7 @@ import com.ebicep.chatplus.features.chatwindows.ChatWindow
 import com.ebicep.chatplus.features.chatwindows.ChatWindowsManager.createDefaultWindow
 import com.ebicep.chatplus.features.internal.MessageFilter
 import com.ebicep.chatplus.features.internal.MessageFilterFormatted
+import com.ebicep.chatplus.features.speechtotext.MicrophoneThread.SpeechToTextReplace
 import com.ebicep.chatplus.features.speechtotext.SpeechToText
 import com.ebicep.chatplus.translator.LanguageManager
 import com.mojang.blaze3d.platform.InputConstants
@@ -89,6 +90,9 @@ object Config {
         }
         LanguageManager.updateTranslateLanguages()
         SpeechToText.updateTranslateLanguage()
+        values.speechToTextReplace.forEach {
+            it.updateRegex()
+        }
     }
 
     private fun correctValues() {
@@ -99,8 +103,7 @@ object Config {
         LanguageManager.findLanguageFromName(values.translateTo).let { if (it == null) values.translateTo = "Auto Detect" }
         LanguageManager.findLanguageFromName(values.translateSelf).let { if (it == null) values.translateSelf = "Auto Detect" }
         LanguageManager.findLanguageFromName(values.translateSpeak).let { if (it == null) values.translateSpeak = "English" }
-        LanguageManager.findLanguageFromName(values.speechToTextTranslateLang)
-            .let { if (it == null) values.speechToTextTranslateLang = "English" }
+        LanguageManager.findLanguageFromName(values.speechToTextTranslateLang).let { if (it == null) values.speechToTextTranslateLang = "English" }
         save()
     }
 
@@ -239,6 +242,7 @@ data class ConfigVariables(
     var speechToTextTranslateEnabled: Boolean = false,
     var speechToTextTranslateToInputBox: Boolean = true,
     var speechToTextTranslateLang: String = "English",
+    var speechToTextReplace: MutableList<SpeechToTextReplace> = mutableListOf(),
 ) {
 
     // speech to text

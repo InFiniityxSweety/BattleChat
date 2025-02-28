@@ -476,5 +476,12 @@
   "chatPlus.speechToText.speechToTextTranslateToInputBox.toggle": "Auto Add Translated Message to Input Box",
   "chatPlus.speechToText.speechToTextTranslateToInputBox.toggle.tooltip": "Enables/Disables automatically adding non quick sent translated speech to text messages to the input box.",
   "chatPlus.speechToText.speechToTextTranslateLang": "Translate To",
-  "chatPlus.speechToText.speechToTextTranslateLang.tooltip": "Language to translate speech to text messages to."
+  "chatPlus.speechToText.speechToTextTranslateLang.tooltip": "Language to translate speech to text messages to.",
+  "chatPlus.speechToText.speechToText.replacePatterns": "Replace Patterns",
+  "chatPlus.speechToText.speechToText.replacePatterns.pattern": "Pattern",
+  "chatPlus.speechToText.speechToText.replacePatterns.pattern.tooltip": "Regex Pattern.\n \nNote: This will match and replace already replaced text.",
+  "chatPlus.speechToText.speechToText.replacePatterns.replaceWith": "Replace With",
+  "chatPlus.speechToText.speechToText.replacePatterns.replaceWith.tooltip": "Replaces whatever the regex pattern matches.",
+  "chatPlus.speechToText.speechToText.replacePatterns.priority": "Priority",
+  "chatPlus.speechToText.speechToText.replacePatterns.priority.tooltip": "Priority of the replace pattern. Higher priority patterns will be replaced first."
 }

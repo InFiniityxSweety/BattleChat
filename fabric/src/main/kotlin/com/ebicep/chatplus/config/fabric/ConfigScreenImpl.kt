@@ -16,6 +16,7 @@ import com.ebicep.chatplus.features.chatwindows.OutlineSettings
 import com.ebicep.chatplus.features.chatwindows.TabSettings.Position
 import com.ebicep.chatplus.features.internal.MessageFilter
 import com.ebicep.chatplus.features.internal.MessageFilterFormatted
+import com.ebicep.chatplus.features.speechtotext.MicrophoneThread.SpeechToTextReplace
 import com.ebicep.chatplus.features.speechtotext.SpeechToText
 import com.ebicep.chatplus.hud.ChatManager
 import com.ebicep.chatplus.hud.ChatManager.resetGlobalSortedTabs
@@ -1083,7 +1084,8 @@ object ConfigScreenImpl {
             entryBuilder.booleanToggle(
                 "chatPlus.speechToText.toggle",
                 Config.values.speechToTextEnabled
-            ) { Config.values.speechToTextEnabled = it }, entryBuilder.booleanToggle(
+            ) { Config.values.speechToTextEnabled = it },
+            entryBuilder.booleanToggle(
                 "chatPlus.speechToText.toInputBox.toggle",
                 Config.values.speechToTextToInputBox
             ) { Config.values.speechToTextToInputBox = it },
@@ -1118,10 +1120,12 @@ object ConfigScreenImpl {
             entryBuilder.keyCodeOption(
                 "key.speechToText.quickSend",
                 Config.values.speechToTextQuickSendKey
-            ) { Config.values.speechToTextQuickSendKey = it }, entryBuilder.booleanToggle(
+            ) { Config.values.speechToTextQuickSendKey = it },
+            entryBuilder.booleanToggle(
                 "chatPlus.speechToText.speechToTextTranslateEnabled.toggle",
                 Config.values.speechToTextTranslateEnabled
-            ) { Config.values.speechToTextTranslateEnabled = it }, entryBuilder.booleanToggle(
+            ) { Config.values.speechToTextTranslateEnabled = it },
+            entryBuilder.booleanToggle(
                 "chatPlus.speechToText.speechToTextTranslateToInputBox.toggle",
                 Config.values.speechToTextTranslateToInputBox
             ) { Config.values.speechToTextTranslateToInputBox = it },
@@ -1135,7 +1139,22 @@ object ConfigScreenImpl {
                     Config.values.speechToTextTranslateLang = str
                     SpeechToText.updateTranslateLanguage()
                 }
-            )
+            ),
+            getCustomListOption(
+                "chatPlus.speechToText.speechToText.replacePatterns",
+                Config.values.speechToTextReplace,
+                { Config.values.speechToTextReplace = it },
+                true,
+                { SpeechToTextReplace("", "", 0) },
+                { v ->
+                    listOf(
+                        entryBuilder.stringField("chatPlus.speechToText.speechToText.replacePatterns.pattern", v.pattern, { v.pattern = it }),
+                        entryBuilder.stringField("chatPlus.speechToText.speechToText.replacePatterns.replaceWith", v.str, { v.str = it }),
+                        entryBuilder.intField("chatPlus.speechToText.speechToText.replacePatterns.priority", v.priority) { v.priority = it }
+                    )
+                },
+                { Component.literal(it.pattern + " > " + it.str) }
+            ),
         )
     }
 

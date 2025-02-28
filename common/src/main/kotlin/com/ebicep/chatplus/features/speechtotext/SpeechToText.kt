@@ -6,6 +6,7 @@ import com.ebicep.chatplus.config.configDirectoryPath
 import com.ebicep.chatplus.events.ChatPlusTickEvent
 import com.ebicep.chatplus.events.EventBus
 import com.ebicep.chatplus.features.InputOverFlowAutoFill
+import com.ebicep.chatplus.features.internal.MessageFilterWithString
 import com.ebicep.chatplus.hud.ChatManager
 import com.ebicep.chatplus.hud.ChatPlusScreen
 import com.ebicep.chatplus.hud.ChatScreenCloseEvent
@@ -22,6 +23,7 @@ import com.google.gson.JsonParser
 import dev.architectury.event.EventResult
 import dev.architectury.event.events.client.ClientGuiEvent
 import dev.architectury.event.events.client.ClientRawInputEvent
+import kotlinx.serialization.Serializable
 import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphics
@@ -319,6 +321,13 @@ class MicrophoneThread : Thread("ChatPlusMicrophoneThread") {
                     if (lastSpokenMessage.isNullOrBlank()) {
                         continue
                     }
+                    Config.values.speechToTextReplace
+                        .sortedBy { -it.priority }
+                        .filter { it.regex.pattern.isNotEmpty() }
+                        .forEach {
+                            lastSpokenMessage = lastSpokenMessage!!.replace(it.regex, it.str)
+                            ChatPlus.LOGGER.info("Replaced: $lastSpokenMessage")
+                        }
                     val screen = Minecraft.getInstance().screen
                     if (ChatManager.isChatFocused()) {
                         doWithMessage { messages, translated ->
@@ -386,6 +395,17 @@ class MicrophoneThread : Thread("ChatPlusMicrophoneThread") {
             ChatPlus.LOGGER.error(e)
         }
         return microphone
+    }
+
+    @Serializable
+    class SpeechToTextReplace : MessageFilterWithString {
+
+        var priority: Int = 0
+
+        constructor(pattern: String, str: String, priority: Int) : super(pattern, str) {
+            this.priority = priority
+        }
+
     }
 
 }
