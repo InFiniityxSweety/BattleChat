@@ -532,7 +532,8 @@ class ChatRenderer {
     }
 
     fun getNormalizedHeight(height: Int): Int {
-        return height - (height % (lineHeight * scale).toInt())
+        val scaledHeight = ceil(height / scale).toInt()
+        return ceil((scaledHeight - (scaledHeight % lineHeight)) * scale).toInt()
     }
 
 }
