@@ -844,25 +844,34 @@ object ConfigScreenImpl {
     }
 
     private fun addFindMessageOption(builder: ConfigBuilder, entryBuilder: ConfigEntryBuilder) {
-        builder.getOrCreateCategory(Component.translatable("chatPlus.findMessage.title").withColor(FindMessage.FIND_COLOR)).with(
+        builder.getOrCreateCategory(Component.translatable("chatPlus.findMessage.title").withColor(Config.values.findMessageDefaultMode.color)).with(
             entryBuilder.booleanToggle(
                 "chatPlus.findMessage.toggle",
                 Config.values.findMessageEnabled
             ) { Config.values.findMessageEnabled = it },
-            entryBuilder.linePriorityField("chatPlus.linePriority.findMessage", Config.values.findMessageLinePriority)
-            { Config.values.findMessageLinePriority = it },
             entryBuilder.booleanToggle(
                 "chatPlus.findMessage.highlightInputBox.toggle",
                 Config.values.findMessageHighlightInputBox
             ) { Config.values.findMessageHighlightInputBox = it },
             entryBuilder.booleanToggle(
-                "chatPlus.findMessage.textBarElement.toggle",
-                Config.values.findMessageTextBarElementEnabled
-            ) { Config.values.findMessageTextBarElementEnabled = it },
+                "chatPlus.findMessage.findMessageHighlightMatchedText.toggle",
+                Config.values.findMessageHighlightMatchedText
+            ) { Config.values.findMessageHighlightMatchedText = it },
+            entryBuilder.linePriorityField("chatPlus.linePriority.findMessage", Config.values.findMessageLinePriority)
+            { Config.values.findMessageLinePriority = it },
             entryBuilder.keyCodeOptionWithModifier(
                 "chatPlus.findMessage.key",
                 Config.values.findMessageKey
-            )
+            ),
+            entryBuilder.enumSelector(
+                "chatPlus.findMessage.textBarElement.defaultMode",
+                FindMessage.FindMode::class.java,
+                Config.values.findMessageDefaultMode
+            ) { Config.values.findMessageDefaultMode = it },
+            entryBuilder.booleanToggle(
+                "chatPlus.findMessage.textBarElement.toggle",
+                Config.values.findMessageTextBarElementEnabled
+            ) { Config.values.findMessageTextBarElementEnabled = it },
         )
     }
 

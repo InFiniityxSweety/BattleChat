@@ -189,10 +189,12 @@ data class ConfigVariables(
     var autoBookMarkPatterns: MutableList<MessageFilterFormatted> = mutableListOf(),
     // find message
     var findMessageEnabled: Boolean = true,
-    var findMessageLinePriority: Int = 250,
     var findMessageHighlightInputBox: Boolean = false,
-    var findMessageTextBarElementEnabled: Boolean = true,
+    var findMessageHighlightMatchedText: Boolean = true,
+    var findMessageLinePriority: Int = 250,
     var findMessageKey: KeyWithModifier = KeyWithModifier(InputConstants.getKey("key.keyboard.f"), 2),
+    var findMessageDefaultMode: FindMessage.FindMode = FindMessage.FindMode.CONTAINS,
+    var findMessageTextBarElementEnabled: Boolean = true,
     // copy message
     var copyMessageKey: KeyWithModifier = KeyWithModifier(InputConstants.getKey("key.keyboard.c"), 2),
     var copyMessageLinePriority: Int = 50,

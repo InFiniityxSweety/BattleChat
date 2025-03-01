@@ -1,6 +1,5 @@
 package com.ebicep.chatplus.features.textbarelements
 
-import com.ebicep.chatplus.config.Config
 import com.ebicep.chatplus.hud.ChatPlusScreen.EDIT_BOX_DISPLAY_HEIGHT
 import com.ebicep.chatplus.util.ComponentUtil
 import net.minecraft.client.Minecraft
@@ -59,7 +58,7 @@ interface TextBarElement {
             currentX,
             currentY,
             getPaddedWidth(),
-            EDIT_BOX_DISPLAY_HEIGHT - (if (Config.values.vanillaInputBox) 0 else 1),
+            EDIT_BOX_DISPLAY_HEIGHT,
             color
         )
     }
