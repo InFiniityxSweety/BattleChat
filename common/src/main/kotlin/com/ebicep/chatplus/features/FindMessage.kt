@@ -35,6 +35,7 @@ object FindMessage {
     var findMode: FindMode? = null
     val findEnabled: Boolean
         get() = findMode != null
+    var lastFindMode = CONTAINS
     private var lastInput = ""
     private var lastInputRegex = Regex("")
 
@@ -162,7 +163,7 @@ object FindMessage {
                 if (message.second < Events.currentTick) {
                     return@let
                 }
-                it.backgroundColor = findMode!!.backgroundColor
+                it.backgroundColor = lastFindMode.backgroundColor
             }
         }
         EventBus.register<ChatRenderLineTextEvent>({ -5 }) {
@@ -198,6 +199,7 @@ object FindMessage {
         findMode = if (findEnabled) {
             null
         } else {
+            lastFindMode = newFindMode
             newFindMode
         }
         EventBus.post(FindToggleEvent(findEnabled))
