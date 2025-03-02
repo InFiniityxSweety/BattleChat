@@ -49,24 +49,18 @@ object FindMessage {
             }
         }
         var findShortcutUsed = false
-        var findKeyReleased = true
-        EventBus.register<ChatScreenKeyPressedEvent>({ 1 }, { findShortcutUsed }) {
+        EventBus.register<ChatScreenInputEvent>({ 1 }, { findShortcutUsed }) {
+            findShortcutUsed = false
             if (!Config.values.findMessageEnabled) {
                 return@register
             }
-            if (!findKeyReleased) {
+            if (it.checkRelease(Config.values.findMessageKey)) {
                 return@register
             }
-            findShortcutUsed = Config.values.findMessageKey.isDown()
-            if (findShortcutUsed) {
-                findKeyReleased = false
-                val shiftDown = Screen.hasShiftDown()
-                toggle(it.screen, if (shiftDown) getOtherMode() else Config.values.findMessageDefaultMode)
-                it.returnFunction = true
-            }
-        }
-        EventBus.register<ChatScreenKeyReleasedEvent> {
-            findKeyReleased = true
+            findShortcutUsed = true
+            val shiftDown = Screen.hasShiftDown()
+            toggle(it.screen, if (shiftDown) getOtherMode() else Config.values.findMessageDefaultMode)
+            it.returnFunction = true
         }
         EventBus.register<ChatScreenCloseEvent> {
             if (findEnabled) {

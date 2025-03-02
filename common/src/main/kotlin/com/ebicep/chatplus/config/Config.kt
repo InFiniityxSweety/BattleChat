@@ -28,7 +28,7 @@ import net.minecraft.util.Mth
 import java.awt.Color
 import java.io.File
 
-const val CONFIG_NAME = "${MOD_ID}-v2.1.0.json"
+const val CONFIG_NAME = "${MOD_ID}-v2.5.0.json"
 val json = Json {
     encodeDefaults = true
     ignoreUnknownKeys = true
@@ -157,7 +157,7 @@ data class ConfigVariables(
     // moving chat
     var movableChatEnabled: Boolean = true,
     var movableChatShowEnabledOnScreen: Boolean = true,
-    var movableChatToggleKey: InputConstants.Key = InputConstants.getKey("key.keyboard.right.control"),
+    var movableChatKey: KeyWithModifier = KeyWithModifier(InputConstants.getKey("key.keyboard.right.control"), 0),
     var movableChatColor: Int = Color(255, 255, 255, 200).rgb,
     var movableChatSelectedColor: Int = Color(0, 255, 0, 200).rgb,
     var movableChatToggleTextBarElement: Boolean = false, // TODO add enabled

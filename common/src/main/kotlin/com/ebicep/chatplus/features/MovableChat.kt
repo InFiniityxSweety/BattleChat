@@ -33,8 +33,6 @@ import com.ebicep.chatplus.util.GraphicsUtil.createPose
 import com.ebicep.chatplus.util.GraphicsUtil.fill0
 import com.ebicep.chatplus.util.GraphicsUtil.guiForward
 import com.ebicep.chatplus.util.GraphicsUtil.translate0
-import com.ebicep.chatplus.util.KeyUtil.getDisplayName
-import com.ebicep.chatplus.util.KeyUtil.isDown
 import com.mojang.blaze3d.vertex.PoseStack
 import kotlinx.serialization.Serializable
 import net.minecraft.ChatFormatting
@@ -89,20 +87,16 @@ object MovableChat {
     private var movingInputBox = false
 
     init {
-        var toggleCooldown = false
-        EventBus.register<ChatScreenKeyPressedEvent>({ 2 }) {
-            if (toggleCooldown) {
+        EventBus.register<ChatScreenInputEvent>({ 5 }) {
+            if (it.checkRelease(Config.values.movableChatKey)) {
                 return@register
             }
-            if (Config.values.movableChatToggleKey.isDown()) {
-                toggleCooldown = true
-                Config.values.movableChatEnabled = !Config.values.movableChatEnabled
-                ChatPlus.sendMessage(
-                    Component.literal("Movable Chat ${if (Config.values.movableChatEnabled) "Enabled" else "Disabled"}")
-                        .withStyle(if (Config.values.movableChatEnabled) ChatFormatting.GREEN else ChatFormatting.RED)
-                )
-                it.returnFunction = true
-            }
+            Config.values.movableChatEnabled = !Config.values.movableChatEnabled
+            ChatPlus.sendMessage(
+                Component.literal("Movable Chat ${if (Config.values.movableChatEnabled) "Enabled" else "Disabled"}")
+                    .withStyle(if (Config.values.movableChatEnabled) ChatFormatting.GREEN else ChatFormatting.RED)
+            )
+            it.returnFunction = true
         }
         EventBus.register<AddTextBarElementEvent>({ 75 }) {
             if (Config.values.movableChatToggleTextBarElement) {
@@ -113,9 +107,6 @@ object MovableChat {
             if (movingChat) {
                 it.returnFunction = true
             }
-        }
-        EventBus.register<ChatScreenKeyReleasedEvent> {
-            toggleCooldown = false
         }
         EventBus.register<ChatScreenCloseEvent> {
             movingChat = false
@@ -415,7 +406,7 @@ object MovableChat {
             if (!Config.values.movableChatEnabled || !Config.values.movableChatShowEnabledOnScreen || !ChatManager.isChatFocused()) {
                 return@register
             }
-            it.components.add(Component.literal("Movable Chat Enabled").withColor(MOVABLE_CHAT_COLOR).append(Config.values.movableChatToggleKey.getDisplayName(true)))
+            it.components.add(Component.literal("Movable Chat Enabled").withColor(MOVABLE_CHAT_COLOR).append(Config.values.movableChatKey.getDisplayName(true)))
         }
     }
 

@@ -657,7 +657,7 @@ object ConfigScreenImpl {
                 "chatPlus.movableChat.showEnabledOnScreen.toggle",
                 Config.values.movableChatShowEnabledOnScreen
             ) { Config.values.movableChatShowEnabledOnScreen = it },
-            entryBuilder.keyCodeOption("chatPlus.movableChat.toggleKey", Config.values.movableChatToggleKey) { Config.values.movableChatToggleKey = it },
+            entryBuilder.keyCodeOptionWithModifier("chatPlus.movableChat.toggleKey", Config.values.movableChatKey),
             entryBuilder.alphaField(
                 "chatPlus.movableChat.color",
                 Config.values.movableChatColor

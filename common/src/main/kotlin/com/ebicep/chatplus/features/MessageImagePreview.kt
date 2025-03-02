@@ -235,10 +235,6 @@ object MessageImagePreview {
         imageCache[urlString] = chatPlusImage
         GlobalScope.launch(Dispatchers.IO) {
             try {
-                ChatPlus.sendMessage(Component.literal("HI $input").withStyle {
-                    it.withColor(ChatFormatting.RED)
-                        .withHoverEvent(HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal(urlString).withStyle(ChatFormatting.AQUA)))
-                })
                 val connection = url.openConnection() as HttpURLConnection
                 connection.apply {
                     requestMethod = "GET"

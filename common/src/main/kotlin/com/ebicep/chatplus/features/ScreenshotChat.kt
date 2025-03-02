@@ -126,7 +126,7 @@ object ScreenshotChat {
             }
         }
         var screenshotKeyPressed = false // block other key presses (ctrl s key)
-        EventBus.register<ChatScreenKeyPressedEvent>({ 1 }, { screenshotKeyPressed }) {
+        EventBus.register<ChatScreenInputEvent>({ 1 }, { screenshotKeyPressed }) {
             if (!Config.values.screenshotChatEnabled) {
                 return@register
             }
