@@ -77,8 +77,8 @@ object FindMessage {
             if (findEnabled && lastInput.isNotEmpty()) {
                 if (findMode == REGEX) {
                     try {
-                        lastInputRegex = Regex(lastInput)
-                    } catch (e: Exception) {
+                        lastInputRegex = Regex(lastInput, if (Config.values.findMessageIgnoreCase) mutableSetOf(RegexOption.IGNORE_CASE) else emptySet())
+                    } catch (_: Exception) {
                         ChatPlus.sendMessage(ComponentUtil.literal("Invalid Regex", ChatFormatting.RED))
                         return@register
                     }
@@ -88,7 +88,7 @@ object FindMessage {
                     if (findMode == REGEX) {
                         string.contains(lastInputRegex)
                     } else {
-                        string.contains(lastInput, ignoreCase = true)
+                        string.contains(lastInput, ignoreCase = Config.values.findMessageIgnoreCase)
                     }
                 }
             }
@@ -109,7 +109,7 @@ object FindMessage {
             if (findEnabled && screen is IMixinChatScreen) {
                 it.filtered = true
                 val filter = screen.input?.value
-                if (filter != null && !it.component.string.contains(filter, ignoreCase = true)) {
+                if (filter != null && !it.component.string.contains(filter, ignoreCase = Config.values.findMessageIgnoreCase)) {
                     it.addMessage = false
                 }
             }

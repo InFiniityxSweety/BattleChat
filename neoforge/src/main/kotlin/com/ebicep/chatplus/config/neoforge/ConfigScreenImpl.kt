@@ -854,9 +854,13 @@ object ConfigScreenImpl {
                 Config.values.findMessageHighlightInputBox
             ) { Config.values.findMessageHighlightInputBox = it },
             entryBuilder.booleanToggle(
-                "chatPlus.findMessage.findMessageHighlightMatchedText.toggle",
+                "chatPlus.findMessage.highlightMatchedText.toggle",
                 Config.values.findMessageHighlightMatchedText
             ) { Config.values.findMessageHighlightMatchedText = it },
+            entryBuilder.booleanToggle(
+                "chatPlus.findMessage.ignoreCase.toggle",
+                Config.values.findMessageIgnoreCase
+            ) { Config.values.findMessageIgnoreCase = it },
             entryBuilder.linePriorityField("chatPlus.linePriority.findMessage", Config.values.findMessageLinePriority)
             { Config.values.findMessageLinePriority = it },
             entryBuilder.keyCodeOptionWithModifier(

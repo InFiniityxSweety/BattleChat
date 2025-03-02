@@ -191,6 +191,7 @@ data class ConfigVariables(
     var findMessageEnabled: Boolean = true,
     var findMessageHighlightInputBox: Boolean = false,
     var findMessageHighlightMatchedText: Boolean = true,
+    var findMessageIgnoreCase: Boolean = true,
     var findMessageLinePriority: Int = 250,
     var findMessageKey: KeyWithModifier = KeyWithModifier(InputConstants.getKey("key.keyboard.f"), 2),
     var findMessageDefaultMode: FindMessage.FindMode = FindMessage.FindMode.CONTAINS,

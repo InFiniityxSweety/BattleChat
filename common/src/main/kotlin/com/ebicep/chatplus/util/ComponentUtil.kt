@@ -1,5 +1,6 @@
 package com.ebicep.chatplus.util
 
+import com.ebicep.chatplus.config.Config
 import com.ebicep.chatplus.mixin.IMixinStringSplitter
 import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
@@ -104,7 +105,7 @@ object ComponentUtil {
         val widthProvider = (Minecraft.getInstance().font.splitter as IMixinStringSplitter).callGetWidthProvider()
         val substringLength = substring.length
         val originalString = ChatFormatting.stripFormatting(originalString)!!
-        val startIndex = originalString.indexOf(substring)
+        val startIndex = originalString.indexOf(substring, ignoreCase = Config.values.findMessageIgnoreCase)
 
         if (startIndex < 0 || startIndex + substringLength > originalString.length) {
             return mutableListOf<Pair<Float, Float>>()
