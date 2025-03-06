@@ -1153,6 +1153,18 @@ object ConfigScreenImpl {
                     SpeechToText.updateTranslateLanguage()
                 }
             ),
+            entryBuilder.startSubCategory(Component.translatable("chatPlus.speechToText.autoReplacePlayers")).with(
+                entryBuilder.booleanToggle(
+                    "chatPlus.speechToText.autoReplacePlayers.toggle",
+                    Config.values.speechToTextAutoReplacePlayers
+                ) { Config.values.speechToTextAutoReplacePlayers = it },
+                entryBuilder.intSlider(
+                    "chatPlus.speechToText.autoReplacePlayers.maxSearchDepth",
+                    Config.values.speechToTextAutoReplacePlayersMaxSearchDepth,
+                    1,
+                    10
+                ) { Config.values.speechToTextAutoReplacePlayersMaxSearchDepth = it },
+            ).build(),
             getCustomListOption(
                 "chatPlus.speechToText.speechToText.replacePatterns",
                 Config.values.speechToTextReplace,

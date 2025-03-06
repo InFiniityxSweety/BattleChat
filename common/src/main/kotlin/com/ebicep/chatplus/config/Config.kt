@@ -245,6 +245,8 @@ data class ConfigVariables(
     var speechToTextTranslateEnabled: Boolean = false,
     var speechToTextTranslateToInputBox: Boolean = true,
     var speechToTextTranslateLang: String = "English",
+    var speechToTextAutoReplacePlayers: Boolean = true,
+    var speechToTextAutoReplacePlayersMaxSearchDepth: Int = 3,
     var speechToTextReplace: MutableList<SpeechToTextReplace> = mutableListOf(),
 ) {
 
