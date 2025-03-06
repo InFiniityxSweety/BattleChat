@@ -34,7 +34,7 @@ class FindTextBarElement(private val chatPlusScreen: ChatScreen) : TextBarElemen
         )
     }
 
-    override fun onRender(guiGraphics: GuiGraphics, currentX: Int, currentY: Int, mouseX: Int, mouseY: Int) {
+    override fun onRender(guiGraphics: GuiGraphics, currentX: Int, currentY: Int, mouseX: Int, mouseY: Int, partialTick: Float) {
         fill(guiGraphics, currentX, currentY)
         drawCenteredString(guiGraphics, currentX, currentY, if (FindMessage.findEnabled) FindMessage.findMode!!.color else -1)
         if (FindMessage.findEnabled) {

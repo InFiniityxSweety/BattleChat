@@ -1,6 +1,7 @@
 package com.ebicep.chatplus.features.textbarelements
 
 import com.ebicep.chatplus.hud.ChatPlusScreen.EDIT_BOX_DISPLAY_HEIGHT
+import com.ebicep.chatplus.hud.ChatScreenMouseClickedEvent
 import com.ebicep.chatplus.util.ComponentUtil
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphics
@@ -8,6 +9,10 @@ import net.minecraft.network.chat.Component
 import net.minecraft.util.FormattedCharSequence
 
 interface TextBarElement {
+
+    fun init() {
+
+    }
 
     fun getWidth(): Int
 
@@ -19,6 +24,10 @@ interface TextBarElement {
 
     fun onClick(button: Int)
 
+    fun onClickEvent(event: ChatScreenMouseClickedEvent) {
+
+    }
+
     fun onHover(guiGraphics: GuiGraphics, pMouseX: Int, pMouseY: Int) {
 
     }
@@ -28,7 +37,8 @@ interface TextBarElement {
         currentX: Int,
         currentY: Int,
         mouseX: Int,
-        mouseY: Int
+        mouseY: Int,
+        partialTick: Float
     )
 
     fun fill(guiGraphics: GuiGraphics, currentX: Int, currentY: Int) {

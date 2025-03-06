@@ -43,7 +43,9 @@ object TranslateMessage {
             if (!Config.values.translatorTextBarElementEnabled) {
                 return@register
             }
-            it.elements.add(TranslateSpeakTextBarElement(it.screen))
+            val textBarElement = TranslateSpeakTextBarElement(it.screen)
+            textBarElement.init()
+            it.elements.add(textBarElement)
         }
         EventBus.register<ChatScreenInitPostEvent> {
             if (!Config.values.translatorEnabled) {

@@ -33,6 +33,7 @@ object TextBarElements {
 
             //____TEXTBOX_____-FIND--TRANSLATE-
             textBarElements.forEach { element ->
+                element.init()
                 val calculatedWidth = element.getPaddedWidth() + SPACER
                 (chatPlusScreen as IChatScreen).chatPlusWidth -= calculatedWidth
             }
@@ -58,12 +59,14 @@ object TextBarElements {
                 ) {
                     element.onClick(it.button)
                 }
+                element.onClickEvent(it)
             }
         }
         EventBus.register<ChatScreenRenderEvent> {
             val guiGraphics = it.guiGraphics
             val mouseX = it.mouseX
             val mouseY = it.mouseY
+            val partialTick = it.partialTick
             val height = chatPlusScreen.height
             val currentY = if (values.vanillaInputBox) height - EDIT_BOX_HEIGHT else values.inputBoxSettings.getCalculatedStartY() - INPUT_BOX_PADDING
             if (Debug.debug) {
@@ -77,7 +80,7 @@ object TextBarElements {
             }
             textBarElements.forEach { element ->
                 val elementStartX = textBarElementsStartX[element]!!
-                element.onRender(guiGraphics, elementStartX, currentY, mouseX, mouseY)
+                element.onRender(guiGraphics, elementStartX, currentY, mouseX, mouseY, partialTick)
                 if (elementStartX < mouseX &&
                     mouseX < elementStartX + element.getPaddedWidth() &&
                     currentY < mouseY &&

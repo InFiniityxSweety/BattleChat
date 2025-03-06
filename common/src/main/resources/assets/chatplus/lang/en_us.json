@@ -454,7 +454,7 @@
   "chatPlus.translator.translateSelf.tooltip": "Language to use when translating your own messages.",
   "chatPlus.translator.translateSpeak": "Speaking Language",
   "chatPlus.translator.translateSpeak.tooltip": "Language your messages are translated to.",
-  "chatPlus.translator.translateSpeak.chat.tooltip": "Language your messages are translated to. Click to toggle.",
+  "chatPlus.translator.translateSpeak.chat.tooltip": "Language your messages are translated to.\nLeft-Click to toggle.\nRight-Click to toggle language selector.",
   "chatPlus.translator.translateSpeakPrefix.tooltip": "Text to prepend that will not get translated.",
   "chatPlus.translator.keepOnAfterChatClose.toggle": "Keep Translate on After Chat Close",
   "chatPlus.translator.keepOnAfterChatClose.toggle.tooltip": "Enables/Disables whether the translator should automatically be on after closing the chat with it on.",
