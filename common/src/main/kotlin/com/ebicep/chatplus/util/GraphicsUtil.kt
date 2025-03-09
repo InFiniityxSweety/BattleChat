@@ -313,7 +313,7 @@ object GraphicsUtil {
         vertexConsumer.addVertex(matrix4f, i, l, 0.0f).setUv(f, m).setColor(n)
         vertexConsumer.addVertex(matrix4f, j, l, 0.0f).setUv(g, m).setColor(n)
         vertexConsumer.addVertex(matrix4f, j, k, 0.0f).setUv(g, h).setColor(n)
-        RenderSystem.enableDepthTest()
+        RenderSystem.disableDepthTest()
     }
 
     fun GuiGraphics.drawImage(resources: Resources) {
