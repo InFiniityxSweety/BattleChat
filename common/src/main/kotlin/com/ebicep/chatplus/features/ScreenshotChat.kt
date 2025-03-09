@@ -128,7 +128,7 @@ object ScreenshotChat {
             }
         }
         var screenshotKeyPressed = false // block other key presses (ctrl s key)
-        EventBus.register<ChatScreenKeyPressedEvent>({ 1 }, { screenshotKeyPressed }) {
+        EventBus.register<ChatScreenInputEvent>({ 1 }, { screenshotKeyPressed }) {
             if (!Config.values.screenshotChatEnabled) {
                 return@register
             }
@@ -243,7 +243,23 @@ object ScreenshotChat {
             val nativeImage: NativeImage = Screenshot.takeScreenshot(target)
             val image: Image = getImage(nativeImage)
             val bufferedImage: BufferedImage = imageToBufferedImage(image)
-            ChatPlus.sendMessage(Component.literal("Screenshot Taken").withStyle { it.withColor(ChatFormatting.GRAY) })
+            ChatPlus.sendMessage(
+                Component.literal("Screenshot Taken").withStyle {
+                    it.withColor(ChatFormatting.GRAY)
+                        .withHoverEvent(
+                            HoverEvent(
+                                HoverEvent.Action.SHOW_TEXT,
+                                Component.literal("Dimensions: ").withStyle(ChatFormatting.GRAY)
+                                    .append(Component.literal("${width.toInt()} x ${height.toInt()}").withStyle(ChatFormatting.AQUA))
+                                    .append(Component.literal("\nWindow Mode: ").withStyle(ChatFormatting.GRAY))
+                                    .append(Component.translatable(screenshotWindowsMode.key).withStyle(ChatFormatting.GREEN))
+                                    .append(Component.literal("\nMode: ").withStyle(ChatFormatting.GRAY))
+                                    .append(Component.translatable(screenshotMode.key).withStyle(ChatFormatting.GREEN))
+                                    .append(Component.literal("\nBackground Mode: ").withStyle(ChatFormatting.GRAY))
+                                    .append(Component.translatable(screenshotBackgroundMode.key).withStyle(ChatFormatting.GREEN))
+                            )
+                        )
+                })
             if (Config.values.screenshotChatSaveToFile) {
                 GlobalScope.launch(Dispatchers.IO) {
                     saveToFile(bufferedImage)
@@ -482,7 +498,7 @@ object ScreenshotChat {
                         it.withColor(ChatFormatting.AQUA)
                             .withUnderlined(true)
                             .withClickEvent(ClickEvent(ClickEvent.Action.OPEN_URL, result))
-                            .withHoverEvent(HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("Click to open link")))
+                            .withHoverEvent(HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("Click to open link").withStyle(ChatFormatting.GREEN)))
                     })
                 )
             }
@@ -493,7 +509,7 @@ object ScreenshotChat {
     }
 
     @Serializable
-    enum class ScreenshotMode(key: String) : EnumTranslatableName {
+    enum class ScreenshotMode(val key: String) : EnumTranslatableName {
         CURRENT_WINDOW("chatPlus.screenshotScreenShotWindowsMode.current"),
         ALL_WINDOWS("chatPlus.screenshotScreenShotWindowsMode.all"),
 
@@ -507,7 +523,7 @@ object ScreenshotChat {
     }
 
     @Serializable
-    enum class ScreenshotBackgroundMode(key: String) : EnumTranslatableName {
+    enum class ScreenshotBackgroundMode(val key: String) : EnumTranslatableName {
         KEEP_BACKGROUND("chatPlus.screenshotBackgroundMode.keepBackground"),
         KEEP_BACKGROUND_SHOW_LINE_COLOR("chatPlus.screenshotBackgroundMode.keepBackgroundShowLineColor"),
         TRANSPARENT("chatPlus.screenshotBackgroundMode.transparent"),
@@ -523,7 +539,7 @@ object ScreenshotChat {
     }
 
     @Serializable
-    enum class ScreenshotWindowsMode(key: String) : EnumTranslatableName {
+    enum class ScreenshotWindowsMode(val key: String) : EnumTranslatableName {
         STACK("chatPlus.screenshotScreenShotWindowsMode.stack"),
         SPLIT("chatPlus.screenshotScreenShotWindowsMode.split"),
 
