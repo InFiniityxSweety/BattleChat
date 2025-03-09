@@ -297,6 +297,7 @@ class ChatRenderer {
                     verticalChatOffset,
                     backgroundColor
                 )
+                guiGraphics.flush()
             }
             if (textOpacity <= 3) {
                 ++displayMessageIndex
