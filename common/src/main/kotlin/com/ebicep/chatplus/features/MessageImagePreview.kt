@@ -13,8 +13,6 @@ import com.ebicep.chatplus.util.GraphicsUtil.createPose
 import com.ebicep.chatplus.util.GraphicsUtil.drawImage
 import com.ebicep.chatplus.util.GraphicsUtil.translate0
 import com.mojang.blaze3d.platform.NativeImage
-import com.mojang.blaze3d.platform.TextureUtil
-import com.mojang.blaze3d.systems.RenderSystem
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -23,11 +21,10 @@ import kotlinx.serialization.Serializable
 import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.Screen
-import net.minecraft.client.renderer.texture.AbstractTexture
+import net.minecraft.client.renderer.texture.DynamicTexture
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.HoverEvent
 import net.minecraft.resources.ResourceLocation
-import net.minecraft.server.packs.resources.ResourceManager
 import java.awt.Color
 import java.awt.image.BufferedImage
 import java.io.ByteArrayInputStream
@@ -406,14 +403,7 @@ object MessageImagePreview {
         var maxFrames: Int = 1
     )
 
-    class ChatPlusTexture(val nativeImage: NativeImage) : AbstractTexture() {
-        override fun load(resourceManager: ResourceManager) {
-            RenderSystem.assertOnRenderThreadOrInit()
-            TextureUtil.prepareImage(this.getId(), nativeImage.width, nativeImage.height)
-            nativeImage.upload(0, 0, 0, false)
-            nativeImage.close()
-        }
-    }
+    class ChatPlusTexture(val nativeImage: NativeImage) : DynamicTexture(nativeImage)
 
     @Serializable
     data class MessageImagePreviewSettings(
