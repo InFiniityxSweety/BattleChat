@@ -387,7 +387,7 @@ object MessageImagePreview {
             }
 
             nativeImage.use { image ->
-                val resourceLocation = ResourceLocation(MOD_ID, "${prefix}_${System.currentTimeMillis()}")
+                val resourceLocation = ResourceLocation.tryBuild(MOD_ID, "${prefix}_${System.currentTimeMillis()}") ?: throw IllegalArgumentException("Invalid ResourceLocation")
                 val chatPlusTexture = ChatPlusTexture(image)
                 Minecraft.getInstance().textureManager.register(resourceLocation, chatPlusTexture)
                 onResource(resourceLocation, chatPlusTexture)
