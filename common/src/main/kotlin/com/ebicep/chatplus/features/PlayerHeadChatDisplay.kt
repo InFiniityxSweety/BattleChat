@@ -118,6 +118,7 @@ object PlayerHeadChatDisplay {
                     false,
                     -1
                 )
+                guiGraphics.flush()
                 RenderSystem.setShaderColor(1f, 1f, 1f, 1f)
                 RenderSystem.disableBlend()
             }

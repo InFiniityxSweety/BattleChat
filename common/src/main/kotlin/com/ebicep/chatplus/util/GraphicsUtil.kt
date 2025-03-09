@@ -1,6 +1,7 @@
 package com.ebicep.chatplus.util
 
 import com.ebicep.chatplus.mixin.IMixinGuiGraphics
+import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.blaze3d.vertex.VertexConsumer
 import net.minecraft.client.gui.Font
@@ -304,6 +305,7 @@ object GraphicsUtil {
         m: Float, // ending v-coordinate in the texture.
         n: Int // color to be applied to the vertices.
     ) {
+        RenderSystem.enableDepthTest()
         this as IMixinGuiGraphics
         val matrix4f: Matrix4f = this.pose().last().pose()
         val vertexConsumer: VertexConsumer = this.bufferSource.getBuffer(function.apply(resourceLocation))
@@ -311,16 +313,25 @@ object GraphicsUtil {
         vertexConsumer.addVertex(matrix4f, i, l, 0.0f).setUv(f, m).setColor(n)
         vertexConsumer.addVertex(matrix4f, j, l, 0.0f).setUv(g, m).setColor(n)
         vertexConsumer.addVertex(matrix4f, j, k, 0.0f).setUv(g, h).setColor(n)
+        RenderSystem.disableDepthTest()
     }
 
     fun GuiGraphics.drawImage(resources: Resources) {
+        this.drawImage(resources.resourceLocation, resources.width, resources.height)
+    }
+
+    fun GuiGraphics.drawImage(resourceLocation: ResourceLocation, width: Int, height: Int) {
+        this.drawImage(resourceLocation, width.toFloat(), height.toFloat())
+    }
+
+    fun GuiGraphics.drawImage(resourceLocation: ResourceLocation, width: Float, height: Float) {
         this.innerBlit0(
             { resLoc -> RenderType.guiTextured(resLoc) },
-            resources.resourceLocation,
+            resourceLocation,
             0f,
-            resources.width.toFloat(),
+            width,
             0f,
-            resources.height.toFloat(),
+            height,
             0f,
             1f,
             0f,
