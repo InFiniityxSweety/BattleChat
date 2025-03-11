@@ -77,6 +77,9 @@ object ChatTabs {
         }
         // tab auto prefix
         EventBus.register<ChatScreenSendMessagePreEvent> {
+            if (it.message.isEmpty()) {
+                return@register
+            }
             if (it.message.startsWith("/") && ChatManager.globalSelectedTab.commandsOverrideAutoPrefix) {
                 return@register
             }
