@@ -1126,6 +1126,19 @@ object ConfigScreenImpl {
                     Config.values.speechToTextSelectedAudioModel = str
                 }
             ),
+            entryBuilder.stringField(
+                "chatPlus.speechToText.speechToTextCharset",
+                Config.values.speechToTextCharset,
+                { Config.values.speechToTextCharset = it },
+                error = {
+                    try {
+                        charset(it)
+                        ""
+                    } catch (_: Exception) {
+                        "chatPlus.speechToText.speechToTextCharSet.invalid"
+                    }
+                }
+            ),
             entryBuilder.keyCodeOption(
                 "key.speechToText.ptt",
                 Config.values.speechToTextMicrophoneKey
@@ -1184,10 +1197,24 @@ object ConfigScreenImpl {
     }
 
 
-    private fun ConfigEntryBuilder.stringField(translatable: String, variable: String, saveConsumer: Consumer<String>, maxWidth: Int? = null): StringListEntry {
+    private fun ConfigEntryBuilder.stringField(
+        translatable: String,
+        variable: String,
+        saveConsumer: Consumer<String>,
+        maxWidth: Int? = null,
+        error: (String) -> String = { "" }
+    ): StringListEntry {
         return startStrField(Component.translatable(translatable), variable)
             .setDefaultValue(variable)
             .setTooltip(Optional.of(ComponentUtil.splitLines(Component.translatable("$translatable.tooltip"), maxWidth).toTypedArray()))
+            .setErrorSupplier {
+                val str = error.invoke(it)
+                if (str.isEmpty()) {
+                    Optional.empty()
+                } else {
+                    Optional.of(Component.translatable(str))
+                }
+            }
             .setSaveConsumer {
                 saveConsumer.accept(it)
                 queueUpdateConfig = true
