@@ -1,6 +1,7 @@
 package com.ebicep.chatplus.features
 
 import com.ebicep.chatplus.ChatPlus
+import com.ebicep.chatplus.IChatScreen
 import com.ebicep.chatplus.config.Config
 import com.ebicep.chatplus.config.EnumTranslatableName
 import com.ebicep.chatplus.events.EventBus
@@ -124,11 +125,12 @@ object FindMessage {
         EventBus.register<ChatScreenRenderEvent> {
             if (findEnabled && Config.values.findMessageHighlightInputBox) {
                 it.screen as IMixinChatScreen
+                it.screen as IChatScreen
                 val editBox = it.screen.input ?: return@register
                 it.guiGraphics.renderOutline(
                     editBox.x - 2,
-                    editBox.y - 4,
-                    editBox.width - 1,
+                    editBox.y - (if (Config.values.vanillaInputBox) 2 else 4),
+                    it.screen.chatPlusWidth - (if (Config.values.vanillaInputBox) 2 else 0),
                     editBox.height,
                     findMode!!.color
                 )
