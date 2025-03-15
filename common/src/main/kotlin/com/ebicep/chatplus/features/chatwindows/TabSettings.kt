@@ -16,6 +16,7 @@ import com.ebicep.chatplus.hud.ChatManager.resetGlobalSortedTabs
 import com.ebicep.chatplus.util.GraphicsUtil
 import com.ebicep.chatplus.util.GraphicsUtil.createPose
 import com.ebicep.chatplus.util.GraphicsUtil.drawImage
+import com.ebicep.chatplus.util.GraphicsUtil.drawString0
 import com.ebicep.chatplus.util.GraphicsUtil.guiForward
 import com.ebicep.chatplus.util.GraphicsUtil.translate0
 import com.ebicep.chatplus.util.KotlinUtil.reduceAlpha
@@ -258,8 +259,7 @@ class TabSettings {
                 backgroundColor
             )
             poseStack.guiForward()
-            guiGraphics.drawString(
-                Minecraft.getInstance().font,
+            guiGraphics.drawString0(
                 chatTab.name,
                 ChatTab.PADDING,
                 ChatTab.PADDING + ChatTab.PADDING / 2,

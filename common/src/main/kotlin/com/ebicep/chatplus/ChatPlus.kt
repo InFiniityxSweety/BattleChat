@@ -3,10 +3,10 @@ package com.ebicep.chatplus
 import com.ebicep.chatplus.config.Config
 import com.ebicep.chatplus.events.EventBus.post
 import com.ebicep.chatplus.events.Events
-import com.ebicep.chatplus.features.FeatureManager
 import com.ebicep.chatplus.features.chattabs.AddNewMessageEvent
 import com.ebicep.chatplus.features.chattabs.ChatTab
 import com.ebicep.chatplus.features.chattabs.SkipNewMessageEvent
+import com.ebicep.chatplus.features.internal.FeatureManager
 import com.ebicep.chatplus.hud.ChatManager.globalSortedTabs
 import com.ebicep.chatplus.translator.LanguageManager
 import com.ebicep.chatplus.util.ComponentUtil.withColor
