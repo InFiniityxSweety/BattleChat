@@ -121,7 +121,7 @@ public abstract class MixinChatScreen extends Screen implements IMixinChatScreen
         if (!Config.INSTANCE.getValues().getEnabled()) {
             return maxLength;
         }
-        return 256 * 5;
+        return Config.INSTANCE.getValues().getMaxInputBoxInputLength();
     }
 
     @ModifyArg(method = "init", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/EditBox;setCanLoseFocus(Z)V"))

@@ -50,7 +50,7 @@ object ConfigScreenImpl {
                 resetGlobalSortedTabs()
             }
             .transparentBackground()
-        builder.setGlobalized(true)
+        builder.setGlobalized(false)
         builder.setGlobalizedExpanded(true)
         val entryBuilder: ConfigEntryBuilder = builder.entryBuilder()
         addGeneralOptions(builder, entryBuilder)
@@ -98,6 +98,17 @@ object ConfigScreenImpl {
                 10,
                 30
             ) { Config.values.maxCommandSuggestions = it },
+            entryBuilder.intField(
+                "chatPlus.chatSettings.maxInputBoxInputLength",
+                Config.values.maxInputBoxInputLength,
+                error = {
+                    if (it <= 0) {
+                        "chatPlus.chatSettings.maxInputBoxInputLength.error"
+                    } else {
+                        ""
+                    }
+                }
+            ) { Config.values.maxInputBoxInputLength = it },
             entryBuilder.enumSelector(
                 "chatPlus.chatSettings.jumpToMessageMode",
                 JumpToMessageMode::class.java,
@@ -1284,21 +1295,31 @@ object ConfigScreenImpl {
     private fun ConfigEntryBuilder.linePriorityField(
         translatable: String,
         variable: Int,
+        error: (Int) -> String = { "" },
         saveConsumer: Consumer<Int>
     ): IntegerListEntry {
-        return intField(translatable, variable, "chatPlus.linePriority.tooltip", saveConsumer)
+        return intField(translatable, variable, "chatPlus.linePriority.tooltip", error, saveConsumer)
     }
 
     private fun ConfigEntryBuilder.intField(
         translatable: String,
         variable: Int,
         tooltip: String = "$translatable.tooltip",
-        saveConsumer: Consumer<Int>
+        error: (Int) -> String = { "" },
+        saveConsumer: Consumer<Int>,
     ): IntegerListEntry {
         return startIntField(Component.translatable(translatable), variable)
             .setDefaultValue(variable)
             .setTooltip(Optional.of(ComponentUtil.splitLines(Component.translatable(tooltip)).toTypedArray()))
             .setSaveConsumer { saveConsumer.accept(it) }
+            .setErrorSupplier {
+                val str = error.invoke(it)
+                if (str.isEmpty()) {
+                    Optional.empty()
+                } else {
+                    Optional.of(Component.translatable(str))
+                }
+            }
             .build()
     }
 

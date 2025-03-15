@@ -125,6 +125,7 @@ data class ConfigVariables(
     var wrappedMessageLineIndent: Int = 0,
     var maxMessages: Int = -1,
     var maxCommandSuggestions: Int = 15,
+    var maxInputBoxInputLength: Int = 256 * 5,
     var jumpToMessageMode: JumpToMessageMode = JumpToMessageMode.CURSOR,
     var selectChatLinePriority: Int = 100,
     var timestampSettings: TimestampMessages.TimestampSettings = TimestampMessages.TimestampSettings(),
