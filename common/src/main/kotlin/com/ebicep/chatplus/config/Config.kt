@@ -117,6 +117,7 @@ object Config {
 @Serializable
 data class ConfigVariables(
     // general
+    var globalizedConfig: Boolean = true,
     var enabled: Boolean = true,
     var addMessagesIfDisabled: Boolean = false,
     var showVanillaWhenUnfocused: Boolean = false,

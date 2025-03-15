@@ -25,6 +25,8 @@
   "chatPlus.general": "General",
   "chatPlus.chatSettings.title": "Chat Settings",
   "chatPlus.chatSettings.tooltip": "Change chat settings similar to vanilla Minecraft.",
+  "chatPlus.chatSettings.globalizedConfig": "Globalized Config",
+  "chatPlus.chatSettings.globalizedConfig.tooltip": "Enables/Disables the cloth config globalized config option, best to see for yourself what it does.",
   "chatPlus.chatSettings.toggle": "Enabled",
   "chatPlus.chatSettings.toggle.tooltip": "Enables/Disables ChatPlus.",
   "chatPlus.chatSettings.addMessagesIfDisabled": "Add Messages If Disabled",

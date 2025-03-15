@@ -50,7 +50,7 @@ object ConfigScreenImpl {
                 resetGlobalSortedTabs()
             }
             .transparentBackground()
-        builder.setGlobalized(true)
+        builder.setGlobalized(Config.values.globalizedConfig)
         builder.setGlobalizedExpanded(true)
         val entryBuilder: ConfigEntryBuilder = builder.entryBuilder()
         addGeneralOptions(builder, entryBuilder)
@@ -77,6 +77,7 @@ object ConfigScreenImpl {
 
     private fun addGeneralOptions(builder: ConfigBuilder, entryBuilder: ConfigEntryBuilder) {
         builder.getOrCreateCategory(Component.translatable("chatPlus.general").withColor(MOD_COLOR)).with(
+            entryBuilder.booleanToggle("chatPlus.chatSettings.globalizedConfig", Config.values.globalizedConfig) { Config.values.globalizedConfig = it },
             entryBuilder.booleanToggle("chatPlus.chatSettings.toggle", Config.values.enabled) { Config.values.enabled = it },
             entryBuilder.booleanToggle("chatPlus.chatSettings.addMessagesIfDisabled", Config.values.addMessagesIfDisabled) { Config.values.addMessagesIfDisabled = it },
             entryBuilder.booleanToggle("chatPlus.chatSettings.showVanillaWhenUnfocused", Config.values.showVanillaWhenUnfocused) { Config.values.showVanillaWhenUnfocused = it },
