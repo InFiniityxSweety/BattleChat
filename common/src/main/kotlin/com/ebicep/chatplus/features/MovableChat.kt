@@ -757,7 +757,13 @@ object MovableChat {
     }
 
     @Serializable
-    data class InputBoxSettings(var startY: Int = -PADDED_INPUT_BOX_HEIGHT) {
+    data class InputBoxSettings(
+        var startY: Int = -PADDED_INPUT_BOX_HEIGHT,
+        var normalizeInputWhileTyping: Boolean = false,
+        var maxInputBoxInputLength: Int = 256 * 5,
+        var showInputBoxInputLength: Boolean = true,
+        var showInputBoxInputLengthBackgroundColor: Int = Color(0, 0, 0, 0).rgb,
+    ) {
 
         fun getCalculatedStartY(): Int {
             var start = startY

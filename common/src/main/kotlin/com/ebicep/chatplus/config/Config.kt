@@ -27,6 +27,7 @@ import kotlinx.serialization.json.Json
 import net.minecraft.util.Mth
 import java.awt.Color
 import java.io.File
+import kotlin.math.max
 
 const val CONFIG_NAME = "${MOD_ID}-v2.5.0.json"
 val json = Json {
@@ -102,6 +103,7 @@ object Config {
 
     private fun correctValues() {
         values.maxCommandSuggestions = Mth.clamp(values.maxCommandSuggestions, 10, 30)
+        values.inputBoxSettings.maxInputBoxInputLength = max(1, values.inputBoxSettings.maxInputBoxInputLength)
         if (values.chatWindows.isEmpty()) {
             values.chatWindows.add(createDefaultWindow())
         }
@@ -126,7 +128,6 @@ data class ConfigVariables(
     var wrappedMessageLineIndent: Int = 0,
     var maxMessages: Int = -1,
     var maxCommandSuggestions: Int = 15,
-    var maxInputBoxInputLength: Int = 256 * 5,
     var jumpToMessageMode: JumpToMessageMode = JumpToMessageMode.CURSOR,
     var selectChatLinePriority: Int = 100,
     var timestampSettings: TimestampMessages.TimestampSettings = TimestampMessages.TimestampSettings(),

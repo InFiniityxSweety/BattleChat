@@ -99,17 +99,6 @@ object ConfigScreenImpl {
                 10,
                 30
             ) { Config.values.maxCommandSuggestions = it },
-            entryBuilder.intField(
-                "chatPlus.chatSettings.maxInputBoxInputLength",
-                Config.values.maxInputBoxInputLength,
-                error = {
-                    if (it <= 0) {
-                        "chatPlus.chatSettings.maxInputBoxInputLength.error"
-                    } else {
-                        ""
-                    }
-                }
-            ) { Config.values.maxInputBoxInputLength = it },
             entryBuilder.enumSelector(
                 "chatPlus.chatSettings.jumpToMessageMode",
                 JumpToMessageMode::class.java,
@@ -134,25 +123,50 @@ object ConfigScreenImpl {
                     Config.values.timestampSettings.chatTimestampModeType
                 ) { Config.values.timestampSettings.chatTimestampModeType = it },
             ).build(),
-            entryBuilder.startSubCategory(Component.translatable("chatPlus.chatSettings.inputOverFlowAutoFill")).with(
+            entryBuilder.startSubCategory(Component.translatable("chatPlus.chatSettings.inputBoxSettings")).with(
                 entryBuilder.booleanToggle(
-                    "chatPlus.chatSettings.inputOverFlowAutoFill.enabled",
-                    Config.values.inputOverFlowAutoFillSettings.enabled
-                ) { Config.values.inputOverFlowAutoFillSettings.enabled = it },
+                    "chatPlus.chatSettings.inputBoxSettings.normalizeInputWhileTyping",
+                    Config.values.inputBoxSettings.normalizeInputWhileTyping
+                ) { Config.values.inputBoxSettings.normalizeInputWhileTyping = it },
+                entryBuilder.intField(
+                    "chatPlus.chatSettings.inputBoxSettings.maxInputBoxInputLength",
+                    Config.values.inputBoxSettings.maxInputBoxInputLength,
+                    error = {
+                        if (it <= 0) {
+                            "chatPlus.chatSettings.inputBoxSettings.maxInputBoxInputLength.error"
+                        } else {
+                            ""
+                        }
+                    }
+                ) { Config.values.inputBoxSettings.maxInputBoxInputLength = it },
                 entryBuilder.booleanToggle(
-                    "chatPlus.chatSettings.inputOverFlowAutoFill.onlyCycleOnEnter",
-                    Config.values.inputOverFlowAutoFillSettings.onlyOnEnter
-                ) { Config.values.inputOverFlowAutoFillSettings.onlyOnEnter = it },
-                entryBuilder.enumSelector(
-                    "chatPlus.chatSettings.inputOverFlowAutoFill.autoFillCommandInteraction",
-                    InputOverFlowAutoFill.AutoFillCommandInteraction::class.java,
-                    Config.values.inputOverFlowAutoFillSettings.autoFillCommandInteraction
-                ) { Config.values.inputOverFlowAutoFillSettings.autoFillCommandInteraction = it },
-                entryBuilder.enumSelector(
-                    "chatPlus.chatSettings.inputOverFlowAutoFill.queueMode",
-                    InputOverFlowAutoFill.QueueMode::class.java,
-                    Config.values.inputOverFlowAutoFillSettings.queueMode
-                ) { Config.values.inputOverFlowAutoFillSettings.queueMode = it },
+                    "chatPlus.chatSettings.inputBoxSettings.showInputBoxInputLength",
+                    Config.values.inputBoxSettings.showInputBoxInputLength
+                ) { Config.values.inputBoxSettings.showInputBoxInputLength = it },
+                entryBuilder.alphaField(
+                    "chatPlus.chatSettings.inputBoxSettings.showInputBoxInputLengthBackgroundColor",
+                    Config.values.inputBoxSettings.showInputBoxInputLengthBackgroundColor
+                ) { Config.values.inputBoxSettings.showInputBoxInputLengthBackgroundColor = it },
+                entryBuilder.startSubCategory(Component.translatable("chatPlus.chatSettings.inputBoxSettings.inputOverFlowAutoFill")).with(
+                    entryBuilder.booleanToggle(
+                        "chatPlus.chatSettings.inputBoxSettings.inputOverFlowAutoFill.enabled",
+                        Config.values.inputOverFlowAutoFillSettings.enabled
+                    ) { Config.values.inputOverFlowAutoFillSettings.enabled = it },
+                    entryBuilder.booleanToggle(
+                        "chatPlus.chatSettings.inputBoxSettings.inputOverFlowAutoFill.onlyCycleOnEnter",
+                        Config.values.inputOverFlowAutoFillSettings.onlyOnEnter
+                    ) { Config.values.inputOverFlowAutoFillSettings.onlyOnEnter = it },
+                    entryBuilder.enumSelector(
+                        "chatPlus.chatSettings.inputBoxSettings.inputOverFlowAutoFill.autoFillCommandInteraction",
+                        InputOverFlowAutoFill.AutoFillCommandInteraction::class.java,
+                        Config.values.inputOverFlowAutoFillSettings.autoFillCommandInteraction
+                    ) { Config.values.inputOverFlowAutoFillSettings.autoFillCommandInteraction = it },
+                    entryBuilder.enumSelector(
+                        "chatPlus.chatSettings.inputBoxSettings.inputOverFlowAutoFill.queueMode",
+                        InputOverFlowAutoFill.QueueMode::class.java,
+                        Config.values.inputOverFlowAutoFillSettings.queueMode
+                    ) { Config.values.inputOverFlowAutoFillSettings.queueMode = it },
+                ).build(),
             ).build(),
             entryBuilder.startSubCategory(Component.translatable("chatPlus.chatSettings.messageImagePreview")).with(
                 entryBuilder.booleanToggle(

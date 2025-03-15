@@ -114,7 +114,7 @@ object FindMessage {
                 }
             }
         }
-        EventBus.register<ChatScreenInputBoxEditEvent> {
+        EventBus.register<ChatScreenInputBoxEditEvent>({ 5 }, { findEnabled }) {
             if (findEnabled) {
                 lastInput = it.str
                 ChatManager.globalSelectedTab.queueRefreshDisplayedMessages(false)

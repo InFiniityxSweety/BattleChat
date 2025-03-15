@@ -40,6 +40,7 @@ object FeatureManager {
         InputBoxAutoAdjustChatWindow
         MessageImagePreview
         InputBoxCharacterCount
+        InputBoxNormalizeInput
 //        AlternatingColorBackground
     }
 
