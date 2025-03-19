@@ -156,12 +156,13 @@ data class ConfigVariables(
     var animationDisableOnFocus: Boolean = false,
     var animationNewMessageTransitionTime: Int = 200,
     // windows
+    var tabEditorScreen: Boolean = true,
+    var windowEditorScreen: Boolean = true,
     var scrollCycleTabEnabled: Boolean = true,
     var arrowCycleTabEnabled: Boolean = true,
     var moveToTabWhenCycling: Boolean = true,
     var inputBoxAutoAdjustChatWindowEnabled: Boolean = true,
     var tabNotificationSettings: TabNotificationSettings = TabNotificationSettings(),
-    var chatWindows: MutableList<ChatWindow> = mutableListOf(),
     // moving chat
     var movableChatEnabled: Boolean = true,
     var movableChatShowEnabledOnScreen: Boolean = true,
@@ -258,6 +259,15 @@ data class ConfigVariables(
     var speechToTextAutoReplacePlayersMaxSearchDepth: Int = 3,
     var speechToTextReplace: MutableList<SpeechToTextReplace> = mutableListOf(),
 ) {
+
+    var chatWindows: MutableList<ChatWindow> = mutableListOf()
+        set(value) {
+            field = if (value.isEmpty()) {
+                mutableListOf(createDefaultWindow())
+            } else {
+                value
+            }
+        }
 
     // speech to text
     var speechToTextSampleRate: Int = 48000

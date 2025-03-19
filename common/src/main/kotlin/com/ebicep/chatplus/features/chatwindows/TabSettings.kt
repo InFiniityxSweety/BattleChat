@@ -45,9 +45,15 @@ class TabSettings {
     @Serializable(with = ChatTabSerializer::class)
     var tabs: MutableList<ChatTab> = mutableListOf()
         set(value) {
-            field = value
+            field = if (value.isEmpty()) {
+                val defaultTab = createDefaultTab()
+                defaultTab.chatWindow = chatWindow
+                mutableListOf(defaultTab)
+            } else {
+                value
+            }
             selectedTabIndex = Mth.clamp(selectedTabIndex, 0, tabs.size - 1)
-            value.forEach { it.chatWindow = chatWindow }
+            field.forEach { it.chatWindow = chatWindow }
             resetSortedChatTabs()
         }
 
