@@ -2,7 +2,7 @@ package com.ebicep.chatplus
 
 import com.ebicep.chatplus.config.Config
 import com.ebicep.chatplus.events.Events
-import com.ebicep.chatplus.features.FeatureManager
+import com.ebicep.chatplus.features.internal.FeatureManager
 import com.ebicep.chatplus.translator.LanguageManager
 import com.mojang.blaze3d.platform.NativeImage
 import net.minecraft.ChatFormatting
