@@ -11,6 +11,8 @@ import com.ebicep.chatplus.features.internal.MessageFilterFormatted
 import com.ebicep.chatplus.hud.ChatManager
 import com.ebicep.chatplus.hud.ChatPlusScreen
 import com.ebicep.chatplus.mixin.IMixinScreen
+import com.ebicep.chatplus.util.ComponentUtil.getColoredString
+
 import com.google.common.base.Predicate
 import com.google.common.collect.Lists
 import kotlinx.serialization.KSerializer
@@ -62,9 +64,17 @@ class ChatTab : MessageFilterFormatted {
     data class ChatPlusGuiMessageLine(
         val line: GuiMessage.Line,
         val content: String,
+        var coloredContent: String?,
         val linkedMessage: ChatPlusGuiMessage,
         val wrappedIndex: Int
-    )
+    ) {
+        fun coloredContent(): String {
+            if (coloredContent == null) {
+                coloredContent = line.content.getColoredString()
+            }
+            return coloredContent!!
+        }
+    }
 
     override fun matches(message: String, pattern: String, regex: Regex): Boolean {
         val ip = Minecraft.getInstance().player?.connection?.serverData?.ip ?: return super.matches(message, pattern, regex)
@@ -329,6 +339,7 @@ class ChatTab : MessageFilterFormatted {
             val line = ChatPlusGuiMessageLine(
                 GuiMessage.Line(addedTime, formattedCharSequence, tag, lastComponent),
                 content,
+                null,
                 linkedMessage,
                 j
             )

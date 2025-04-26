@@ -3,6 +3,7 @@ package com.ebicep.chatplus.features.chattabs
 import com.ebicep.chatplus.events.EventBus
 import com.ebicep.chatplus.features.chatwindows.ChatWindow
 import com.ebicep.chatplus.features.internal.MessageFilterFormatted
+
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import net.minecraft.network.chat.Component
@@ -48,7 +49,7 @@ class AutoTabCreator {
         val text = component.string
         val tabSettings = chatWindow.tabSettings
         // check if already in other tab
-        if (tabSettings.tabs.any { it.isAutoTab && it.matches(text) }) {
+        if (tabSettings.tabs.any { it.isAutoTab && it.matches(component) }) {
             return null
         }
         autoTabOptions.forEach {
