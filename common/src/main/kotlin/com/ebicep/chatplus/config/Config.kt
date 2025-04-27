@@ -29,7 +29,7 @@ import java.awt.Color
 import java.io.File
 import kotlin.math.max
 
-const val CONFIG_NAME = "${MOD_ID}-v2.5.0.json"
+const val CONFIG_NAME = "${MOD_ID}-v2.7.0.json"
 val json = Json {
     encodeDefaults = true
     ignoreUnknownKeys = true
@@ -61,17 +61,20 @@ object Config {
 
     fun load() {
         ChatPlus.LOGGER.info("Config Directory: ${ConfigDirectory.getConfigDirectory().toAbsolutePath().normalize()}/chatplus")
-        val configDirectory: File = File(configDirectoryPath)
+        val configDirectory = File(configDirectoryPath)
         if (!configDirectory.exists()) {
             configDirectory.mkdir()
         }
-        val configFile: File = File(configDirectory, CONFIG_NAME)
+        val configFile = File(configDirectory, CONFIG_NAME)
         if (!configFile.exists()) {
             ChatPlus.LOGGER.info("No config file found, checking migration")
             if (!MigrationManager.tryMigration(configDirectory, configFile)) {
                 ChatPlus.LOGGER.info("No migration found, creating new config")
                 configFile.createNewFile()
                 configFile.writeText(json.encodeToString(ConfigVariables.serializer(), values))
+            } else {
+                ChatPlus.LOGGER.info("Reading migrated config")
+                values = json.decodeFromString(ConfigVariables.serializer(), configFile.readText())
             }
         } else {
             values = json.decodeFromString(ConfigVariables.serializer(), configFile.readText())

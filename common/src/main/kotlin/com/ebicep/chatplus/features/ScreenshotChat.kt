@@ -278,7 +278,7 @@ object ScreenshotChat {
                 MessageDirection.BOTTOM_UP -> renderer.rescaledY - displayMessageIndex * renderer.lineHeight
             }
             val verticalTextOffset: Float = verticalChatOffset + renderer.l1 // align text with background
-            var textColor: Int = 0xFFFFFF
+            var textColor = 0xFFFFFF
             var backgroundColor = if (useChatBackgroundColor) updatedBackgroundColor else 0
             poseStack.createPose {
                 poseStack.guiForward()

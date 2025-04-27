@@ -73,8 +73,8 @@ class TabSettings {
         selectedTabIndex = Mth.clamp(selectedTabIndex, 0, tabs.size - 1)
 
         tabs.forEach {
-            it.updateRegex()
             it.updateServerIPRegex()
+            it.updateCurrentSettings()
         }
         resetSortedChatTabs(false)
     }
@@ -98,6 +98,12 @@ class TabSettings {
         sortedTabs = tabs.sortedBy { -it.priority }
         if (resetGlobal && Config.loaded) {
             resetGlobalSortedTabs()
+        }
+    }
+
+    fun updateTabSettings(ip: String? = null) {
+        tabs.forEach {
+            it.updateCurrentSettings(ip ?: Minecraft.getInstance().player?.connection?.serverData?.ip)
         }
     }
 

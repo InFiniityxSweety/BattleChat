@@ -10,7 +10,7 @@ import com.ebicep.chatplus.features.SendNote.NOTE_COLOR
 import com.ebicep.chatplus.features.chattabs.AutoTabCreator
 import com.ebicep.chatplus.features.chattabs.CHAT_TAB_HEIGHT
 import com.ebicep.chatplus.features.chattabs.ChatTab
-import com.ebicep.chatplus.features.chattabs.ServerTabPattern
+import com.ebicep.chatplus.features.chattabs.ServerChatTabSettings
 import com.ebicep.chatplus.features.chatwindows.ChatWindow
 import com.ebicep.chatplus.features.chatwindows.OutlineSettings
 import com.ebicep.chatplus.features.chatwindows.TabSettings.Position
@@ -503,7 +503,7 @@ object ConfigScreenImpl {
                 window.tabSettings.tabs,
                 { window.tabSettings.tabs = it },
                 window.tabSettings.tabs.size > 1,
-                { ChatTab(window, "", "") },
+                { ChatTab(window, ServerChatTabSettings()) },
                 { value ->
                     getTabEntries(entryBuilder, value)
                 },
@@ -517,53 +517,52 @@ object ConfigScreenImpl {
         entryBuilder: ConfigEntryBuilder,
         value: ChatTab
     ): List<TooltipListEntry<out Any?>> = listOf(
-        entryBuilder.stringField("chatPlus.chatWindow.tabSettings.chatTabs.name", value.name, { value.name = it }),
-        entryBuilder.stringField("chatPlus.chatWindow.tabSettings.chatTabs.pattern", value.pattern, { value.pattern = it }),
-        entryBuilder.booleanToggle(
-            "chatPlus.chatWindow.tabSettings.chatTabs.formatted.toggle",
-            value.formatted
-        ) { value.formatted = it },
-        entryBuilder.stringField("chatPlus.chatWindow.tabSettings.chatTabs.autoPrefix", value.autoPrefix, { value.autoPrefix = it }),
-        getCustomListOption(
-            "chatPlus.chatWindow.tabSettings.chatTabs.serverTabPatterns",
-            value.serverTabPatterns,
-            { value.serverTabPatterns = it },
-            true,
-            { ServerTabPattern("", "") },
-            { v ->
-                listOf(
-                    entryBuilder.stringField("chatPlus.chatWindow.tabSettings.chatTabs.serverTabPattern", v.pattern, { v.pattern = it }),
-                    entryBuilder.stringField("chatPlus.chatWindow.tabSettings.chatTabs.pattern", v.chatPattern.pattern, { v.chatPattern.pattern = it }),
-                    entryBuilder.booleanToggle(
-                        "chatPlus.chatWindow.tabSettings.chatTabs.formatted.toggle",
-                        v.chatPattern.formatted
-                    ) { v.chatPattern.formatted = it },
-                    entryBuilder.stringField("chatPlus.chatWindow.tabSettings.chatTabs.autoPrefix", v.autoPrefix, { v.autoPrefix = it }),
-                )
-            },
-            { Component.literal(it.pattern) },
-            false
-        ),
-        entryBuilder.intField(
-            "chatPlus.chatWindow.tabSettings.chatTabs.priority",
-            value.priority
-        ) { value.priority = it },
-        entryBuilder.booleanToggle(
-            "chatPlus.chatWindow.tabSettings.chatTabs.alwaysAdd",
-            value.alwaysAdd
-        ) { value.alwaysAdd = it },
-        entryBuilder.booleanToggle(
-            "chatPlus.chatWindow.tabSettings.chatTabs.skipOthers",
-            value.skipOthers
-        ) { value.skipOthers = it },
-        entryBuilder.booleanToggle(
-            "chatPlus.chatWindow.tabSettings.chatTabs.commandsOverrideAutoPrefix",
-            value.commandsOverrideAutoPrefix
-        ) { value.commandsOverrideAutoPrefix = it },
         entryBuilder.booleanToggle(
             "chatPlus.chatWindow.tabSettings.chatTabs.temporary",
             value.temporary
         ) { value.temporary = it },
+        getCustomListOption(
+            "chatPlus.chatWindow.tabSettings.chatTabs.settings",
+            value.settings,
+            { value.settings = it },
+            true,
+            { ServerChatTabSettings("", false) },
+            { value ->
+                listOf(
+                    entryBuilder.stringField("chatPlus.chatWindow.tabSettings.chatTabs.serverPattern", value.serverPattern.pattern, { value.serverPattern.pattern = it }),
+                    entryBuilder.stringField("chatPlus.chatWindow.tabSettings.chatTabs.name", value.name, { value.name = it }),
+                    entryBuilder.stringField("chatPlus.chatWindow.tabSettings.chatTabs.pattern", value.pattern, { value.pattern = it }),
+                    entryBuilder.booleanToggle("chatPlus.chatWindow.tabSettings.chatTabs.formatted.toggle", value.formatted) { value.formatted = it },
+                    entryBuilder.stringField("chatPlus.chatWindow.tabSettings.chatTabs.autoPrefix", value.autoPrefix, { value.autoPrefix = it }),
+                    entryBuilder.intField(
+                        "chatPlus.chatWindow.tabSettings.chatTabs.priority",
+                        value.priority
+                    ) { value.priority = it },
+                    entryBuilder.booleanToggle(
+                        "chatPlus.chatWindow.tabSettings.chatTabs.alwaysAdd",
+                        value.alwaysAdd
+                    ) { value.alwaysAdd = it },
+                    entryBuilder.booleanToggle(
+                        "chatPlus.chatWindow.tabSettings.chatTabs.skipOthers",
+                        value.skipOthers
+                    ) { value.skipOthers = it },
+                    entryBuilder.booleanToggle(
+                        "chatPlus.chatWindow.tabSettings.chatTabs.commandsOverrideAutoPrefix",
+                        value.commandsOverrideAutoPrefix
+                    ) { value.commandsOverrideAutoPrefix = it },
+                )
+            },
+            {
+                Component.literal(
+                    if (it.serverPattern.pattern.isEmpty()) "Default"
+                    else it.serverPattern.pattern
+                ).withStyle(
+                    if (value.currentSettings === it) ChatFormatting.GREEN
+                    else ChatFormatting.RED
+                )
+            },
+            false
+        )
     )
 
     private fun getAutoTabCreatorCategory(

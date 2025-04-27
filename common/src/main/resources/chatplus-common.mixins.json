@@ -11,9 +11,11 @@
     "IMixinStringSplitter",
     "MixinChatComponent",
     "MixinChatScreen",
+    "MixinClientConfigurationPacketListenerImpl",
     "MixinGuiGraphics",
     "MixinScreen",
     "MixinServerList",
+    "MixinTitleScreen",
     "NativeImagePointerAccessor"
   ],
   "mixins": [

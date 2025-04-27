@@ -23,7 +23,7 @@ import java.util.function.Consumer
 
 class Editor(
     val previousScreen: Screen?,
-    val titleComponent: () -> String,
+    titleComponent: () -> String,
     val subTitleComponent: () -> String?,
     val pressClone: (Button) -> Unit,
     val pressEdit: (Button) -> Unit,

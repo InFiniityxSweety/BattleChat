@@ -49,7 +49,7 @@ class AutoTabCreator {
         val text = component.string
         val tabSettings = chatWindow.tabSettings
         // check if already in other tab
-        if (tabSettings.tabs.any { it.isAutoTab && it.matches(component) }) {
+        if (tabSettings.tabs.any { it.isAutoTab && it.currentSettings.matches(component) }) {
             return null
         }
         autoTabOptions.forEach {
@@ -60,16 +60,17 @@ class AutoTabCreator {
             val autoPrefix = formatRegex(it.autoPrefixFormatter, matchResult)
             val chatTab = ChatTab(
                 chatWindow,
-                tabName,
-                pattern,
-                autoPrefix,
-                it.priority,
-                it.alwaysAdd,
-                it.skipOthers,
-                it.commandsOverrideAutoPrefix,
-                it.temporary,
-                true
-            )
+                ServerChatTabSettings(pattern, it.formatted).also { settings ->
+                    settings.name = tabName
+                    settings.autoPrefix = autoPrefix
+                    settings.priority = it.priority
+                    settings.alwaysAdd = it.alwaysAdd
+                    settings.skipOthers = it.skipOthers
+                    settings.commandsOverrideAutoPrefix = it.commandsOverrideAutoPrefix
+                }
+            ).also {
+                it.temporary = true
+            }
             tabSettings.tabs.add(chatTab)
             tabSettings.resetSortedChatTabs()
             return AutoTabData(it, chatTab)
@@ -107,8 +108,7 @@ class AutoTabCreator {
         var commandsOverrideAutoPrefix: Boolean = true
         var temporary: Boolean = true
 
-        constructor(pattern: String) : super(pattern) {
-        }
+        constructor(pattern: String) : super(pattern)
 
     }
 

@@ -46,6 +46,7 @@ object ChatPlus {
             .append(Component.literal("TEST?").withStyle {
                 it.withColor(0xA6A6A6)
             })
+        ChatManager.globalSelectedTab.updateCurrentSettings()
         println("Final value: ${ChatManager.globalSelectedTab.displayedMessages.last().coloredContent()}")
 //        Minecraft.getInstance().player!!.sendSystemMessage(component)
 //        Minecraft.getInstance().player!!.connection.sendChat(component.getColoredString())

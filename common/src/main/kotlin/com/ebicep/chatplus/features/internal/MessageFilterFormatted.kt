@@ -17,18 +17,7 @@ open class MessageFilterFormatted : MessageFilter {
         this.formatted = formatted
     }
 
-    open fun matches(message: String, pattern: String, regex: Regex): Boolean {
-        if (pattern == "(?s).*" || pattern == "(.*?)") {
-            return true
-        }
-        return if (formatted) {
-            regex.matches(message.replace("§", "&"))
-        } else {
-            regex.matches(ChatFormatting.stripFormatting(message)!!)
-        }
-    }
-
-    open fun matches(message: String, coloredMessage: String?, pattern: String, regex: Regex): Boolean {
+    fun matches(message: String, coloredMessage: String?): Boolean {
         if (pattern == "(?s).*" || pattern == "(.*?)") {
             return true
         }
@@ -40,11 +29,11 @@ open class MessageFilterFormatted : MessageFilter {
     }
 
     fun matches(message: Component): Boolean {
-        return matches(message.string, message.visualOrderText.getColoredString(), pattern, regex)
+        return matches(message.string, message.visualOrderText.getColoredString())
     }
 
     fun matches(message: ChatPlusGuiMessageLine): Boolean {
-        return matches(message.content, message.coloredContent(), pattern, regex)
+        return matches(message.content, message.coloredContent())
     }
 
     fun find(message: String): MatchResult? {
