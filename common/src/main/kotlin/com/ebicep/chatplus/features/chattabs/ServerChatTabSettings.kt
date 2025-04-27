@@ -43,6 +43,7 @@ open class ServerChatTabSettings : MessageFilterFormatted {
         return ServerChatTabSettings(
             pattern, formatted
         ).also {
+            it.serverPattern = MessageFilter(this.serverPattern.pattern)
             it.name = this.name
             it.autoPrefix = this.autoPrefix
             it.priority = this.priority

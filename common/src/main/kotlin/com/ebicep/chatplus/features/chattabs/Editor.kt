@@ -41,6 +41,7 @@ class Editor(
                     val mutableList = chatTab.chatWindow.tabSettings.tabs.toMutableList()
                     mutableList.add(chatTab.clone())
                     chatTab.chatWindow.tabSettings.tabs = mutableList
+                    chatTab.chatWindow.tabSettings.updateTabSettings()
                     resetGlobalSortedTabs()
                     Minecraft.getInstance().setScreen(previousScreen)
                 },
