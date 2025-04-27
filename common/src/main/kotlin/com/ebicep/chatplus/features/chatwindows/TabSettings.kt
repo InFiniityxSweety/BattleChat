@@ -279,7 +279,7 @@ class TabSettings {
             )
         }
         // notification badge
-        if (Config.values.tabNotificationSettings.enabled && !chatTab.read) {
+        if (Config.values.tabNotificationSettings.enabled && chatTab.unreadCount > 0) {
             val scale = Config.values.tabNotificationSettings.scale
             poseStack.createPose {
                 poseStack.guiForward(GraphicsUtil.GuiForwardType.ChatTabNotificationBadge)
@@ -289,6 +289,15 @@ class TabSettings {
                 )
                 poseStack.scale(scale, scale, 1f)
                 guiGraphics.drawImage(Resources.NOTIFICATION_BADGE)
+                if (Config.values.tabNotificationSettings.showCount) {
+                    poseStack.guiForward()
+                    guiGraphics.drawString0(
+                        chatTab.unreadCount.toString(),
+                        Resources.NOTIFICATION_BADGE.width / 2 - Minecraft.getInstance().font.width(chatTab.unreadCount.toString()) / 2,
+                        Resources.NOTIFICATION_BADGE.height / 2 - Minecraft.getInstance().font.lineHeight / 2,
+                        Config.values.tabNotificationSettings.countColor
+                    )
+                }
             }
         }
     }

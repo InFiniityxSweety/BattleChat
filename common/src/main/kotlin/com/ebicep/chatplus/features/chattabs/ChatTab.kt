@@ -197,7 +197,7 @@ class ChatTab {
     var lastMessageTime: Long = 0
 
     @Transient
-    var read: Boolean = true
+    var unreadCount: Int = 0
 
     @Transient
     lateinit var chatWindow: ChatWindow
@@ -233,7 +233,7 @@ class ChatTab {
                 ChatPlus.LOGGER.info("Set current settings to default ${newCurrent.serverPattern.pattern} for $ip")
             }
         }
-        newCurrent!!.chatTab = this
+        newCurrent.chatTab = this
         currentSettings = newCurrent
         width = -1
         ChatPlus.LOGGER.info("Set current settings for $patterns to ${currentSettings.serverPattern.pattern} for $ip")
@@ -285,7 +285,7 @@ class ChatTab {
         }
         val newDisplayMessageResult = this.addNewDisplayMessage(mutableComponent, addedTime, tag, chatPlusGuiMessage)
         if (chatWindow.tabSettings.selectedTab != this) {
-            this.read = false
+            this.unreadCount++
         }
         return NewMessageResult(chatTabAddNewMessageEvent, removedMessages, newDisplayMessageResult)
     }

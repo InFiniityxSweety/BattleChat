@@ -388,6 +388,14 @@ object ConfigScreenImpl {
                         "chatPlus.chatWindowsTabs.tabNotification.enabled",
                         Config.values.tabNotificationSettings.enabled
                     ) { Config.values.tabNotificationSettings.enabled = it },
+                    entryBuilder.booleanToggle(
+                        "chatPlus.chatWindowsTabs.tabNotification.showCount",
+                        Config.values.tabNotificationSettings.showCount
+                    ) { Config.values.tabNotificationSettings.showCount = it },
+                    entryBuilder.alphaField(
+                        "chatPlus.chatWindowsTabs.tabNotification.countColor",
+                        Config.values.tabNotificationSettings.countColor
+                    ) { Config.values.tabNotificationSettings.countColor = it },
                     entryBuilder.percentSlider(
                         "chatPlus.chatWindowsTabs.tabNotification.scale",
                         Config.values.tabNotificationSettings.scale
@@ -416,7 +424,7 @@ object ConfigScreenImpl {
 
     private fun getWindowEntries(
         entryBuilder: ConfigEntryBuilder,
-        window: ChatWindow
+        window: ChatWindow,
     ): List<SubCategoryListEntry> = listOf(
         getWindowGeneralCategory(entryBuilder, window).build(),
         getWindowPaddingCategory(entryBuilder, window).build(),
@@ -427,7 +435,7 @@ object ConfigScreenImpl {
 
     private fun getWindowOutlineCategory(
         entryBuilder: ConfigEntryBuilder,
-        window: ChatWindow
+        window: ChatWindow,
     ): SubCategoryBuilder {
         return entryBuilder.startSubCategory(Component.translatable("chatPlus.chatWindow.outlineSettings.outline")).with(
             entryBuilder.booleanToggle(
@@ -461,7 +469,7 @@ object ConfigScreenImpl {
 
     private fun getWindowTabsCategory(
         entryBuilder: ConfigEntryBuilder,
-        window: ChatWindow
+        window: ChatWindow,
     ): SubCategoryBuilder {
         return entryBuilder.startSubCategory(Component.translatable("chatPlus.chatWindow.tabSettings.chatTabs.title")).with(
             entryBuilder.booleanToggle(
@@ -515,7 +523,7 @@ object ConfigScreenImpl {
 
     private fun getTabEntries(
         entryBuilder: ConfigEntryBuilder,
-        value: ChatTab
+        value: ChatTab,
     ): List<TooltipListEntry<out Any?>> = listOf(
         entryBuilder.booleanToggle(
             "chatPlus.chatWindow.tabSettings.chatTabs.temporary",
@@ -567,7 +575,7 @@ object ConfigScreenImpl {
 
     private fun getAutoTabCreatorCategory(
         entryBuilder: ConfigEntryBuilder,
-        window: ChatWindow
+        window: ChatWindow,
     ): SubCategoryBuilder {
         return entryBuilder.startSubCategory(Component.translatable("chatPlus.chatWindow.autoTabCreator.title")).with(
             getCustomListOption(
@@ -640,7 +648,7 @@ object ConfigScreenImpl {
 
     private fun getWindowPaddingCategory(
         entryBuilder: ConfigEntryBuilder,
-        window: ChatWindow
+        window: ChatWindow,
     ): SubCategoryBuilder {
         return entryBuilder.startSubCategory(Component.translatable("chatPlus.chatWindow.padding")).with(
             entryBuilder.intSlider(
@@ -666,7 +674,7 @@ object ConfigScreenImpl {
 
     private fun getWindowGeneralCategory(
         entryBuilder: ConfigEntryBuilder,
-        window: ChatWindow
+        window: ChatWindow,
     ): SubCategoryBuilder {
         return entryBuilder.startSubCategory(Component.translatable("chatPlus.chatWindow.generalSettings")).with(
             entryBuilder.booleanToggle(
@@ -1273,7 +1281,7 @@ object ConfigScreenImpl {
         variable: String,
         saveConsumer: Consumer<String>,
         maxWidth: Int? = null,
-        error: (String) -> String = { "" }
+        error: (String) -> String = { "" },
     ): StringListEntry {
         return startStrField(Component.translatable(translatable), variable)
             .setDefaultValue(variable)
@@ -1296,7 +1304,7 @@ object ConfigScreenImpl {
     private fun ConfigEntryBuilder.booleanToggle(
         translatable: String,
         variable: Boolean,
-        saveConsumer: Consumer<Boolean>
+        saveConsumer: Consumer<Boolean>,
     ): BooleanListEntry {
         return startBooleanToggle(Component.translatable(translatable), variable)
             .setDefaultValue(variable)
@@ -1311,7 +1319,7 @@ object ConfigScreenImpl {
     private fun ConfigEntryBuilder.percentSlider(
         translatable: String,
         variable: Float,
-        saveConsumer: Consumer<Float>
+        saveConsumer: Consumer<Float>,
     ): IntegerSliderEntry {
         return percentSlider(translatable, variable, 0, 1, saveConsumer)
     }
@@ -1321,7 +1329,7 @@ object ConfigScreenImpl {
         variable: Float,
         min: Int,
         max: Int,
-        saveConsumer: Consumer<Float>
+        saveConsumer: Consumer<Float>,
     ): IntegerSliderEntry {
         val intValue = (variable * 100).toInt()
         return startIntSlider(Component.translatable(translatable), intValue, min * 100, max * 100)
@@ -1340,7 +1348,7 @@ object ConfigScreenImpl {
         variable: Int,
         min: Int,
         max: Int,
-        saveConsumer: Consumer<Int>
+        saveConsumer: Consumer<Int>,
     ): IntegerSliderEntry {
         return startIntSlider(Component.translatable(translatable), variable, min, max)
             .setDefaultValue(variable)
@@ -1356,7 +1364,7 @@ object ConfigScreenImpl {
         translatable: String,
         variable: Int,
         error: (Int) -> String = { "" },
-        saveConsumer: Consumer<Int>
+        saveConsumer: Consumer<Int>,
     ): IntegerListEntry {
         return intField(translatable, variable, "chatPlus.linePriority.tooltip", error, saveConsumer)
     }
@@ -1391,7 +1399,7 @@ object ConfigScreenImpl {
         create: () -> T,
         render: (T) -> List<AbstractConfigListEntry<*>>,
         entryNameFunction: (T) -> Component,
-        defaultExpanded: Boolean = true
+        defaultExpanded: Boolean = true,
     ): NestedListListEntry<T, MultiElementListEntry<T>> {
         return NestedListListEntry(
             Component.translatable(translatable),
@@ -1413,7 +1421,7 @@ object ConfigScreenImpl {
     private fun ConfigEntryBuilder.keyCodeOption(
         translatable: String,
         variable: InputConstants.Key,
-        saveConsumer: Consumer<InputConstants.Key>
+        saveConsumer: Consumer<InputConstants.Key>,
     ): KeyCodeEntry {
         return startKeyCodeField(Component.translatable(translatable), variable)
             .setDefaultValue(variable)
@@ -1427,7 +1435,7 @@ object ConfigScreenImpl {
 
     private fun ConfigEntryBuilder.keyCodeOptionWithModifier(
         translatable: String,
-        variable: KeyWithModifier
+        variable: KeyWithModifier,
     ): KeyCodeEntry {
         return startModifierKeyCodeField(
             Component.translatable(translatable),
@@ -1457,7 +1465,7 @@ object ConfigScreenImpl {
         translatable: String,
         enumClass: Class<T>,
         defaultValue: T,
-        saveConsumer: (T) -> Unit
+        saveConsumer: (T) -> Unit,
     ): EnumListEntry<T> where T : Enum<T>, T : EnumTranslatableName {
         return startEnumSelector(Component.translatable(translatable), enumClass, defaultValue)
             .setEnumNameProvider { (it as T).getTranslatableName() }
@@ -1472,7 +1480,7 @@ object ConfigScreenImpl {
         nameFunction: (T) -> Component,
         enumClass: Class<T>,
         defaultValue: T,
-        saveConsumer: (T) -> Unit
+        saveConsumer: (T) -> Unit,
     ): EnumListEntry<T> where T : Enum<T> {
         return startEnumSelector(Component.translatable(translatable), enumClass, defaultValue)
             .setEnumNameProvider { nameFunction.invoke(it as T) }
@@ -1485,7 +1493,7 @@ object ConfigScreenImpl {
     private fun ConfigEntryBuilder.alphaField(
         translatable: String,
         color: Int,
-        saveConsumer: Consumer<Int>
+        saveConsumer: Consumer<Int>,
     ): ColorEntry {
         return startAlphaColorField(Component.translatable(translatable), color)
             .setTooltip(Optional.of(ComponentUtil.splitLines(Component.translatable("$translatable.tooltip")).toTypedArray()))
@@ -1500,7 +1508,7 @@ object ConfigScreenImpl {
         toObjectFunction: (String) -> T,
         selections: Iterable<T>,
         error: (T) -> String,
-        saveConsumer: (T) -> Unit
+        saveConsumer: (T) -> Unit,
     ): DropdownBoxEntry<T> {
         return startDropdownMenu(
             Component.translatable(translatable),

@@ -97,14 +97,14 @@ object ChatTabs {
             it.message = ChatManager.globalSelectedTab.autoPrefix + it.message
         }
         EventBus.register<ChatTabSwitchEvent> {
-            it.newTab.read = true
+            it.newTab.unreadCount = 0
         }
         EventBus.register<WindowSwitchEvent> {
-            it.newWindow.tabSettings.selectedTab.read = true
+            it.newWindow.tabSettings.selectedTab.unreadCount = 0
         }
         EventBus.register<MovableChatRemoveTabFromWindowEvent> {
             if (!it.deleted) {
-                it.chatWindow.tabSettings.selectedTab.read = true
+                it.chatWindow.tabSettings.selectedTab.unreadCount = 0
             }
         }
     }
