@@ -29,7 +29,8 @@ import java.awt.Color
 import java.io.File
 import kotlin.math.max
 
-const val CONFIG_NAME = "${MOD_ID}-v2.7.0.json"
+const val CONFIG_VERSION = "2.7.0"
+const val CONFIG_NAME = "${MOD_ID}-v$CONFIG_VERSION.json"
 val json = Json {
     encodeDefaults = true
     ignoreUnknownKeys = true

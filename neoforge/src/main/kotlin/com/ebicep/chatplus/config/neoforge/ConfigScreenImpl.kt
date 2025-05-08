@@ -42,7 +42,7 @@ object ConfigScreenImpl {
     private fun getBuilder(previousScreen: Screen?): ConfigBuilder {
         val builder: ConfigBuilder = ConfigBuilder.create()
             .setParentScreen(previousScreen)
-            .setTitle(Component.translatable("chatPlus.title").withColor(MOD_COLOR))
+            .setTitle(Component.translatable("chatPlus.title").withColor(MOD_COLOR).append(Component.literal(" $CONFIG_VERSION")))
             .setSavingRunnable {
                 Config.save()
                 ChatManager.rescaleAll()
