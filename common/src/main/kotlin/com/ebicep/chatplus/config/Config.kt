@@ -12,6 +12,7 @@ import com.ebicep.chatplus.config.serializers.KeySerializer
 import com.ebicep.chatplus.config.serializers.KeyWithModifier
 import com.ebicep.chatplus.features.*
 import com.ebicep.chatplus.features.MovableChat.InputBoxSettings
+import com.ebicep.chatplus.features.ScreenshotChat.ScreenshotUploadSettings
 import com.ebicep.chatplus.features.chattabs.TabNotificationSettings
 import com.ebicep.chatplus.features.chatwindows.ChatWindow
 import com.ebicep.chatplus.features.chatwindows.ChatWindowsManager.createDefaultWindow
@@ -223,6 +224,7 @@ data class ConfigVariables(
     var screenshotChatCopyToClipboard: Boolean = true,
     var screenshotChatSaveToFile: Boolean = true, // TODO
     var screenshotChatAutoUpload: Boolean = true,
+    var screenshotChatAutoUploadSettings: ScreenshotUploadSettings = ScreenshotUploadSettings(),
     var screenshotChatLinePriority: Int = 200,
     var screenshotChatKey: KeyWithModifier = KeyWithModifier(InputConstants.getKey("key.keyboard.s"), 2),
     var screenshotDefaultScreenShotMode: ScreenshotChat.ScreenshotMode = ScreenshotChat.ScreenshotMode.CURRENT_WINDOW,

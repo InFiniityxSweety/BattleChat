@@ -1022,6 +1022,17 @@ object ConfigScreenImpl {
                 "chatPlus.screenshotChatAutoUpload.toggle",
                 Config.values.screenshotChatAutoUpload
             ) { Config.values.screenshotChatAutoUpload = it },
+            entryBuilder.startSubCategory(Component.translatable("chatPlus.screenshotChatAutoUploadSettings")).with(
+                entryBuilder.booleanToggle(
+                    "chatPlus.screenshotChatAutoUploadSettings.anonymousUpload.toggle",
+                    Config.values.screenshotChatAutoUploadSettings.anonymousUpload
+                ) { Config.values.screenshotChatAutoUploadSettings.anonymousUpload = it },
+                entryBuilder.stringField(
+                    "chatPlus.screenshotChatAutoUploadSettings.secret",
+                    Config.values.screenshotChatAutoUploadSettings.secret,
+                    { Config.values.screenshotChatAutoUploadSettings.secret = it }
+                ),
+            ).build(),
             entryBuilder.linePriorityField("chatPlus.linePriority.screenshotChat", Config.values.screenshotChatLinePriority)
             { Config.values.screenshotChatLinePriority = it },
             entryBuilder.keyCodeOptionWithModifier("chatPlus.screenshotChat.key", Config.values.screenshotChatKey),

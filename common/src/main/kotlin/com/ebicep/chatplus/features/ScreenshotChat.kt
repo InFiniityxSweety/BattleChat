@@ -53,8 +53,6 @@ import java.awt.image.RGBImageFilter
 import java.io.*
 import java.net.HttpURLConnection
 import java.net.URL
-import java.net.URLEncoder
-import java.util.*
 import javax.imageio.ImageIO
 
 /**
@@ -262,7 +260,7 @@ object ScreenshotChat {
         chatWindow: ChatWindow,
         guiGraphics: GuiGraphics,
         lines: MutableList<ChatTab.ChatPlusGuiMessageLine>,
-        screenshotBackgroundMode: ScreenshotBackgroundMode
+        screenshotBackgroundMode: ScreenshotBackgroundMode,
     ) {
         val renderer = chatWindow.renderer
         val poseStack = guiGraphics.pose()
@@ -419,53 +417,58 @@ object ScreenshotChat {
     }
 
     private fun upload(bufferedImage: BufferedImage?) {
+        if (Config.values.screenshotChatAutoUploadSettings.secret.isEmpty()) {
+            ChatPlus.sendMessage(Component.literal("Unable to upload screenshot, no secret provided.").withStyle(ChatFormatting.RED))
+            return
+        }
         try {
+            val boundary = "----WebKitFormBoundary" + System.currentTimeMillis()
             val url = URL("https://api.imgur.com/3/image")
-            val con = (url.openConnection() as HttpURLConnection).apply {
+            val connection = (url.openConnection() as HttpURLConnection).apply {
                 doOutput = true
                 doInput = true
                 requestMethod = "POST"
-                setRequestProperty("Authorization", "Client-ID bfea9c11835d95c")
-                setRequestProperty("Content-Type", "application/x-www-form-urlencoded")
+                if (Config.values.screenshotChatAutoUploadSettings.anonymousUpload) {
+                    setRequestProperty("Authorization", "Client-ID ${Config.values.screenshotChatAutoUploadSettings.secret}")
+                } else {
+                    setRequestProperty("Authorization", "Bearer ${Config.values.screenshotChatAutoUploadSettings.secret}")
+                }
+                setRequestProperty("Content-Type", "multipart/form-data; boundary=$boundary")
             }
 
             val baos = ByteArrayOutputStream().also {
                 ImageIO.write(bufferedImage, "png", it)
             }
-            val imageInByte = baos.toByteArray()
-            val encoded = Base64.getEncoder().encodeToString(imageInByte)
 
-            val data = URLEncoder.encode("image", "UTF-8") + "=" + URLEncoder.encode(encoded, "UTF-8")
-            OutputStreamWriter(con.outputStream).use { streamWriter ->
-                streamWriter.write(data)
-                streamWriter.flush()
+            DataOutputStream(connection.outputStream).apply {
+                writeBytes("--$boundary\r\n")
+                writeBytes("Content-Disposition: form-data; name=\"image\"; filename=\"image.png\"\r\n")
+                writeBytes("Content-Type: image/png\r\n")
+                writeBytes("Content-Transfer-Encoding: binary\r\n\r\n")
+                write(baos.toByteArray())
+                writeBytes("\r\n--$boundary--\r\n")
+                // outputStream.writeBytes("Content-Disposition: form-data; name=\"album\"\r\n\r\n")
+                // outputStream.writeBytes(albumId)
+                // outputStream.writeBytes("\r\n--$boundary--\r\n")
+                flush()
             }
 
-            val responseCode = con.responseCode
-            ChatPlus.LOGGER.info("Response Code: $responseCode")
+            val response = connection.inputStream.bufferedReader().readText()
+            ChatPlus.LOGGER.info("Response: $response")
 
-            BufferedReader(InputStreamReader(con.inputStream)).use { bufferedReader ->
-                val stb = StringBuilder()
-                var line: String?
-                while (bufferedReader.readLine().also { line = it } != null) {
-                    stb.append(line).append("\n")
-                }
+            val result = JsonParser.parseString(response).asJsonObject["data"].asJsonObject["link"].asString
 
-                val result = JsonParser.parseString(stb.toString()).asJsonObject["data"]
-                    .asJsonObject["link"].asString
-
-                // Send result to player
-                ChatPlus.sendMessage(
-                    Component.literal("Chat Screenshot Link: ").withStyle {
-                        it.withColor(ChatFormatting.GRAY)
-                    }.append(Component.literal(result).withStyle {
-                        it.withColor(ChatFormatting.AQUA)
-                            .withUnderlined(true)
-                            .withClickEvent(ClickEvent(ClickEvent.Action.OPEN_URL, result))
-                            .withHoverEvent(HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("Click to open link").withStyle(ChatFormatting.GREEN)))
-                    })
-                )
-            }
+            // Send result to player
+            ChatPlus.sendMessage(
+                Component.literal("Chat Screenshot Link: ").withStyle {
+                    it.withColor(ChatFormatting.GRAY)
+                }.append(Component.literal(result).withStyle {
+                    it.withColor(ChatFormatting.AQUA)
+                        .withUnderlined(true)
+                        .withClickEvent(ClickEvent(ClickEvent.Action.OPEN_URL, result))
+                        .withHoverEvent(HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("Click to open link").withStyle(ChatFormatting.GREEN)))
+                })
+            )
         } catch (e: Exception) {
             ChatPlus.LOGGER.error(e)
             ChatPlus.sendMessage(Component.literal("Error Uploading Screenshot").withStyle(ChatFormatting.RED))
@@ -518,7 +521,13 @@ object ScreenshotChat {
 
     data class ScreenshotSettings(
         val screenshotMode: ScreenshotMode,
-        val screenshotBackgroundMode: ScreenshotBackgroundMode
+        val screenshotBackgroundMode: ScreenshotBackgroundMode,
+    )
+
+    @Serializable
+    data class ScreenshotUploadSettings(
+        var anonymousUpload: Boolean = false,
+        var secret: String = "",
     )
 
 }
