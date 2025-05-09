@@ -47,9 +47,7 @@ class Editor(
                 },
                 { button -> Minecraft.getInstance().setScreen(getTabEditorScreen(previousScreen, chatTab)) },
                 { button ->
-                    val mutableList = chatTab.chatWindow.tabSettings.tabs.toMutableList()
-                    mutableList.remove(chatTab)
-                    chatTab.chatWindow.tabSettings.tabs = mutableList
+                    chatTab.chatWindow.tabSettings.removeTab(chatTab)
                     Minecraft.getInstance().setScreen(previousScreen)
                 },
                 { chatTab.chatWindow.tabSettings.tabs.size > 1 }

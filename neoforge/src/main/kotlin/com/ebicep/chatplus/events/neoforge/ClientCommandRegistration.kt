@@ -40,6 +40,18 @@ object ClientCommandRegistration {
                 }
             )
             .then(
+                Commands.literal("tab")
+                    .then(
+                        Commands.literal("delete")
+                            .executes {
+                                val selectedWindow = ChatManager.selectedWindow
+                                val globalSelectedTab = ChatManager.globalSelectedTab
+                                selectedWindow.tabSettings.removeTab(globalSelectedTab)
+                                Command.SINGLE_SUCCESS
+                            }
+                    )
+            )
+            .then(
                 Commands.literal("debug")
                     .executes {
                         Debug.debug = !Debug.debug

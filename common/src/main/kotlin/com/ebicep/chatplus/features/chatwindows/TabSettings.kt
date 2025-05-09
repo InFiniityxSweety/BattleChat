@@ -53,6 +53,7 @@ class TabSettings {
                 value
             }
             selectedTabIndex = Mth.clamp(selectedTabIndex, 0, tabs.size - 1)
+            selectedTab.unreadCount = 0
             field.forEach { it.chatWindow = chatWindow }
             resetSortedChatTabs()
         }
@@ -313,6 +314,15 @@ class TabSettings {
         return totalWidth - CHAT_TAB_X_SPACE
     }
 
+    fun removeTab(chatTab: ChatTab) {
+        if (!tabs.contains(chatTab)) {
+            return
+        }
+        val mutableList = tabs.toMutableList()
+        mutableList.remove(chatTab)
+        tabs = mutableList
+    }
+
     @Serializable
     enum class Position(key: String) : EnumTranslatableName {
         TOP("chatPlus.chatWindow.tabSettings.position.top"),
@@ -334,7 +344,7 @@ data class ChatTabClickedEvent(
     val mouseX: Double,
     val mouseY: Double,
     val tabXStart: Double,
-    val tabYStart: Double
+    val tabYStart: Double,
 )
 
 data class ChatTabRenderEvent(
@@ -342,10 +352,10 @@ data class ChatTabRenderEvent(
     val chatTab: ChatTab,
     val tabWidth: Int,
     var xStart: Int,
-    var yStart: Int
+    var yStart: Int,
 )
 
 data class ChatTabSwitchEvent(
     val oldTab: ChatTab,
-    val newTab: ChatTab
+    val newTab: ChatTab,
 )
