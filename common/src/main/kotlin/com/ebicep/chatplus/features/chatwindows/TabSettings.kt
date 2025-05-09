@@ -314,6 +314,14 @@ class TabSettings {
         return totalWidth - CHAT_TAB_X_SPACE
     }
 
+    fun cloneTab(chatTab: ChatTab) {
+        val mutableList = tabs.toMutableList()
+        mutableList.add(chatTab.clone())
+        tabs = mutableList
+        updateTabSettings()
+        resetGlobalSortedTabs()
+    }
+
     fun removeTab(chatTab: ChatTab) {
         if (!tabs.contains(chatTab)) {
             return

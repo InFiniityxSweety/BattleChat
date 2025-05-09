@@ -52,6 +52,15 @@ object ClientCommandRegistration {
                                 Command.SINGLE_SUCCESS
                             }
                     )
+                    .then(
+                        Commands.literal("clone")
+                            .executes {
+                                val selectedWindow = ChatManager.selectedWindow
+                                val globalSelectedTab = ChatManager.globalSelectedTab
+                                selectedWindow.tabSettings.cloneTab(globalSelectedTab)
+                                Command.SINGLE_SUCCESS
+                            }
+                    )
             )
             .then(
                 Commands.literal("debug")

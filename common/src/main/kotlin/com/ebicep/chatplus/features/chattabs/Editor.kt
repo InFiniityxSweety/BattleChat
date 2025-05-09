@@ -38,11 +38,7 @@ class Editor(
                 { "chatPlus.gui.tabEditor" },
                 { "( ${chatTab.name} ) " },
                 { button ->
-                    val mutableList = chatTab.chatWindow.tabSettings.tabs.toMutableList()
-                    mutableList.add(chatTab.clone())
-                    chatTab.chatWindow.tabSettings.tabs = mutableList
-                    chatTab.chatWindow.tabSettings.updateTabSettings()
-                    resetGlobalSortedTabs()
+                    chatTab.chatWindow.tabSettings.cloneTab(chatTab)
                     Minecraft.getInstance().setScreen(previousScreen)
                 },
                 { button -> Minecraft.getInstance().setScreen(getTabEditorScreen(previousScreen, chatTab)) },

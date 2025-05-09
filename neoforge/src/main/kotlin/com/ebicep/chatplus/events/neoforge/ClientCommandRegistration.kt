@@ -27,17 +27,19 @@ object ClientCommandRegistration {
 
     private fun createCommand(commandName: String): LiteralArgumentBuilder<CommandSourceStack>? =
         Commands.literal(commandName)
-            .then(Commands.literal("clear")
-                .executes {
-                    ChatManager.globalSelectedTab.clear()
-                    Command.SINGLE_SUCCESS
-                }
+            .then(
+                Commands.literal("clear")
+                    .executes {
+                        ChatManager.globalSelectedTab.clear()
+                        Command.SINGLE_SUCCESS
+                    }
             )
-            .then(Commands.literal("hide")
-                .executes {
-                    Config.values.hideChatEnabled = !Config.values.hideChatEnabled
-                    Command.SINGLE_SUCCESS
-                }
+            .then(
+                Commands.literal("hide")
+                    .executes {
+                        Config.values.hideChatEnabled = !Config.values.hideChatEnabled
+                        Command.SINGLE_SUCCESS
+                    }
             )
             .then(
                 Commands.literal("tab")
@@ -47,6 +49,15 @@ object ClientCommandRegistration {
                                 val selectedWindow = ChatManager.selectedWindow
                                 val globalSelectedTab = ChatManager.globalSelectedTab
                                 selectedWindow.tabSettings.removeTab(globalSelectedTab)
+                                Command.SINGLE_SUCCESS
+                            }
+                    )
+                    .then(
+                        Commands.literal("clone")
+                            .executes {
+                                val selectedWindow = ChatManager.selectedWindow
+                                val globalSelectedTab = ChatManager.globalSelectedTab
+                                selectedWindow.tabSettings.cloneTab(globalSelectedTab)
                                 Command.SINGLE_SUCCESS
                             }
                     )
@@ -60,7 +71,7 @@ object ClientCommandRegistration {
                                 .withStyle(if (Debug.debug) ChatFormatting.GREEN else ChatFormatting.RED)
                         )
                         Command.SINGLE_SUCCESS
-                }
+                    }
             )
             .executes {
                 ConfigScreen.open = true
