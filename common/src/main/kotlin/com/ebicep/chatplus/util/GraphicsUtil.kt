@@ -1,8 +1,8 @@
 package com.ebicep.chatplus.util
 
 import com.ebicep.chatplus.mixin.IMixinGuiGraphics
-import com.mojang.blaze3d.vertex.PoseStack
-import com.mojang.blaze3d.vertex.VertexConsumer
+import com.mojang.blaze3d.vertex.*
+import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Font
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.renderer.RenderType
@@ -91,7 +91,7 @@ object GraphicsUtil {
     }
 
     fun GuiGraphics.fill0(i: Float, j: Float, k: Float, l: Float, n: Int) {
-        this.fill0(RenderType.guiOverlay(), i, j, k, l, 0, n)
+        this.fill0(RenderType.gui(), i, j, k, l, 0, n)
     }
 
     fun GuiGraphics.fill0(renderType: RenderType, i: Float, j: Float, k: Float, l: Float, m: Int, n: Int) {
@@ -219,11 +219,15 @@ object GraphicsUtil {
         this.fill(x, y1, x + thickness, y2, color)
     }
 
-    fun GuiGraphics.drawString0(font: Font, string: String, x: Float, y: Float, color: Int): Int {
-        return this.drawString0(font, string, x, y, color, true)
+    fun GuiGraphics.drawString0(string: String, i: Int, j: Int, k: Int): Int {
+        return this.drawString(Minecraft.getInstance().font, string, i, j, k, true)
     }
 
-    fun GuiGraphics.drawString0(font: Font, string: String, x: Float, y: Float, color: Int, bl: Boolean): Int {
+    fun GuiGraphics.drawString0(string: String, x: Float, y: Float, color: Int): Int {
+        return this.drawString0(Minecraft.getInstance().font, string, x, y, color, true)
+    }
+
+    private fun GuiGraphics.drawString0(font: Font, string: String, x: Float, y: Float, color: Int, bl: Boolean): Int {
         this as IMixinGuiGraphics
         val l = font.drawInBatch(
             string,
@@ -240,13 +244,13 @@ object GraphicsUtil {
         return l
     }
 
-    fun GuiGraphics.drawString0(font: Font, formattedCharSequence: FormattedCharSequence, x: Float, y: Float, color: Int): Int {
-        return this.drawString0(font, formattedCharSequence, x, y, color, true)
+    fun GuiGraphics.drawString0(formattedCharSequence: FormattedCharSequence, x: Float, y: Float, color: Int): Int {
+        return this.drawString0(formattedCharSequence, x, y, color, true)
     }
 
-    fun GuiGraphics.drawString0(font: Font, formattedCharSequence: FormattedCharSequence, x: Float, y: Float, color: Int, bl: Boolean): Int {
+    fun GuiGraphics.drawString0(formattedCharSequence: FormattedCharSequence, x: Float, y: Float, color: Int, bl: Boolean): Int {
         this as IMixinGuiGraphics
-        val l = font.drawInBatch(
+        val l = Minecraft.getInstance().font.drawInBatch(
             formattedCharSequence,
             x,
             y,
