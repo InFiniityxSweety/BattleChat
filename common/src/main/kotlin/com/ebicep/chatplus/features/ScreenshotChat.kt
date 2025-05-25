@@ -3,6 +3,7 @@
 package com.ebicep.chatplus.features
 
 import com.ebicep.chatplus.ChatPlus
+import com.ebicep.chatplus.MOD_ID
 import com.ebicep.chatplus.config.Config
 import com.ebicep.chatplus.config.EnumTranslatableName
 import com.ebicep.chatplus.config.MessageDirection
@@ -23,7 +24,16 @@ import com.ebicep.chatplus.util.GraphicsUtil.fill0
 import com.ebicep.chatplus.util.GraphicsUtil.guiForward
 import com.ebicep.chatplus.util.GraphicsUtil.translate0
 import com.google.gson.JsonParser
+import com.mojang.blaze3d.buffers.GpuBuffer
+import com.mojang.blaze3d.pipeline.BlendFunction
+import com.mojang.blaze3d.pipeline.RenderPipeline
+import com.mojang.blaze3d.pipeline.TextureTarget
+import com.mojang.blaze3d.platform.DepthTestFunction
 import com.mojang.blaze3d.platform.NativeImage
+import com.mojang.blaze3d.shaders.UniformType
+import com.mojang.blaze3d.systems.RenderSystem
+import com.mojang.blaze3d.vertex.*
+import it.unimi.dsi.fastutil.objects.Object2ObjectSortedMaps
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -35,10 +45,16 @@ import net.minecraft.client.GuiMessage
 import net.minecraft.client.Minecraft
 import net.minecraft.client.Screenshot
 import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.renderer.MultiBufferSource
+import net.minecraft.client.renderer.RenderStateShard
+import net.minecraft.client.renderer.RenderType
 import net.minecraft.network.chat.ClickEvent
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.HoverEvent
+import net.minecraft.network.chat.HoverEvent.ShowText
 import net.minecraft.network.chat.Style
+import net.minecraft.resources.ResourceLocation
+import net.minecraft.util.TriState
 import org.lwjgl.stb.STBImage
 import java.awt.Color
 import java.awt.Image
@@ -52,10 +68,12 @@ import java.awt.image.ImageProducer
 import java.awt.image.RGBImageFilter
 import java.io.*
 import java.net.HttpURLConnection
+import java.net.URI
 import java.net.URL
 import java.net.URLEncoder
 import java.nio.channels.Channels
 import java.util.*
+import java.util.function.Function
 import javax.imageio.ImageIO
 
 /**
@@ -64,6 +82,49 @@ import javax.imageio.ImageIO
  * <a href="https://github.com/ramidzkh/fabrishot">fabrishot</a>
  */
 object ScreenshotChat {
+
+    val PIPELINE = RenderPipeline.Builder()
+        .withLocation(ResourceLocation.fromNamespaceAndPath(MOD_ID, "pipeline/screenshot_text_render"))
+        .withVertexShader("core/position_tex_color")
+        .withFragmentShader("core/position_tex_color")
+        .withVertexFormat(DefaultVertexFormat.POSITION_TEX_COLOR, VertexFormat.Mode.QUADS)
+        .withSampler("Sampler0")
+        .withUniform("ModelViewMat", UniformType.MATRIX4X4)
+        .withUniform("ProjMat", UniformType.MATRIX4X4)
+        .withDepthTestFunction(DepthTestFunction.LEQUAL_DEPTH_TEST)
+        .withBlend(BlendFunction.TRANSLUCENT)
+        .build()
+    var RENDER_TYPE: RenderType = RenderType.create(
+        "$MOD_ID:screenshot",
+        786432,
+        PIPELINE,
+        RenderType.CompositeState.builder()
+            .setLightmapState(RenderStateShard.LIGHTMAP)
+            .setLayeringState(RenderStateShard.LayeringStateShard.VIEW_OFFSET_Z_LAYERING)
+            .createCompositeState(false)
+    )
+    var TEXTURED: Function<ResourceLocation?, RenderType?>? = Util.memoize<ResourceLocation, RenderType> { resourceLocation: ResourceLocation ->
+        RenderType.create(
+            "$MOD_ID:textured",
+            786432,
+            PIPELINE,
+            RenderType.CompositeState
+                .builder()
+                .setTextureState(RenderStateShard.TextureStateShard(resourceLocation, TriState.FALSE, false))
+                .createCompositeState(false)
+        )
+    }
+
+
+    class ChatPlusBufferSource(bufferAllocator: ByteBufferBuilder) : MultiBufferSource.BufferSource(bufferAllocator, Object2ObjectSortedMaps.emptyMap()) {
+
+        var bufferBuilder: BufferBuilder = BufferBuilder(this.sharedBuffer, RENDER_TYPE.mode(), RENDER_TYPE.format())
+
+        override fun getBuffer(renderType: RenderType): VertexConsumer {
+            return this.bufferBuilder
+        }
+
+    }
 
     val SCREENSHOT_COLOR = -1
     private val TRANSPARENCY_COLOR = Color(54, 57, 63, 255)
@@ -185,100 +246,122 @@ object ScreenshotChat {
         }
         ChatPlus.LOGGER.info("screenshotting = width: $width, height: $height")
         val minecraft = Minecraft.getInstance()
-//        val renderTarget: RenderTarget = TextureTarget(width.toInt(), height.toInt(), true) TODO use this
-        val mainRenderTarget = minecraft.mainRenderTarget
-        val oldWidth = mainRenderTarget.width
-        val oldHeight = mainRenderTarget.height
-        mainRenderTarget.resize(width.toInt(), height.toInt())
-        mainRenderTarget.setClearColor(TRANSPARENCY_COLOR.red / 255f, TRANSPARENCY_COLOR.green / 255f, TRANSPARENCY_COLOR.blue / 255f, 0f)
-        mainRenderTarget.clear()
-//        renderTarget.setClearColor(TRANSPARENCY_COLOR.red / 255f, TRANSPARENCY_COLOR.green / 255f, TRANSPARENCY_COLOR.blue / 255f, 0f)
-//        renderTarget.clear()
-//        renderTarget.bindWrite(true)
-        val guiGraphics = GuiGraphics(minecraft, minecraft.renderBuffers().bufferSource())
-        val poseStack = guiGraphics.pose()
-        poseStack.scale((minecraft.window.guiScaledWidth / width).toFloat(), (minecraft.window.guiScaledHeight / height).toFloat(), 1f)
-        when (screenshotWindowsMode) {
-            ScreenshotWindowsMode.STACK -> {
-                var h = 0.0
-                linesOrdered.forEach { window, messages ->
-                    poseStack.createPose {
-                        val renderer = window.renderer
-                        poseStack.translate0(x = -renderer.rescaledX.toDouble(), y = -(renderer.rescaledY - messages.size * renderer.lineHeight.toDouble()) + h)
-                        renderLines(window, guiGraphics, messages, screenshotBackgroundMode)
-                        h += messages.size * renderer.lineHeight.toDouble()
-                    }
-                }
-            }
-
-            ScreenshotWindowsMode.SPLIT -> {
-                var w = 0.0
-                linesOrdered.forEach { window, messages ->
-                    poseStack.createPose {
-                        val renderer = window.renderer
-                        poseStack.translate0(x = -renderer.rescaledX.toDouble() + w, y = -(renderer.rescaledY - messages.size * renderer.lineHeight.toDouble()))
-                        renderLines(window, guiGraphics, messages, screenshotBackgroundMode)
-                        w += window.renderer.rescaledWidth
-                    }
-                }
-            }
-        }
-        guiGraphics.flush()
-
-//        renderTarget.unbindWrite()
-//        renderTarget.blitToScreen(width.toInt(), height.toInt())
-//        screenshotRenderTarget(renderTarget)
         try {
-            val nativeImage: NativeImage = Screenshot.takeScreenshot(minecraft.mainRenderTarget)
-            val image: Image = getImage(nativeImage)
-            val bufferedImage: BufferedImage = imageToBufferedImage(image)
-            ChatPlus.sendMessage(
-                Component.literal("Screenshot Taken").withStyle {
-                    it.withColor(ChatFormatting.GRAY)
-                        .withHoverEvent(
-                            HoverEvent(
-                                HoverEvent.Action.SHOW_TEXT,
-                                Component.literal("Dimensions: ").withStyle(ChatFormatting.GRAY)
-                                    .append(Component.literal("${width.toInt()} x ${height.toInt()}").withStyle(ChatFormatting.AQUA))
-                                    .append(Component.literal("\nWindow Mode: ").withStyle(ChatFormatting.GRAY))
-                                    .append(Component.translatable(screenshotWindowsMode.key).withStyle(ChatFormatting.GREEN))
-                                    .append(Component.literal("\nMode: ").withStyle(ChatFormatting.GRAY))
-                                    .append(Component.translatable(screenshotMode.key).withStyle(ChatFormatting.GREEN))
-                                    .append(Component.literal("\nBackground Mode: ").withStyle(ChatFormatting.GRAY))
-                                    .append(Component.translatable(screenshotBackgroundMode.key).withStyle(ChatFormatting.GREEN))
-                            )
-                        )
-                })
-            if (Config.values.screenshotChatSaveToFile) {
-                GlobalScope.launch(Dispatchers.IO) {
-                    saveToFile(bufferedImage)
+            val renderTarget = TextureTarget("ChatPlusScreenshot", width.toInt(), height.toInt(), true)
+            val vertexProvider = ChatPlusBufferSource(ByteBufferBuilder(512))
+            val vertexConsumer = vertexProvider.getBuffer(RENDER_TYPE) as BufferBuilder
+            val guiGraphics = GuiGraphics(minecraft, vertexProvider)
+            val poseStack = guiGraphics.pose()
+            poseStack.scale((minecraft.window.guiScaledWidth / width).toFloat(), (minecraft.window.guiScaledHeight / height).toFloat(), 1f)
+            val wasPlayerHeadEnabled = Config.values.playerHeadChatDisplayEnabled // TODO image rendering (SEE BELOW)
+            Config.values.playerHeadChatDisplayEnabled = false
+            when (screenshotWindowsMode) {
+                ScreenshotWindowsMode.STACK -> {
+                    var h = 0.0
+                    linesOrdered.forEach { window, messages ->
+                        poseStack.createPose {
+                            val renderer = window.renderer
+                            poseStack.translate0(x = -renderer.rescaledX.toDouble(), y = -(renderer.rescaledY - messages.size * renderer.lineHeight.toDouble()) + h)
+                            renderLines(window, guiGraphics, messages, screenshotBackgroundMode)
+                            h += messages.size * renderer.lineHeight.toDouble()
+                        }
+                    }
+                }
+
+                ScreenshotWindowsMode.SPLIT -> {
+                    var w = 0.0
+                    linesOrdered.forEach { window, messages ->
+                        poseStack.createPose {
+                            val renderer = window.renderer
+                            poseStack.translate0(x = -renderer.rescaledX.toDouble() + w, y = -(renderer.rescaledY - messages.size * renderer.lineHeight.toDouble()))
+                            renderLines(window, guiGraphics, messages, screenshotBackgroundMode)
+                            w += window.renderer.rescaledWidth
+                        }
+                    }
                 }
             }
-            if (Config.values.screenshotChatCopyToClipboard) {
-                GlobalScope.launch(Dispatchers.IO) {
-                    copy(bufferedImage)
-                }
+            RENDER_TYPE.setupRenderState()
+            val meshData = vertexConsumer.build()!!
+            val gpuBuffer: GpuBuffer = PIPELINE.vertexFormat.uploadImmediateVertexBuffer(meshData.vertexBuffer())
+            val gpuBuffer2: GpuBuffer?
+            val indexType: VertexFormat.IndexType?
+            val indexBuffer = meshData.indexBuffer()
+            if (indexBuffer == null) {
+                val autoStorageIndexBuffer = RenderSystem.getSequentialBuffer(meshData.drawState().mode())
+                gpuBuffer2 = autoStorageIndexBuffer.getBuffer(meshData.drawState().indexCount())
+                indexType = autoStorageIndexBuffer.type()
+            } else {
+                gpuBuffer2 = PIPELINE.vertexFormat.uploadImmediateIndexBuffer(indexBuffer)
+                indexType = meshData.drawState().indexType()
             }
-            if (Config.values.screenshotChatAutoUpload) {
-                GlobalScope.launch(Dispatchers.IO) {
-                    upload(bufferedImage)
+            RenderSystem.getDevice()
+                .createCommandEncoder()
+                .createRenderPass(
+                    renderTarget.colorTexture,
+                    OptionalInt.of(TRANSPARENCY_COLOR.rgb),
+                    null,
+                    OptionalDouble.empty()
+                )
+                .use { renderPass ->
+                    renderPass.setPipeline(PIPELINE)
+                    renderPass.setVertexBuffer(0, gpuBuffer)
+                    renderPass.setIndexBuffer(gpuBuffer2, indexType)
+                    renderPass.drawIndexed(0, meshData.drawState().indexCount())
                 }
+            meshData.close()
+            RENDER_TYPE.clearRenderState()
+            if (wasPlayerHeadEnabled) {
+                Config.values.playerHeadChatDisplayEnabled = true
+            }
+            try {
+                Screenshot.takeScreenshot(renderTarget) { nativeImage ->
+                    val image: Image = getImage(nativeImage)
+                    val bufferedImage: BufferedImage = imageToBufferedImage(image)
+                    ChatPlus.sendMessage(
+                        Component.literal("Screenshot Taken").withStyle {
+                            it.withColor(ChatFormatting.GRAY)
+                                .withHoverEvent(
+                                    ShowText(
+                                        Component.literal("Dimensions: ").withStyle(ChatFormatting.GRAY)
+                                            .append(Component.literal("${width.toInt()} x ${height.toInt()}").withStyle(ChatFormatting.AQUA))
+                                            .append(Component.literal("\nWindow Mode: ").withStyle(ChatFormatting.GRAY))
+                                            .append(Component.translatable(screenshotWindowsMode.key).withStyle(ChatFormatting.GREEN))
+                                            .append(Component.literal("\nMode: ").withStyle(ChatFormatting.GRAY))
+                                            .append(Component.translatable(screenshotMode.key).withStyle(ChatFormatting.GREEN))
+                                            .append(Component.literal("\nBackground Mode: ").withStyle(ChatFormatting.GRAY))
+                                            .append(Component.translatable(screenshotBackgroundMode.key).withStyle(ChatFormatting.GREEN))
+                                    )
+                                )
+                        })
+                    if (Config.values.screenshotChatSaveToFile) {
+                        GlobalScope.launch(Dispatchers.IO) {
+                            saveToFile(bufferedImage)
+                        }
+                    }
+                    if (Config.values.screenshotChatCopyToClipboard) {
+                        GlobalScope.launch(Dispatchers.IO) {
+                            copy(bufferedImage)
+                        }
+                    }
+                    if (Config.values.screenshotChatAutoUpload) {
+                        GlobalScope.launch(Dispatchers.IO) {
+                            upload(bufferedImage)
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                ChatPlus.LOGGER.error(e)
             }
         } catch (e: Exception) {
             ChatPlus.LOGGER.error(e)
         }
-
-        mainRenderTarget.resize(oldWidth, oldHeight)
-        mainRenderTarget.setClearColor(0f, 0f, 0f, 0f)
-        mainRenderTarget.clear()
-//        minecraft.mainRenderTarget.bindWrite(true)
     }
 
     private fun renderLines(
         chatWindow: ChatWindow,
         guiGraphics: GuiGraphics,
         lines: MutableList<ChatTab.ChatPlusGuiMessageLine>,
-        screenshotBackgroundMode: ScreenshotBackgroundMode
+        screenshotBackgroundMode: ScreenshotBackgroundMode,
     ) {
         val renderer = chatWindow.renderer
         val poseStack = guiGraphics.pose()
@@ -416,7 +499,7 @@ object ScreenshotChat {
             ImageIO.write(bufferedImage, "png", newFile)
             val component = Component.literal(newFile.name)
                 .withStyle(ChatFormatting.AQUA, ChatFormatting.UNDERLINE)
-                .withStyle { style: Style -> style.withClickEvent(ClickEvent(ClickEvent.Action.OPEN_FILE, newFile.absolutePath)) }
+                .withStyle { style: Style -> style.withClickEvent(ClickEvent.OpenFile(newFile.absolutePath)) }
             ChatPlus.sendMessage(Component.translatable("screenshot.success", component).withStyle(ChatFormatting.GRAY))
         } catch (e: IOException) {
             ChatPlus.LOGGER.error(e)
@@ -491,8 +574,8 @@ object ScreenshotChat {
                     }.append(Component.literal(result).withStyle {
                         it.withColor(ChatFormatting.AQUA)
                             .withUnderlined(true)
-                            .withClickEvent(ClickEvent(ClickEvent.Action.OPEN_URL, result))
-                            .withHoverEvent(HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("Click to open link").withStyle(ChatFormatting.GREEN)))
+                            .withClickEvent(ClickEvent.OpenUrl(URI(result)))
+                            .withHoverEvent(HoverEvent.ShowText(Component.literal("Click to open link").withStyle(ChatFormatting.GREEN)))
                     })
                 )
             }
@@ -548,7 +631,150 @@ object ScreenshotChat {
 
     data class ScreenshotSettings(
         val screenshotMode: ScreenshotMode,
-        val screenshotBackgroundMode: ScreenshotBackgroundMode
+        val screenshotBackgroundMode: ScreenshotBackgroundMode,
     )
 
 }
+
+
+////            vertexProvider.finish()
+//
+////            meshData.close()
+//
+////            val vertexProvider = OverrideVertexProvider(ByteBufferBuilder(256))
+////            val vertexConsumer = vertexProvider.getBuffer(RENDER_TYPE) as BufferBuilder
+////            val guiGraphics = GuiGraphics(minecraft, vertexProvider)
+////            val poseStack = guiGraphics.pose()
+//
+////            poseStack.scale(10f, 10f, 1f)
+//
+////            val images = listOf(
+////                ResourceLocation.withDefaultNamespace("skins/3b0c6e9a8d249bac856a3ec261fe5d528431e0a7"),
+////                ResourceLocation.withDefaultNamespace("skins/3b0c6e9a8d249bac856a3ec261fe5d528431e0a7"),
+////                ResourceLocation.withDefaultNamespace("skins/3b0c6e9a8d249bac856a3ec261fe5d528431e0a7")
+////            )
+////
+////            data class DrawEntry(
+////                val texture: AbstractTexture,
+////                val vertexBuffer: GpuBuffer,
+////                val indexBuffer: GpuBuffer,
+////                val indexType: VertexFormat.IndexType,
+////                val indexCount: Int,
+////            )
+////
+////            ChatPlus.LOGGER.info("preparing")
+////
+////            val drawEntries = mutableListOf<DrawEntry>()
+////            val vertexProvider = OverrideVertexProvider(ByteBufferBuilder(256))
+////            val bufferBuilder = vertexProvider.getBuffer(RENDER_TYPE) as BufferBuilder
+////            val guiGraphics = GuiGraphics(minecraft, vertexProvider)
+////            val poseStack = guiGraphics.pose()
+////            poseStack.scale(.10f, .10f, 1f)
+////            var index = 0
+////            for (resourceLocation in images) {
+////                ChatPlus.LOGGER.info("loading texture $resourceLocation")
+////                poseStack.createPose {
+////                    GraphicsUtil.PlayerHeadUtils.playerFaceRendererDraw(guiGraphics, resourceLocation, index * 200f, index * 200f, width)
+////                }
+////                index++
+////                ChatPlus.LOGGER.info("done loading texture $resourceLocation")
+////            }
+////            guiGraphics.drawString0(Minecraft.getInstance().font, "HELLO WORLD", 0f, 0f, Color(255, 0, 0, 255).rgb)
+//////            when (screenshotWindowsMode) {
+//////                ScreenshotWindowsMode.STACK -> {
+//////                    var h = 0.0
+//////                    linesOrdered.forEach { window, messages ->
+//////                        poseStack.createPose {
+//////                            val renderer = window.renderer
+//////                            poseStack.translate0(x = -renderer.rescaledX.toDouble(), y = -(renderer.rescaledY - messages.size * renderer.lineHeight.toDouble()) + h)
+//////                            renderLines(window, guiGraphics, messages, screenshotBackgroundMode)
+//////                            h += messages.size * renderer.lineHeight.toDouble()
+//////                        }
+//////                    }
+//////                }
+//////
+//////                ScreenshotWindowsMode.SPLIT -> {
+//////                    var w = 0.0
+//////                    linesOrdered.forEach { window, messages ->
+//////                        poseStack.createPose {
+//////                            val renderer = window.renderer
+//////                            poseStack.translate0(x = -renderer.rescaledX.toDouble() + w, y = -(renderer.rescaledY - messages.size * renderer.lineHeight.toDouble()))
+//////                            renderLines(window, guiGraphics, messages, screenshotBackgroundMode)
+//////                            w += window.renderer.rescaledWidth
+//////                        }
+//////                    }
+//////                }
+//////            }
+////            guiGraphics.flush()
+////            RENDER_TYPE.setupRenderState()
+//////            var index = 0
+//////            for (resourceLocation in images) {
+//////                ChatPlus.LOGGER.info("loading texture $resourceLocation")
+//////                GraphicsUtil.PlayerHeadUtils.playerFaceRendererDraw(guiGraphics, resourceLocation, index * 200f, index * 200f, width)
+//////                guiGraphics.flush()
+//////
+//////                val meshData = vertexProvider.bufferBuilder.build()!!
+//////                val vertexBuffer = PIPELINE.vertexFormat.uploadImmediateVertexBuffer(meshData.vertexBuffer())
+//////                val indexBuffer = meshData.indexBuffer()
+//////                val (gpuIndexBuffer, indexType) = if (indexBuffer == null) {
+//////                    val auto = RenderSystem.getSequentialBuffer(meshData.drawState().mode())
+//////                    auto.getBuffer(meshData.drawState().indexCount()) to auto.type()
+//////                } else {
+//////                    PIPELINE.vertexFormat.uploadImmediateIndexBuffer(indexBuffer) to meshData.drawState().indexType()
+//////                }
+//////
+//////                val texture = Minecraft.getInstance().textureManager.getTexture(resourceLocation)
+//////                drawEntries += DrawEntry(texture, vertexBuffer, gpuIndexBuffer, indexType, meshData.drawState().indexCount())
+//////                meshData.close()
+//////
+//////                index++
+//////                ChatPlus.LOGGER.info("done loading texture $resourceLocation")
+//////            }
+////
+////            ChatPlus.LOGGER.info("starting render pass")
+////
+////            val meshData = vertexProvider.bufferBuilder.buildOrThrow()!!
+////            val gpuBuffer = PIPELINE.vertexFormat.uploadImmediateVertexBuffer(meshData.vertexBuffer())
+////
+////            val textureManager = minecraft.textureManager
+////            val indexBuffer = meshData.indexBuffer()
+////
+////            val gpuIndexBuffer: GpuBuffer
+////            val indexType: VertexFormat.IndexType
+////
+////            if (indexBuffer == null) {
+////                val autoIndex = RenderSystem.getSequentialBuffer(meshData.drawState().mode())
+////                gpuIndexBuffer = autoIndex.getBuffer(meshData.drawState().indexCount())
+////                indexType = autoIndex.type()
+////            } else {
+////                gpuIndexBuffer = PIPELINE.vertexFormat.uploadImmediateIndexBuffer(indexBuffer)
+////                indexType = meshData.drawState().indexType()
+////            }
+////            RenderSystem.getDevice()
+////                .createCommandEncoder()
+////                .createRenderPass(
+////                    renderTarget.colorTexture,
+////                    OptionalInt.of(TRANSPARENCY_COLOR.rgb),
+////                    null,
+////                    OptionalDouble.empty()
+////                )
+////                .use { renderPass ->
+////                    renderPass.setPipeline(PIPELINE)
+////                    renderPass.setVertexBuffer(0, gpuBuffer)
+////
+////                    var indexOffset = 0
+////                    // Bind textures used (you may need to bind multiple if different)
+////                    for (resourceLocation in images) {
+////                        ChatPlus.LOGGER.info("binding texture ${resourceLocation}")
+////                        val texture = textureManager.getTexture(resourceLocation)
+////                        renderPass.bindSampler("Sampler0", texture.getTexture()) // if all use same sampler
+////                        // Calculate how many indices this texture group uses
+////                        val indicesForThisTexture = images.size * 6 // 6 indices per quad
+////                        renderPass.setIndexBuffer(gpuIndexBuffer, indexType)
+////                        renderPass.drawIndexed(indexOffset, indicesForThisTexture)
+////                        indexOffset += indicesForThisTexture
+////                    }
+////                }
+////
+////            meshData.close()
+////            RENDER_TYPE.clearRenderState()

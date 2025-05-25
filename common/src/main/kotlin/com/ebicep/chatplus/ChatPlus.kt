@@ -4,16 +4,11 @@ import com.ebicep.chatplus.config.Config
 import com.ebicep.chatplus.events.Events
 import com.ebicep.chatplus.features.FeatureManager
 import com.ebicep.chatplus.translator.LanguageManager
-import com.mojang.blaze3d.platform.NativeImage
 import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
-import net.minecraft.client.Screenshot
-import net.minecraft.client.renderer.texture.DynamicTexture
 import net.minecraft.network.chat.Component
-import net.minecraft.resources.ResourceLocation
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
-import java.io.File
 
 const val MOD_ID = "chatplus"
 const val MOD_COLOR = 0xFF12e3DB.toInt()
@@ -38,13 +33,13 @@ object ChatPlus {
     }
 
     fun renderTest2() {
-        Minecraft.getInstance().mainRenderTarget.unbindWrite()
-        val nativeImage: NativeImage = Screenshot.takeScreenshot(Minecraft.getInstance().mainRenderTarget)
-        val dynamicTexture = DynamicTexture(nativeImage)
-        dynamicTexture.dumpContents(
-            ResourceLocation.fromNamespaceAndPath(MOD_ID, "test3"),
-            File(Minecraft.getInstance().gameDirectory, Screenshot.SCREENSHOT_DIR).toPath()
-        )
+//        Minecraft.getInstance().mainRenderTarget.unbindWrite()
+//        val nativeImage: NativeImage = Screenshot.takeScreenshot(Minecraft.getInstance().mainRenderTarget)
+//        val dynamicTexture = DynamicTexture(nativeImage)
+//        dynamicTexture.dumpContents(
+//            ResourceLocation.fromNamespaceAndPath(MOD_ID, "test3"),
+//            File(Minecraft.getInstance().gameDirectory, Screenshot.SCREENSHOT_DIR).toPath()
+//        )
     }
 
     fun renderTest() {

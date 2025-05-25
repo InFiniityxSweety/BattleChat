@@ -1,7 +1,6 @@
 package com.ebicep.chatplus.util
 
 import com.ebicep.chatplus.mixin.IMixinGuiGraphics
-import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.blaze3d.vertex.VertexConsumer
 import net.minecraft.client.gui.Font
@@ -92,7 +91,7 @@ object GraphicsUtil {
     }
 
     fun GuiGraphics.fill0(i: Float, j: Float, k: Float, l: Float, n: Int) {
-        this.fill0(RenderType.gui(), i, j, k, l, 0, n)
+        this.fill0(RenderType.guiOverlay(), i, j, k, l, 0, n)
     }
 
     fun GuiGraphics.fill0(renderType: RenderType, i: Float, j: Float, k: Float, l: Float, m: Int, n: Int) {
@@ -115,10 +114,10 @@ object GraphicsUtil {
         }
 
         val vertexConsumer = this.bufferSource.getBuffer(renderType)
-        vertexConsumer.addVertex(matrix4f, i, j, m.toFloat()).setColor(n)
-        vertexConsumer.addVertex(matrix4f, i, l, m.toFloat()).setColor(n)
-        vertexConsumer.addVertex(matrix4f, k, l, m.toFloat()).setColor(n)
-        vertexConsumer.addVertex(matrix4f, k, j, m.toFloat()).setColor(n)
+        vertexConsumer.addVertex(matrix4f, i, j, m.toFloat()).setColor(n).setUv(0f, 0f)
+        vertexConsumer.addVertex(matrix4f, i, l, m.toFloat()).setColor(n).setUv(0f, 0f)
+        vertexConsumer.addVertex(matrix4f, k, l, m.toFloat()).setColor(n).setUv(0f, 0f)
+        vertexConsumer.addVertex(matrix4f, k, j, m.toFloat()).setColor(n).setUv(0f, 0f)
     }
 
     fun GuiGraphics.renderOutline(
@@ -305,7 +304,6 @@ object GraphicsUtil {
         m: Float, // ending v-coordinate in the texture.
         n: Int // color to be applied to the vertices.
     ) {
-        RenderSystem.enableDepthTest()
         this as IMixinGuiGraphics
         val matrix4f: Matrix4f = this.pose().last().pose()
         val vertexConsumer: VertexConsumer = this.bufferSource.getBuffer(function.apply(resourceLocation))
@@ -313,7 +311,6 @@ object GraphicsUtil {
         vertexConsumer.addVertex(matrix4f, i, l, 0.0f).setUv(f, m).setColor(n)
         vertexConsumer.addVertex(matrix4f, j, l, 0.0f).setUv(g, m).setColor(n)
         vertexConsumer.addVertex(matrix4f, j, k, 0.0f).setUv(g, h).setColor(n)
-        RenderSystem.disableDepthTest()
     }
 
     fun GuiGraphics.drawImage(resources: Resources) {

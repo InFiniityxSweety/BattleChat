@@ -49,15 +49,16 @@ object TimestampMessages {
                 val timestampedHoverComponents = HashSet<Any>()
                 component.toFlatList().forEach {
                     val flatComponent = it as MutableComponent
-                    if (flatComponent.style.hoverEvent == null) {
+                    val hoverEvent = flatComponent.style.hoverEvent
+                    if (hoverEvent == null) {
                         flatComponent.withStyle {
                             timestampedHoverComponents.add(lastTimestamp)
-                            it.withHoverEvent(HoverEvent(HoverEvent.Action.SHOW_TEXT, lastTimestamp))
+                            it.withHoverEvent(HoverEvent.ShowText(lastTimestamp))
                         }
                     } else {
-                        when (flatComponent.style.hoverEvent?.action) {
-                            HoverEvent.Action.SHOW_TEXT -> {
-                                val hoverValue = flatComponent.style.hoverEvent?.getValue(HoverEvent.Action.SHOW_TEXT) as MutableComponent?
+                        when (hoverEvent) {
+                            is HoverEvent.ShowText -> {
+                                val hoverValue = hoverEvent.value as MutableComponent?
                                 if (hoverValue != null && !timestampedHoverComponents.containsReference(hoverValue)) {
                                     if (hoverValue.siblings.javaClass.getName().contains("Immutable")) {
                                         hoverValue.siblings = ArrayList(hoverValue.siblings)
@@ -67,8 +68,8 @@ object TimestampMessages {
                                 }
                             }
 
-                            HoverEvent.Action.SHOW_ENTITY -> {
-                                val hoverValue = flatComponent.style.hoverEvent?.getValue(HoverEvent.Action.SHOW_ENTITY)
+                            is HoverEvent.ShowEntity -> {
+                                val hoverValue = hoverEvent.entity
                                 if (hoverValue != null && !timestampedHoverComponents.containsReference(hoverValue.tooltipLines)) {
                                     hoverValue.tooltipLines.add(lastTimestamp)
                                     timestampedHoverComponents.add(hoverValue.tooltipLines)

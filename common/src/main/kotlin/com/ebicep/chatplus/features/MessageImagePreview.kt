@@ -81,7 +81,7 @@ object MessageImagePreview {
                 if (imageURLs.none()) {
                     ChatPlus.sendMessage(Component.literal("No image URLs found").withStyle {
                         it.withColor(ChatFormatting.GRAY)
-                            .withHoverEvent(HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal(input).withStyle(ChatFormatting.AQUA)))
+                            .withHoverEvent(HoverEvent.ShowText(Component.literal(input).withStyle(ChatFormatting.AQUA)))
                     })
                     return@let
                 }
@@ -98,7 +98,7 @@ object MessageImagePreview {
                         ChatPlus.LOGGER.error(e)
                         ChatPlus.sendMessage(Component.literal("Failed to load image #$index").withStyle {
                             it.withColor(ChatFormatting.RED)
-                                .withHoverEvent(HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal(url).withStyle(ChatFormatting.AQUA)))
+                                .withHoverEvent(HoverEvent.ShowText(Component.literal(url).withStyle(ChatFormatting.AQUA)))
                         })
                     }
                 }
@@ -226,7 +226,7 @@ object MessageImagePreview {
         ChatPlus.LOGGER.info("Loading Image from URL: $urlString")
         ChatPlus.sendMessage(Component.literal("Loading Image").withStyle {
             it.withColor(ChatFormatting.YELLOW)
-                .withHoverEvent(HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal(urlString).withStyle(ChatFormatting.AQUA)))
+                .withHoverEvent(HoverEvent.ShowText(Component.literal(urlString).withStyle(ChatFormatting.AQUA)))
         })
         val chatPlusImage = ChatPlusImage()
         imageCache[urlString] = chatPlusImage
@@ -272,7 +272,7 @@ object MessageImagePreview {
                 ChatPlus.LOGGER.error("$errorMessage: $urlString", e)
                 ChatPlus.sendMessage(Component.literal(errorMessage).withStyle {
                     it.withColor(ChatFormatting.RED)
-                        .withHoverEvent(HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal(urlString).withStyle(ChatFormatting.AQUA)))
+                        .withHoverEvent(HoverEvent.ShowText(Component.literal(urlString).withStyle(ChatFormatting.AQUA)))
                 })
             }
         }
@@ -317,7 +317,7 @@ object MessageImagePreview {
             ChatPlus.LOGGER.info("Loaded Image from URL: $urlString")
             ChatPlus.sendMessage(Component.literal("Loaded Image").withStyle {
                 it.withColor(ChatFormatting.GREEN)
-                    .withHoverEvent(HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal(urlString).withStyle(ChatFormatting.AQUA)))
+                    .withHoverEvent(HoverEvent.ShowText(Component.literal(urlString).withStyle(ChatFormatting.AQUA)))
             })
         }
     }
@@ -366,7 +366,7 @@ object MessageImagePreview {
             ChatPlus.LOGGER.info("Loaded GIF from URL: $urlString")
             ChatPlus.sendMessage(Component.literal("Loaded GIF").withStyle {
                 it.withColor(ChatFormatting.GREEN)
-                    .withHoverEvent(HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal(urlString).withStyle(ChatFormatting.AQUA)))
+                    .withHoverEvent(HoverEvent.ShowText(Component.literal(urlString).withStyle(ChatFormatting.AQUA)))
             })
         }
     }
@@ -400,10 +400,10 @@ object MessageImagePreview {
         var resourceLocations: MutableList<ResourceLocation?> = mutableListOf(),
         var chatPlusTextures: MutableList<ChatPlusTexture?> = mutableListOf(),
         var currentFrame: Float = 1f,
-        var maxFrames: Int = 1
+        var maxFrames: Int = 1,
     )
 
-    class ChatPlusTexture(val nativeImage: NativeImage) : DynamicTexture(nativeImage)
+    class ChatPlusTexture(val nativeImage: NativeImage) : DynamicTexture({ "ChatPlusMessageImagePreview${System.currentTimeMillis()}" }, nativeImage)
 
     @Serializable
     data class MessageImagePreviewSettings(

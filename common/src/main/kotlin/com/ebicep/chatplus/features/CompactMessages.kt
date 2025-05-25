@@ -20,8 +20,6 @@ import net.minecraft.network.chat.HoverEvent
 import net.minecraft.network.chat.Style
 import net.minecraft.network.chat.TextColor
 import net.minecraft.util.Mth
-import net.minecraft.network.chat.contents.PlainTextContents
-import java.util.*
 import kotlin.math.max
 
 object CompactMessages {
@@ -188,10 +186,8 @@ object CompactMessages {
             if (hoverEvent1 == null || hoverEvent2 == null) {
                 return hoverEvent1 == hoverEvent2
             }
-            if (hoverEvent1.action == HoverEvent.Action.SHOW_TEXT && hoverEvent2.action == HoverEvent.Action.SHOW_TEXT) {
-                val value1 = hoverEvent1.getValue(HoverEvent.Action.SHOW_TEXT)
-                val value2 = hoverEvent2.getValue(HoverEvent.Action.SHOW_TEXT)
-                return componentEquals(value1, value2)
+            if (hoverEvent1 is HoverEvent.ShowText && hoverEvent2 is HoverEvent.ShowText) {
+                return componentEquals(hoverEvent1.value(), hoverEvent2.value)
             }
             return hoverEvent1 == hoverEvent2
         }

@@ -231,7 +231,7 @@ object TranslateMessage {
                 ComponentUtil.translatable(
                     "chatPlus.translator.sameMessage",
                     ChatFormatting.RED,
-                    HoverEvent(HoverEvent.Action.SHOW_TEXT, component)
+                    HoverEvent.ShowText(component)
                 )
             )
         }
@@ -241,7 +241,7 @@ object TranslateMessage {
                 val component = ComponentUtil.literal(
                     (matchedRegex ?: "") + it.trim() + " (" + (fromLanguage ?: "Unknown") + ")",
                     ChatFormatting.GREEN,
-                    HoverEvent(HoverEvent.Action.SHOW_TEXT, line[index].guiMessage.content.copy())
+                    HoverEvent.ShowText(line[index].guiMessage.content.copy())
                 )
                 ChatManager.globalSelectedTab.addNewMessage(
                     AddNewMessageEvent(
