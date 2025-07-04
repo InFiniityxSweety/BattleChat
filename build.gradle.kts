@@ -7,15 +7,15 @@ buildscript {
     repositories { mavenCentral() }
 
     dependencies {
-        classpath(kotlin("gradle-plugin", version = "2.0.20"))
-        classpath(kotlin("serialization", version = "2.0.20"))
+        classpath(kotlin("gradle-plugin", version = "2.2.0"))
+        classpath(kotlin("serialization", version = "2.2.0"))
     }
 }
 
 plugins {
     java
-    kotlin("jvm") version "2.0.20"
-    kotlin("plugin.serialization") version "2.0.20" apply false
+    kotlin("jvm") version "2.2.0"
+    kotlin("plugin.serialization") version "2.2.0" apply false
     id("architectury-plugin") version "3.4-SNAPSHOT"
     id("dev.architectury.loom") version "1.10-SNAPSHOT" apply false
     id("com.github.johnrengelman.shadow") version "8.1.1" apply false
@@ -66,8 +66,8 @@ allprojects {
     }
 
     dependencies {
-        compileOnly("org.jetbrains.kotlin:kotlin-stdlib:2.0.20")
-        implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
+        compileOnly("org.jetbrains.kotlin:kotlin-stdlib:2.2.0")
+        implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
         implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
         implementation("net.java.dev.jna:jna:5.14.0")
         implementation("com.alphacephei:vosk:0.3.45")
@@ -84,6 +84,17 @@ allprojects {
             jvmTarget.set(JvmTarget.JVM_21)
         }
     }
+
+    tasks.register("checkMetadataDeps") {
+        doLast {
+            configurations.compileClasspath.get().resolvedConfiguration.firstLevelModuleDependencies
+                .filter { it.moduleGroup == "org.jetbrains.kotlinx" && it.moduleName == "kotlinx-metadata-jvm" }
+                .forEach {
+                    println("Using kotlinx-metadata-jvm version: ${it.moduleVersion}")
+                }
+        }
+    }
+
 
     java {
         withSourcesJar()
