@@ -29,7 +29,7 @@ class SendNoteTextBarElement(private val chatPlusScreen: ChatScreen) : TextBarEl
     }
 
     override fun onHover(guiGraphics: GuiGraphics, pMouseX: Int, pMouseY: Int) {
-        guiGraphics.renderTooltip(
+        guiGraphics.setTooltipForNextFrame(
             chatPlusScreen.font,
             tooltip("chatPlus.sendNote.textBarElement.tooltip"),
             pMouseX,
@@ -40,7 +40,7 @@ class SendNoteTextBarElement(private val chatPlusScreen: ChatScreen) : TextBarEl
     override fun onRender(guiGraphics: GuiGraphics, currentX: Int, currentY: Int, mouseX: Int, mouseY: Int, partialTick: Float) {
         fill(guiGraphics, currentX, currentY)
         val onCooldown = SendNote.onCooldown()
-        drawCenteredString(guiGraphics, currentX, currentY, if (onCooldown) NOTE_COLOR else 0xFFFFFF)
+        drawCenteredString(guiGraphics, currentX, currentY, if (onCooldown) NOTE_COLOR else -1)
         if (onCooldown) {
             renderOutline(guiGraphics, currentX, currentY, NOTE_COLOR)
         }

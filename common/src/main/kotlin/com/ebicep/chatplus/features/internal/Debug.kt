@@ -4,12 +4,9 @@ import com.ebicep.chatplus.events.EventBus
 import com.ebicep.chatplus.features.chattabs.ChatTabGetMessageAtEvent
 import com.ebicep.chatplus.features.chattabs.MessageAtType
 import com.ebicep.chatplus.hud.*
-import com.ebicep.chatplus.util.GraphicsUtil
 import com.ebicep.chatplus.util.GraphicsUtil.createPose
 import com.ebicep.chatplus.util.GraphicsUtil.drawImage
 import com.ebicep.chatplus.util.GraphicsUtil.drawString0
-import com.ebicep.chatplus.util.GraphicsUtil.guiForward
-import com.ebicep.chatplus.util.GraphicsUtil.translate0
 import com.ebicep.chatplus.util.Resources
 import net.minecraft.client.Minecraft
 import kotlin.math.roundToInt
@@ -41,13 +38,12 @@ object Debug {
             val mouseX = ChatPlusScreen.lastMouseX
             val mouseY = ChatPlusScreen.lastMouseY
             pose.createPose {
-                pose.guiForward(GraphicsUtil.GuiForwardType.Debug)
                 guiGraphics.drawString(
                     Minecraft.getInstance().font,
                     "$mouseX,$mouseY",
                     mouseX + 5,
                     mouseY + 5,
-                    0xFFFFFF
+                    -1
                 )
                 val globalSelectedTab = ChatManager.globalSelectedTab
                 guiGraphics.drawString(
@@ -55,7 +51,7 @@ object Debug {
                     "${globalSelectedTab.chatScrollbarPos}",
                     mouseX + 5,
                     mouseY + 15,
-                    0xFFFFFF
+                    -1
                 )
                 // mouse relative to chat window position
                 val messageAtEvent = EventBus.post(ChatTabGetMessageAtEvent(globalSelectedTab, MessageAtType.HOVER))
@@ -87,13 +83,12 @@ object Debug {
             val guiGraphics = it.guiGraphics
             val pose = guiGraphics.pose()
             pose.createPose {
-                pose.translate0(z = 5000)
                 guiGraphics.drawString(
                     Minecraft.getInstance().font,
                     "${renderer.x},${renderer.y}",
                     renderer.x,
                     renderer.y + 5,
-                    0x00FF00
+                    (0xFF00FF00).toInt()
                 )
             }
         }
@@ -108,33 +103,33 @@ object Debug {
             val guiGraphics = it.guiGraphics
             val pose = guiGraphics.pose()
             pose.createPose {
-                pose.translate0(z = 5000)
+//                pose.translate0(z = 5000)
                 var string = "${renderer.internalHeight}"
                 guiGraphics.drawString0(
                     string,
                     renderer.rescaledX - Minecraft.getInstance().font.width(string) - 1,
                     renderer.rescaledY - it.displayMessageIndex * renderer.lineHeight - 20,
-                    0x00FF00
+                    (0xFF00FF00).toInt()
                 )
                 string = renderer.getUpdatedHeight(HeightType.ADJUSTED).toString()
                 guiGraphics.drawString0(
                     string,
                     renderer.rescaledX - Minecraft.getInstance().font.width(string) - 1,
                     renderer.rescaledY - it.displayMessageIndex * renderer.lineHeight - 10,
-                    0x00FF00
+                    (0xFF00FF00).toInt()
                 )
                 string = renderer.getTotalLineHeight().toString()
                 guiGraphics.drawString0(
                     string,
                     renderer.rescaledX - Minecraft.getInstance().font.width(string) - 1,
                     renderer.rescaledY - it.displayMessageIndex * renderer.lineHeight,
-                    0x00FF00
+                    (0xFF00FF00).toInt()
                 )
                 guiGraphics.drawString0(
                     "${renderer.rescaledEndX},${renderer.rescaledY - it.displayMessageIndex * renderer.lineHeight}",
                     renderer.rescaledEndX,
                     renderer.rescaledY - it.displayMessageIndex * renderer.lineHeight - 10,
-                    0x00FF00
+                    (0xFF00FF00).toInt()
                 )
             }
         }
@@ -155,7 +150,7 @@ object Debug {
 //                    "${it.index}",
 //                    renderer.rescaledEndX + 1,
 //                    it.verticalChatOffset - renderer.lineHeight,
-//                    0x00FF00
+//                    (0xFF00FF00).toInt()
 //                )
 //            }
 //            pose.createPose {
@@ -168,7 +163,7 @@ object Debug {
 //                    it.text.replace("§", "&"),
 //                    ((renderer.rescaledEndX + 1) * inverseScale).toInt(),
 //                    ((it.verticalChatOffset - renderer.lineHeight) * inverseScale).toInt(),
-//                    0xFFFF00
+//                    (0xFF00FF00).toInt()
 //                )
 //            }
         }

@@ -24,7 +24,7 @@ import java.util.*
 
 object SendNote {
 
-    val NOTE_COLOR = Color(255, 255, 0).rgb
+    val NOTE_COLOR = Color(255, 255, 0, 255).rgb
     private var lastSentNoteTick = -1L
     private val notes: MutableSet<ChatTab.ChatPlusGuiMessage> = Collections.newSetFromMap(IdentityHashMap())
 

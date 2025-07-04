@@ -8,7 +8,6 @@ import com.ebicep.chatplus.hud.ChatManager.resetGlobalSortedTabs
 import com.ebicep.chatplus.util.GraphicsUtil.createPose
 import com.ebicep.chatplus.util.GraphicsUtil.drawString0
 import com.ebicep.chatplus.util.GraphicsUtil.translate0
-import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.gui.components.AbstractWidget
@@ -19,6 +18,7 @@ import net.minecraft.client.gui.screens.Screen
 import net.minecraft.network.chat.CommonComponents
 import net.minecraft.network.chat.Component
 import net.minecraft.util.FormattedCharSequence
+import org.joml.Matrix3x2fStack
 import java.util.function.Consumer
 
 class Editor(
@@ -146,6 +146,7 @@ class Editor(
 
     override fun render(guiGraphics: GuiGraphics, i: Int, j: Int, f: Float) {
         super.render(guiGraphics, i, j, f)
+        guiGraphics.nextStratum()
         val poseStack = guiGraphics.pose()
         poseStack.createPose {
             drawText(poseStack, 2f, guiGraphics, this.title.visualOrderText)
@@ -159,17 +160,17 @@ class Editor(
     }
 
     private fun drawText(
-        poseStack: PoseStack,
+        poseStack: Matrix3x2fStack,
         scale: Float,
         guiGraphics: GuiGraphics,
-        text: FormattedCharSequence
+        text: FormattedCharSequence,
     ) {
-        poseStack.scale(scale, scale, 1f)
+        poseStack.scale(scale, scale)
         guiGraphics.drawString0(
             text,
             minecraft!!.window.guiScaledWidth * .5f / scale - minecraft!!.font.width(text) / 2f,
             10 / scale,
-            0xFFFFFF,
+            -1,
         )
     }
 

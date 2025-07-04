@@ -1,14 +1,15 @@
 package com.ebicep.chatplus.mixin;
 
+import com.mojang.blaze3d.pipeline.RenderPipeline;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.resources.ResourceLocation;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.gen.Accessor;
+import org.spongepowered.asm.mixin.gen.Invoker;
 
 @Mixin(GuiGraphics.class)
 public interface IMixinGuiGraphics {
 
-    @Accessor("bufferSource")
-    MultiBufferSource.BufferSource getBufferSource();
+    @Invoker("innerBlit")
+    void callInnerBlit(RenderPipeline renderPipeline, ResourceLocation resourceLocation, int i, int j, int k, int l, float f, float g, float h, float m, int n);
 
 }

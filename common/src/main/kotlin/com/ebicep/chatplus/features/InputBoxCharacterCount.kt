@@ -35,8 +35,8 @@ object InputBoxCharacterCount {
             poseStack.createPose {
                 val length = "${input.length}"
                 val width = Minecraft.getInstance().font.width(length)
-                poseStack.scale(SCALE, SCALE, 1f)
-                poseStack.translate0(x = (screen.chatPlusWidth / SCALE - width) - PADDING_SCALED, z = 1f)
+                poseStack.scale(SCALE, SCALE)
+                poseStack.translate0(x = (screen.chatPlusWidth / SCALE - width) - PADDING_SCALED)
                 guiGraphics.fill0(
                     x / SCALE,
                     y / SCALE,
@@ -60,11 +60,11 @@ object InputBoxCharacterCount {
         val range = max - min
         val percent = (currentLength - min) / range.toFloat()
         return when (percent) {
-            in 0f..0.33f -> 0x00FF00 // green
-            in 0.33f..0.66f -> 0xFFFF00 // yellow
-            in 0.66f..0.99f -> 0xFFA500 // orange
-            else -> 0xFF0000 // red
-        }
+            in 0f..0.33f -> 0xFF00FF00 // green
+            in 0.33f..0.66f -> 0xFFFFFF00 // yellow
+            in 0.66f..0.99f -> 0xFFFFA500 // orange
+            else -> 0xFFFF0000 // red
+        }.toInt()
     }
 
 }

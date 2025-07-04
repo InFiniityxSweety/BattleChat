@@ -215,7 +215,7 @@ class MicrophoneThread : Thread("ChatPlusMicrophoneThread") {
                 if (!failed) {
                     poseStack.createPose {
                         val scale = .8f
-                        poseStack.scale(scale, scale, scale)
+                        poseStack.scale(scale, scale)
                         poseStack.translate0(x = centerWidth / scale, y = 55 / scale)
                         guiGraphics.drawCenteredString(
                             Minecraft.getInstance().font,

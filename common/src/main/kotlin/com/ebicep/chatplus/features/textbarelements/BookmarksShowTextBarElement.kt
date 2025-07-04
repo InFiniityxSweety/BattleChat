@@ -25,7 +25,7 @@ class ShowBookmarksBarElement(private val chatPlusScreen: ChatScreen) : TextBarE
     }
 
     override fun onHover(guiGraphics: GuiGraphics, pMouseX: Int, pMouseY: Int) {
-        guiGraphics.renderTooltip(
+        guiGraphics.setTooltipForNextFrame(
             chatPlusScreen.font,
             tooltip("chatPlus.bookmark.textBarElement"),
             pMouseX,

@@ -24,7 +24,7 @@ class MovableChatToggleTextBarElement(private val chatPlusScreen: ChatScreen) : 
     }
 
     override fun onHover(guiGraphics: GuiGraphics, pMouseX: Int, pMouseY: Int) {
-        guiGraphics.renderTooltip(
+        guiGraphics.setTooltipForNextFrame(
             chatPlusScreen.font,
             tooltip("chatPlus.movableChat.textBarElement.toggle.tooltip"),
             pMouseX,

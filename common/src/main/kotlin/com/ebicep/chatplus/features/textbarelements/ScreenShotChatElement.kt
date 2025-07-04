@@ -46,7 +46,7 @@ class ScreenShotChatElement(private val chatPlusScreen: ChatScreen) : TextBarEle
     }
 
     override fun onHover(guiGraphics: GuiGraphics, pMouseX: Int, pMouseY: Int) {
-        guiGraphics.renderTooltip(
+        guiGraphics.setTooltipForNextFrame(
             chatPlusScreen.font,
             tooltip("chatPlus.screenshotChat.tooltip"),
             pMouseX,
@@ -57,7 +57,7 @@ class ScreenShotChatElement(private val chatPlusScreen: ChatScreen) : TextBarEle
     override fun onRender(guiGraphics: GuiGraphics, currentX: Int, currentY: Int, mouseX: Int, mouseY: Int, partialTick: Float) {
         fill(guiGraphics, currentX, currentY)
         val onCooldown = onCooldown()
-        drawCenteredString(guiGraphics, currentX, currentY, if (onCooldown) SCREENSHOT_COLOR else 0xFFFFFF)
+        drawCenteredString(guiGraphics, currentX, currentY, if (onCooldown) SCREENSHOT_COLOR else -1)
         if (onCooldown) {
             renderOutline(guiGraphics, currentX, currentY, SCREENSHOT_COLOR)
         }

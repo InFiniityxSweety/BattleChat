@@ -129,9 +129,9 @@ object MessageImagePreview {
                                 val width = nativeImage.width * scale
                                 val height = nativeImage.height * scale
                                 if (drawRight) {
-                                    poseStack.translate0(windowWidth - width - 10, y, 10f)
+                                    poseStack.translate0(windowWidth - width - 10, y)
                                 } else {
-                                    poseStack.translate0(10f, y, 10f)
+                                    poseStack.translate0(10f, y)
                                 }
                                 y += height + 10
 //                                guiGraphics.fill(0, 0, width.toInt(), height.toInt(), 0xFF000000.toInt())

@@ -13,11 +13,9 @@ import com.ebicep.chatplus.features.chattabs.ChatTabs.createDefaultTab
 import com.ebicep.chatplus.features.internal.Debug
 import com.ebicep.chatplus.hud.ChatManager
 import com.ebicep.chatplus.hud.ChatManager.resetGlobalSortedTabs
-import com.ebicep.chatplus.util.GraphicsUtil
 import com.ebicep.chatplus.util.GraphicsUtil.createPose
 import com.ebicep.chatplus.util.GraphicsUtil.drawImage
 import com.ebicep.chatplus.util.GraphicsUtil.drawString0
-import com.ebicep.chatplus.util.GraphicsUtil.guiForward
 import com.ebicep.chatplus.util.GraphicsUtil.translate0
 import com.ebicep.chatplus.util.KotlinUtil.reduceAlpha
 import com.ebicep.chatplus.util.Resources
@@ -198,7 +196,6 @@ class TabSettings {
 
                     if (Debug.debug) {
                         poseStack.createPose {
-                            poseStack.guiForward()
                             guiGraphics.drawString(
                                 Minecraft.getInstance().font,
                                 "x:${it.xStart}",
@@ -213,6 +210,26 @@ class TabSettings {
                                 -10,
                                 0xFF5050
                             )
+                        }
+                    }
+                }
+            }
+            poseStack.createPose {
+                tabs.forEachIndexed { index, chatTab ->
+                    val startX = chatTab.xStart
+                    val startY = chatTab.yStart
+
+                    poseStack.translate0(x = startX)
+                    // notification badge
+                    if (Config.values.tabNotificationSettings.enabled && !chatTab.read) {
+                        val scale = Config.values.tabNotificationSettings.scale
+                        poseStack.createPose {
+                            poseStack.translate0(
+                                x = chatTab.width - Resources.NOTIFICATION_BADGE.width / 2 * scale,
+                                y = startY - Resources.NOTIFICATION_BADGE.height / 2 * scale - if (position == Position.TOP) TAB_HEIGHT else 0
+                            )
+                            poseStack.scale(scale, scale)
+                            guiGraphics.drawImage(Resources.NOTIFICATION_BADGE)
                         }
                     }
                 }
@@ -253,7 +270,6 @@ class TabSettings {
         }
 
         poseStack.createPose {
-            poseStack.guiForward(GraphicsUtil.GuiForwardType.ChatWindowTab) { isGlobalSelected }
             guiGraphics.fill(
                 0,
                 startY,
@@ -264,26 +280,12 @@ class TabSettings {
                 },
                 backgroundColor
             )
-            poseStack.guiForward()
             guiGraphics.drawString0(
                 chatTab.name,
                 ChatTab.PADDING,
                 ChatTab.PADDING + ChatTab.PADDING / 2,
                 textColor
             )
-        }
-        // notification badge
-        if (Config.values.tabNotificationSettings.enabled && !chatTab.read) {
-            val scale = Config.values.tabNotificationSettings.scale
-            poseStack.createPose {
-                poseStack.guiForward(GraphicsUtil.GuiForwardType.ChatTabNotificationBadge)
-                poseStack.translate0(
-                    x = chatTab.width - Resources.NOTIFICATION_BADGE.width / 2 * scale,
-                    y = startY - Resources.NOTIFICATION_BADGE.height / 2 * scale - if (position == Position.TOP) TAB_HEIGHT else 0
-                )
-                poseStack.scale(scale, scale, 1f)
-                guiGraphics.drawImage(Resources.NOTIFICATION_BADGE)
-            }
         }
     }
 
@@ -319,7 +321,7 @@ data class ChatTabClickedEvent(
     val mouseX: Double,
     val mouseY: Double,
     val tabXStart: Double,
-    val tabYStart: Double
+    val tabYStart: Double,
 )
 
 data class ChatTabRenderEvent(
@@ -327,10 +329,10 @@ data class ChatTabRenderEvent(
     val chatTab: ChatTab,
     val tabWidth: Int,
     var xStart: Int,
-    var yStart: Int
+    var yStart: Int,
 )
 
 data class ChatTabSwitchEvent(
     val oldTab: ChatTab,
-    val newTab: ChatTab
+    val newTab: ChatTab,
 )

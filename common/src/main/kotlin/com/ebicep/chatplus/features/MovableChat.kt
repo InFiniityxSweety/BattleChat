@@ -27,20 +27,17 @@ import com.ebicep.chatplus.hud.ChatPlusScreen.EDIT_BOX_HEIGHT
 import com.ebicep.chatplus.hud.ChatPlusScreen.lastMouseX
 import com.ebicep.chatplus.hud.ChatPlusScreen.lastMouseY
 import com.ebicep.chatplus.mixin.IMixinChatScreen
-import com.ebicep.chatplus.util.ComponentUtil.withColor
-import com.ebicep.chatplus.util.GraphicsUtil
 import com.ebicep.chatplus.util.GraphicsUtil.createPose
 import com.ebicep.chatplus.util.GraphicsUtil.drawString0
 import com.ebicep.chatplus.util.GraphicsUtil.fill0
-import com.ebicep.chatplus.util.GraphicsUtil.guiForward
 import com.ebicep.chatplus.util.GraphicsUtil.translate0
-import com.mojang.blaze3d.vertex.PoseStack
 import kotlinx.serialization.Serializable
 import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.network.chat.Component
 import net.minecraft.util.Mth
+import org.joml.Matrix3x2fStack
 import java.awt.Color
 import kotlin.math.abs
 import kotlin.math.max
@@ -255,7 +252,6 @@ object MovableChat {
                 MessageDirection.TOP_DOWN -> renderer.rescaledY
                 MessageDirection.BOTTOM_UP -> startY + visibleLineHeightScaled
             }
-            poseStack.guiForward(GraphicsUtil.GuiForwardType.MovableChatMoving)
             guiGraphics.fill0(
                 renderer.rescaledX,
                 startY,
@@ -265,7 +261,7 @@ object MovableChat {
             )
             poseStack.createPose {
                 val unscaled = 1 / renderer.scale
-                poseStack.scale(unscaled, unscaled, 1f)
+                poseStack.scale(unscaled, unscaled)
                 renderMoving(
                     poseStack,
                     guiGraphics,
@@ -511,7 +507,6 @@ object MovableChat {
         val poseStack = guiGraphics.pose()
         poseStack.createPose {
             // below cursor - if tab is outside tab bar
-            poseStack.guiForward(GraphicsUtil.GuiForwardType.MovableChatDebug)
             guiGraphics.drawString0(
                 "$outsideTabBar",
                 lastMouseX + 5,
@@ -527,7 +522,7 @@ object MovableChat {
         }
         poseStack.createPose {
             // below cursor - offset from tab start position
-            poseStack.translate0(x = chatTab.xStart, y = chatTab.yStart, z = 100)
+            poseStack.translate0(x = chatTab.xStart, y = chatTab.yStart)
             guiGraphics.drawString0(
                 "movingTabXOffset: $movingTabXOffset",
                 30,
@@ -550,7 +545,6 @@ object MovableChat {
         val poseStack = guiGraphics.pose()
         val renderer = chatWindow.renderer
         poseStack.createPose {
-            poseStack.translate0(z = 1000)
             // tab mouse start position (bottom of cursor)
             guiGraphics.drawString0(
                 "$movingTabMouseXStart",
@@ -619,18 +613,17 @@ object MovableChat {
     }
 
     private fun renderMoving(
-        poseStack: PoseStack,
+        poseStack: Matrix3x2fStack,
         guiGraphics: GuiGraphics,
         x: Int,
         y: Int,
         height: Int,
         backgroundWidth: Int,
-        selectedWindow: Boolean
+        selectedWindow: Boolean,
     ) {
         poseStack.createPose {
             val movingWidth = movingChatWidth && selectedWindow
             val movingHeight = movingChatHeight && selectedWindow
-            poseStack.guiForward()
             guiGraphics.fill0(
                 x + backgroundWidth - RENDER_MOVING_SIZE,
                 y - height.toFloat(),
@@ -638,7 +631,6 @@ object MovableChat {
                 y.toFloat(),
                 if (movingWidth) Config.values.movableChatSelectedColor else Config.values.movableChatColor
             )
-            poseStack.guiForward(backwards = movingWidth && !movingHeight)
             guiGraphics.fill0(
                 x.toFloat(),
                 y - height.toFloat(),

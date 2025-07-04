@@ -144,7 +144,7 @@ class TranslateSpeakTextBarElement(private val chatPlusScreen: ChatScreen) : Tex
 
     override fun onHover(guiGraphics: GuiGraphics, pMouseX: Int, pMouseY: Int) {
         chatPlusScreen as IMixinScreen
-        guiGraphics.renderTooltip(
+        guiGraphics.setTooltipForNextFrame(
             chatPlusScreen.font,
             tooltip("chatPlus.translator.translateSpeak.chat.tooltip"),
             pMouseX,

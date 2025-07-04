@@ -34,7 +34,7 @@ object HoverHighlight {
 //                        hoveredOverMessage!!.content,
 //                        ChatPlusScreen.lastMouseX + 10,
 //                        ChatPlusScreen.lastMouseY + 10,
-//                        0xFFFFFF
+//                        -1
 //                    )
 //                }
 //            }

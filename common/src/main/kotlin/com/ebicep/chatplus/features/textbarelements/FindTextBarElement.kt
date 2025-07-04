@@ -25,7 +25,7 @@ class FindTextBarElement(private val chatPlusScreen: ChatScreen) : TextBarElemen
     }
 
     override fun onHover(guiGraphics: GuiGraphics, pMouseX: Int, pMouseY: Int) {
-        guiGraphics.renderTooltip(
+        guiGraphics.setTooltipForNextFrame(
             chatPlusScreen.font,
             tooltip("chatPlus.findMessage.highlightInputBox.tooltip"),
             pMouseX,

@@ -1,15 +1,17 @@
 package com.ebicep.chatplus.util
 
 import com.ebicep.chatplus.mixin.IMixinGuiGraphics
-import com.mojang.blaze3d.vertex.*
+import com.mojang.blaze3d.pipeline.RenderPipeline
+import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Font
 import net.minecraft.client.gui.GuiGraphics
-import net.minecraft.client.renderer.RenderType
+import net.minecraft.client.renderer.RenderPipelines
+import net.minecraft.locale.Language
+import net.minecraft.network.chat.FormattedText
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.util.FormattedCharSequence
-import org.joml.Matrix4f
-import java.util.function.Function
+import org.joml.Matrix3x2fStack
 
 object GraphicsUtil {
 
@@ -53,22 +55,22 @@ object GraphicsUtil {
         }
     }
 
-    inline fun PoseStack.createPose(fn: () -> Unit) {
-        pushPose()
+    inline fun Matrix3x2fStack.createPose(fn: () -> Unit) {
+        pushMatrix()
         fn()
-        popPose()
+        popMatrix()
     }
 
-    fun PoseStack.translate0(x: Double = 0.0, y: Double = 0.0, z: Double = 0.0) {
-        translate(x, y, z)
+    fun Matrix3x2fStack.translate0(x: Double = 0.0, y: Double = 0.0) {
+        translate(x.toFloat(), y.toFloat())
     }
 
-    fun PoseStack.translate0(x: Float = 0f, y: Float = 0f, z: Float = 0f) {
-        translate(x, y, z)
+    fun Matrix3x2fStack.translate0(x: Float = 0f, y: Float = 0f) {
+        translate(x, y)
     }
 
-    fun PoseStack.translate0(x: Int = 0, y: Int = 0, z: Int = 0) {
-        translate(x.toDouble(), y.toDouble(), z.toDouble())
+    fun Matrix3x2fStack.translate0(x: Int = 0, y: Int = 0) {
+        translate(x.toFloat(), y.toFloat())
     }
 
     /**
@@ -90,35 +92,49 @@ object GraphicsUtil {
         translate(0.0, 0.0, guiForwardType.getAmount { backwards } / 1000)
     }
 
-    fun GuiGraphics.fill0(i: Float, j: Float, k: Float, l: Float, n: Int) {
-        this.fill0(RenderType.gui(), i, j, k, l, 0, n)
+    fun GuiGraphics.fill0(i: Float, j: Float, k: Float, l: Float, m: Int) {
+        this.fill(RenderPipelines.GUI, i.toInt(), j.toInt(), k.toInt(), l.toInt(), m)
     }
 
-    fun GuiGraphics.fill0(renderType: RenderType, i: Float, j: Float, k: Float, l: Float, m: Int, n: Int) {
-        this as IMixinGuiGraphics
-        val matrix4f = this.pose().last().pose()
-        var o: Float
-        var i = i
-        var j = j
-        var k = k
-        var l = l
-        if (i < k) {
-            o = i
-            i = k
-            k = o
-        }
-        if (j < l) {
-            o = j
-            j = l
-            l = o
-        }
-
-        val vertexConsumer = this.bufferSource.getBuffer(renderType)
-        vertexConsumer.addVertex(matrix4f, i, j, m.toFloat()).setColor(n).setUv(0f, 0f)
-        vertexConsumer.addVertex(matrix4f, i, l, m.toFloat()).setColor(n).setUv(0f, 0f)
-        vertexConsumer.addVertex(matrix4f, k, l, m.toFloat()).setColor(n).setUv(0f, 0f)
-        vertexConsumer.addVertex(matrix4f, k, j, m.toFloat()).setColor(n).setUv(0f, 0f)
-    }
+//    fun GuiGraphics.fill0(renderPipeline: RenderPipeline, i: Float, j: Float, k: Float, l: Float, m: Int, n: Int) {
+//        var o: Float
+//        var i = i
+//        var j = j
+//        var k = k
+//        var l = l
+//        if (i < k) {
+//            o = i
+//            i = k
+//            k = o
+//        }
+//        if (j < l) {
+//            o = j
+//            j = l
+//            l = o
+//        }
+//
+//        this.guiRenderState.submitGuiElement(
+//            ColoredRectangleRenderState(
+//                renderPipeline,
+//                textureSetup,
+//                Matrix3x2f(this.pose),
+//                i,
+//                j,
+//                k,
+//                l,
+//                m,
+//                if (integer != null) integer else m,
+//                this.scissorStack.peek()
+//            )
+//        )
+//
+//
+//        val vertexConsumer = this.bufferSource.getBuffer(renderPipeline)
+//        vertexConsumer.addVertex(matrix4f, i, j, m.toFloat()).setColor(n).setUv(0f, 0f)
+//        vertexConsumer.addVertex(matrix4f, i, l, m.toFloat()).setColor(n).setUv(0f, 0f)
+//        vertexConsumer.addVertex(matrix4f, k, l, m.toFloat()).setColor(n).setUv(0f, 0f)
+//        vertexConsumer.addVertex(matrix4f, k, j, m.toFloat()).setColor(n).setUv(0f, 0f)
+//    }
 
     fun GuiGraphics.renderOutline(
         startX: Float,
@@ -130,7 +146,7 @@ object GraphicsUtil {
         top: Boolean = true,
         bottom: Boolean = true,
         left: Boolean = true,
-        right: Boolean = true
+        right: Boolean = true,
     ) {
         renderOutlineSetPos(startX, startY, startX + width, startY + height, color, thickness, top, bottom, left, right)
     }
@@ -145,7 +161,7 @@ object GraphicsUtil {
         top: Boolean = true,
         bottom: Boolean = true,
         left: Boolean = true,
-        right: Boolean = true
+        right: Boolean = true,
     ) {
         if (top) {
             this.fill0(startX, startY, endX, startY + thickness, color)
@@ -171,7 +187,7 @@ object GraphicsUtil {
         top: Boolean = true,
         bottom: Boolean = true,
         left: Boolean = true,
-        right: Boolean = true
+        right: Boolean = true,
     ) {
         renderOutlineSetPos(startX, startY, startX + width, startY + height, color, thickness, top, bottom, left, right)
     }
@@ -186,7 +202,7 @@ object GraphicsUtil {
         top: Boolean = true,
         bottom: Boolean = true,
         left: Boolean = true,
-        right: Boolean = true
+        right: Boolean = true,
     ) {
         if (top) {
             this.fill(startX, startY, endX, startY + thickness, color)
@@ -219,54 +235,28 @@ object GraphicsUtil {
         this.fill(x, y1, x + thickness, y2, color)
     }
 
-    fun GuiGraphics.drawString0(string: String, i: Int, j: Int, k: Int): Int {
-        return this.drawString(Minecraft.getInstance().font, string, i, j, k, true)
+    fun GuiGraphics.drawString0(string: String, i: Int, j: Int, k: Int) {
+        this.drawString(Minecraft.getInstance().font, string, i, j, k, true)
     }
 
-    fun GuiGraphics.drawString0(string: String, x: Float, y: Float, color: Int): Int {
-        return this.drawString0(Minecraft.getInstance().font, string, x, y, color, true)
+    fun GuiGraphics.drawString0(string: String, x: Float, y: Float, color: Int) {
+        this.drawString0(Minecraft.getInstance().font, string, x, y, color, true)
     }
 
-    private fun GuiGraphics.drawString0(font: Font, string: String, x: Float, y: Float, color: Int, bl: Boolean): Int {
-        this as IMixinGuiGraphics
-        val l = font.drawInBatch(
-            string,
-            x,
-            y,
-            color,
-            bl,
-            this.pose().last().pose(),
-            this.bufferSource,
-            Font.DisplayMode.NORMAL,
-            0,
-            0xF000F0
-        )
-        return l
+    private fun GuiGraphics.drawString0(font: Font, string: String, x: Float, y: Float, color: Int, bl: Boolean) {
+        this.drawString(font, Language.getInstance().getVisualOrder(FormattedText.of(string)), x.toInt(), y.toInt(), color, bl)
     }
 
-    fun GuiGraphics.drawString0(formattedCharSequence: FormattedCharSequence, x: Float, y: Float, color: Int): Int {
-        return this.drawString0(formattedCharSequence, x, y, color, true)
+    fun GuiGraphics.drawString0(formattedCharSequence: FormattedCharSequence, x: Float, y: Float, color: Int) {
+        this.drawString0(formattedCharSequence, x, y, color, true)
     }
 
-    fun GuiGraphics.drawString0(formattedCharSequence: FormattedCharSequence, x: Float, y: Float, color: Int, bl: Boolean): Int {
-        this as IMixinGuiGraphics
-        val l = Minecraft.getInstance().font.drawInBatch(
-            formattedCharSequence,
-            x,
-            y,
-            color,
-            bl,
-            this.pose().last().pose(),
-            this.bufferSource,
-            Font.DisplayMode.NORMAL,
-            0, // highlights text
-            0xF000F0
-        )
-        return l
+    fun GuiGraphics.drawString0(formattedCharSequence: FormattedCharSequence, x: Float, y: Float, color: Int, bl: Boolean) {
+        this.drawString(Minecraft.getInstance().font, formattedCharSequence, x.toInt(), y.toInt(), color, bl)
     }
 
     fun GuiGraphics.blit0(
-        function: (ResourceLocation) -> RenderType,
+        renderPipeline: RenderPipeline,
         resourceLocation: ResourceLocation,
         i: Float, // starting x-coordinate for the blit.
         j: Float, // starting y-coordinate for the blit.
@@ -278,10 +268,10 @@ object GraphicsUtil {
         n: Float, // height of the texture.
         o: Float, // total width of the texture.
         p: Float, // total height of the texture.
-        q: Int // color to be applied to the vertices.
+        q: Int, // color to be applied to the vertices.
     ) {
         innerBlit0(
-            function,
+            renderPipeline,
             resourceLocation,
             i,
             i + k,
@@ -296,7 +286,7 @@ object GraphicsUtil {
     }
 
     private fun GuiGraphics.innerBlit0(
-        function: Function<ResourceLocation, RenderType>,
+        renderPipeline: RenderPipeline,
         resourceLocation: ResourceLocation,
         i: Float, // starting x-coordinate for the blit.
         j: Float, // ending x-coordinate for the blit.
@@ -306,15 +296,10 @@ object GraphicsUtil {
         g: Float, // ending u-coordinate in the texture.
         h: Float, // starting v-coordinate in the texture.
         m: Float, // ending v-coordinate in the texture.
-        n: Int // color to be applied to the vertices.
+        n: Int, // color to be applied to the vertices.
     ) {
         this as IMixinGuiGraphics
-        val matrix4f: Matrix4f = this.pose().last().pose()
-        val vertexConsumer: VertexConsumer = this.bufferSource.getBuffer(function.apply(resourceLocation))
-        vertexConsumer.addVertex(matrix4f, i, k, 0.0f).setUv(f, h).setColor(n)
-        vertexConsumer.addVertex(matrix4f, i, l, 0.0f).setUv(f, m).setColor(n)
-        vertexConsumer.addVertex(matrix4f, j, l, 0.0f).setUv(g, m).setColor(n)
-        vertexConsumer.addVertex(matrix4f, j, k, 0.0f).setUv(g, h).setColor(n)
+        this.callInnerBlit(renderPipeline, resourceLocation, i.toInt(), j.toInt(), k.toInt(), l.toInt(), f, g, h, m, n)
     }
 
     fun GuiGraphics.drawImage(resources: Resources) {
@@ -327,7 +312,7 @@ object GraphicsUtil {
 
     fun GuiGraphics.drawImage(resourceLocation: ResourceLocation, width: Float, height: Float) {
         this.innerBlit0(
-            { resLoc -> RenderType.guiTextured(resLoc) },
+            RenderPipelines.GUI_TEXTURED,
             resourceLocation,
             0f,
             width,
@@ -337,7 +322,7 @@ object GraphicsUtil {
             1f,
             0f,
             1f,
-            -1
+            -1,
         )
     }
 
@@ -355,12 +340,12 @@ object GraphicsUtil {
             k: Float,
             renderHat: Boolean,
             renderUpsideDown: Boolean,
-            l: Int
+            l: Int,
         ) {
             val m = 8 + (if (renderUpsideDown) 8 else 0)
             val n = 8 * (if (renderUpsideDown) -1 else 1)
             guiGraphics.blit0(
-                { resLoc -> RenderType.guiTextured(resLoc) },
+                RenderPipelines.GUI_TEXTURED,
                 resourceLocation,
                 i,
                 j,
@@ -383,7 +368,7 @@ object GraphicsUtil {
             val m = 8 + (if (bl) 8 else 0)
             val n = 8 * (if (bl) -1 else 1)
             guiGraphics.blit0(
-                { resLoc -> RenderType.guiTextured(resLoc) },
+                RenderPipelines.GUI_TEXTURED,
                 resourceLocation,
                 i,
                 j,

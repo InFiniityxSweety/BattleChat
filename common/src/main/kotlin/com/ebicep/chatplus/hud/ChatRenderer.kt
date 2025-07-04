@@ -13,13 +13,10 @@ import com.ebicep.chatplus.features.internal.Debug
 import com.ebicep.chatplus.hud.ChatPlusScreen.EDIT_BOX_HEIGHT
 import com.ebicep.chatplus.hud.ChatPlusScreen.lastMouseX
 import com.ebicep.chatplus.hud.ChatPlusScreen.lastMouseY
-import com.ebicep.chatplus.util.GraphicsUtil
 import com.ebicep.chatplus.util.GraphicsUtil.createPose
 import com.ebicep.chatplus.util.GraphicsUtil.drawString0
 import com.ebicep.chatplus.util.GraphicsUtil.fill0
-import com.ebicep.chatplus.util.GraphicsUtil.guiForward
 import com.ebicep.chatplus.util.KotlinUtil.reduceAlpha
-import com.mojang.blaze3d.vertex.PoseStack
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import net.minecraft.client.GuiMessage
@@ -236,7 +233,7 @@ class ChatRenderer {
         }
         handleScreenResize()
 
-        val poseStack: PoseStack = guiGraphics.pose()
+        val poseStack = guiGraphics.pose()
         var chatFocused: Boolean = ChatManager.isChatFocused()
 
         val preLinesEvent = ChatRenderPreLinesEvent(guiGraphics, chatWindow, chatFocused)
@@ -246,8 +243,8 @@ class ChatRenderer {
         chatFocused = preLinesEvent.chatFocused
 
         val messagesToDisplay = chatWindow.tabSettings.selectedTab.displayedMessages.size
-        poseStack.pushPose()
-        poseStack.scale(scale, scale, 1.0f)
+        poseStack.pushMatrix()
+        poseStack.scale(scale, scale)
         var displayMessageIndex = 0
         var linesPerPage = rescaledLinesPerPage
         if (!chatFocused) {
@@ -276,7 +273,6 @@ class ChatRenderer {
             val verticalTextOffset: Float = verticalChatOffset + l1 // align text with background
             var textColor: Int = 16777215 + (textOpacity shl 24)
             poseStack.createPose {
-                poseStack.guiForward()
                 val lineAppearanceEvent = ChatRenderPreLineAppearanceEvent(
                     guiGraphics,
                     chatWindow,
@@ -297,15 +293,12 @@ class ChatRenderer {
                     verticalChatOffset,
                     backgroundColor
                 )
-                guiGraphics.flush()
             }
             if (textOpacity <= 3) {
                 ++displayMessageIndex
                 continue
             }
             poseStack.createPose {
-                poseStack.guiForward()
-                poseStack.guiForward()
                 EventBus.post(
                     ChatRenderLineTextEvent(
                         guiGraphics,
@@ -334,11 +327,10 @@ class ChatRenderer {
         if (EventBus.post(ChatRenderPostLinesEvent(guiGraphics, chatWindow, displayMessageIndex)).returnFunction) {
             return
         }
-        poseStack.popPose()
+        poseStack.popMatrix()
 
         if (chatFocused && Debug.debug && chatWindow == ChatManager.selectedWindow) {
             poseStack.createPose {
-                poseStack.guiForward(GraphicsUtil.GuiForwardType.ChatRendererDebug)
                 guiGraphics.drawString0("$height", lastMouseX - 15, lastMouseY + 5, 0x3eeff)
                 guiGraphics.drawString0("$rescaledHeight", lastMouseX - 15, lastMouseY + 15, 0x3eeff)
                 guiGraphics.drawString0("$lineHeight", lastMouseX - 15, lastMouseY + 25, 0x3eeff)

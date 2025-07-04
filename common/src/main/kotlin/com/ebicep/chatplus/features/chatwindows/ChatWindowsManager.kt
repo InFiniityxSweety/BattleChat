@@ -5,9 +5,7 @@ import com.ebicep.chatplus.events.EventBus
 import com.ebicep.chatplus.features.chattabs.CHAT_TAB_HEIGHT
 import com.ebicep.chatplus.features.chattabs.CHAT_TAB_Y_OFFSET
 import com.ebicep.chatplus.hud.*
-import com.ebicep.chatplus.util.GraphicsUtil
 import com.ebicep.chatplus.util.GraphicsUtil.createPose
-import com.ebicep.chatplus.util.GraphicsUtil.guiForward
 import net.minecraft.client.gui.GuiGraphics
 
 object ChatWindowsManager {
@@ -50,7 +48,6 @@ object ChatWindowsManager {
             val guiGraphics = it.guiGraphics
             val poseStack = guiGraphics.pose()
             poseStack.createPose {
-                poseStack.guiForward(GraphicsUtil.GuiForwardType.ChatWindowOutline) { ChatManager.globalSelectedTab == selectedTab }
                 val outlineBoxType = outline.outlineBoxType
                 val outlineTabType = outline.outlineTabType
                 outlineBoxType.render(outlineTabType, guiGraphics, chatWindow, selectedTab, renderer)
@@ -132,7 +129,6 @@ object ChatWindowsManager {
             }
             val poseStack = guiGraphics.pose()
             poseStack.createPose {
-                poseStack.guiForward(GraphicsUtil.GuiForwardType.ChatWindows) { index }
                 it.renderer.render(it, guiGraphics, i, j, k)
             }
         }

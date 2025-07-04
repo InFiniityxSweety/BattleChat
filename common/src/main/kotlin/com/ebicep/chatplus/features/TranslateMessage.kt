@@ -131,7 +131,7 @@ object TranslateMessage {
                 mouseX in 0 until 65 &&
                 mouseY in height - EDIT_BOX_HEIGHT until height
             ) {
-                guiGraphics.renderTooltip(
+                guiGraphics.setTooltipForNextFrame(
                     minecraft.font,
                     Component.translatable("chatPlus.translator.translateSpeakPrefix.tooltip"),
                     mouseX,
