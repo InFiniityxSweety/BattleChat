@@ -3,6 +3,7 @@ package com.ebicep.chatplus.features.chattabs
 import com.ebicep.chatplus.ChatPlus
 import com.ebicep.chatplus.config.Config
 import com.ebicep.chatplus.config.JumpToMessageMode
+import com.ebicep.chatplus.config.MessageDirection
 import com.ebicep.chatplus.events.Event
 import com.ebicep.chatplus.events.EventBus
 import com.ebicep.chatplus.events.Events
@@ -345,7 +346,11 @@ class ChatTab {
         )
         var wrappedIndex = index
         val added: MutableList<ChatPlusGuiMessageLine> = mutableListOf()
-        for (j in list.indices) {
+
+        val reversed = chatWindow.generalSettings.messageDirection == MessageDirection.TOP_DOWN &&
+                chatWindow.generalSettings.topDownDirectionWrapInOrder
+        val indices = if (reversed) list.indices.reversed() else list.indices
+        for (j in indices) {
             val chatPlusLine = list[j]
             val formattedCharSequence = chatPlusLine.first
             val content = chatPlusLine.second

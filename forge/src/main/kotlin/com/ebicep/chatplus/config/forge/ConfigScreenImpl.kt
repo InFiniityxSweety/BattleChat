@@ -735,6 +735,10 @@ object ConfigScreenImpl {
                 MessageDirection::class.java,
                 window.generalSettings.messageDirection
             ) { window.generalSettings.messageDirection = it },
+            entryBuilder.booleanToggle(
+                "chatPlus.chatWindow.generalSettings.topDownDirectionWrapInOrder.toggle",
+                window.generalSettings.topDownDirectionWrapInOrder
+            ) { window.generalSettings.topDownDirectionWrapInOrder = it },
         )
     }
 

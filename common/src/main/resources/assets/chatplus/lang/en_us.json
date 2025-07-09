@@ -200,6 +200,8 @@
   "chatPlus.chatWindow.generalSettings.messageDirection.tooltip": "The direction in which chat lines are rendered",
   "chatPlus.chatWindow.generalSettings.messageDirection.topDown": "Top Down",
   "chatPlus.chatWindow.generalSettings.messageDirection.bottomUp": "Bottom Up",
+  "chatPlus.chatWindow.generalSettings.topDownDirectionWrapInOrder.toggle": "Top Down Wrap in Order",
+  "chatPlus.chatWindow.generalSettings.topDownDirectionWrapInOrder.toggle.tooltip": "Enables/Disables if wrapped messages should display as bottom up.",
   "chatPlus.chatWindow.generalSettings.messageAlignment": "Message Alignment",
   "chatPlus.chatWindow.generalSettings.messageAlignment.tooltip": "Changes the alignment of chat.",
   "chatPlus.chatWindow.generalSettings.messageAlignment.left": "Left",
