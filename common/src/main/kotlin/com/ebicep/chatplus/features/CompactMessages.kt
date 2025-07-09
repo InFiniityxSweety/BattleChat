@@ -52,23 +52,27 @@ object CompactMessages {
                 // remove previous displayed message and update it
                 var addIndex = -1
                 var oldDisplayMessage: ChatTab.ChatPlusGuiMessageLine? = null
-                for (j in displayedMessages.size - 1 downTo 0) {
-                    val displayedMessage = displayedMessages[j]
-                    if (messages[i] === displayedMessage.linkedMessage) {
-                        displayedMessages.removeAt(j)
-                        if (displayedMessage.wrappedIndex == 0) {
-                            addIndex = j
-                            oldDisplayMessage = displayedMessage
-                            break
+                if (!Config.values.compactMessagesSendAsNew ||
+                    Config.values.compactMessagesSendAsNew && Config.values.compactMessagesDeleteDuplicate
+                ) {
+                    for (j in displayedMessages.size - 1 downTo 0) {
+                        val displayedMessage = displayedMessages[j]
+                        if (messages[i] === displayedMessage.linkedMessage) {
+                            displayedMessages.removeAt(j)
+                            if (displayedMessage.wrappedIndex == 0) {
+                                addIndex = j
+                                oldDisplayMessage = displayedMessage
+                                break
+                            }
                         }
                     }
                 }
                 it.chatPlusGuiMessage.timesRepeated = message.timesRepeated + 1
-                if (addIndex == -1 || oldDisplayMessage == null) {
-                    break
-                }
                 it.mutableComponent.siblings.add(literalIgnored(" (${it.chatPlusGuiMessage.timesRepeated})", ComponentUtil.LiteralIgnoredType.COMPACT).withStyle(COMPACT_STYLE))
                 if (Config.values.compactMessagesSendAsNew) {
+                    break
+                }
+                if (addIndex == -1 || oldDisplayMessage == null) {
                     break
                 }
                 val addedTime = if (Config.values.compactMessagesRefreshAddedTime) it.addedTime else oldDisplayMessage.line.addedTime

@@ -246,6 +246,8 @@ object ConfigScreenImpl {
             { Config.values.compactMessagesEnabled = it },
             entryBuilder.booleanToggle("chatPlus.compactMessages.compactMessagesSendAsNew.toggle", Config.values.compactMessagesSendAsNew)
             { Config.values.compactMessagesSendAsNew = it },
+            entryBuilder.booleanToggle("chatPlus.compactMessages.compactMessagesDeleteDuplicate.toggle", Config.values.compactMessagesDeleteDuplicate)
+            { Config.values.compactMessagesDeleteDuplicate = it },
             entryBuilder.booleanToggle(
                 "chatPlus.compactMessages.refreshFadeTime.toggle",
                 Config.values.compactMessagesRefreshAddedTime
