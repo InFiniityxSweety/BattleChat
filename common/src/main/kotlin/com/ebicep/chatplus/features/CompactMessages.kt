@@ -49,7 +49,6 @@ object CompactMessages {
                 if (!componentEquals(guiMessage.content, it.mutableComponent)) {
                     continue
                 }
-                message.timesRepeated++
                 // remove previous displayed message and update it
                 var addIndex = -1
                 var oldDisplayMessage: ChatTab.ChatPlusGuiMessageLine? = null
@@ -64,10 +63,14 @@ object CompactMessages {
                         }
                     }
                 }
+                it.chatPlusGuiMessage.timesRepeated = message.timesRepeated + 1
                 if (addIndex == -1 || oldDisplayMessage == null) {
                     break
                 }
-                it.mutableComponent.siblings.add(literalIgnored(" (${message.timesRepeated})", ComponentUtil.LiteralIgnoredType.COMPACT).withStyle(COMPACT_STYLE))
+                it.mutableComponent.siblings.add(literalIgnored(" (${it.chatPlusGuiMessage.timesRepeated})", ComponentUtil.LiteralIgnoredType.COMPACT).withStyle(COMPACT_STYLE))
+                if (Config.values.compactMessagesSendAsNew) {
+                    break
+                }
                 val addedTime = if (Config.values.compactMessagesRefreshAddedTime) it.addedTime else oldDisplayMessage.line.addedTime
                 val displayMessageEvent = EventBus.post(
                     ChatTabAddDisplayMessageEvent(
