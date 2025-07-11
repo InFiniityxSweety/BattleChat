@@ -151,11 +151,15 @@ object TranslateMessage {
         }
 
         ClientChatEvent.RECEIVED.register { type: ChatType.Bound, component: Component ->
-            handleTranslate(component)
+            if (!isTranslateMessage(component)) {
+                handleTranslate(component)
+            }
             CompoundEventResult.pass()
         }
         ClientSystemMessageEvent.RECEIVED.register { component: Component ->
-            handleTranslate(component)
+            if (!isTranslateMessage(component)) {
+                handleTranslate(component)
+            }
             CompoundEventResult.pass()
         }
         ClientRawInputEvent.KEY_PRESSED.register { _, keyCode, _, _, modifiers ->
@@ -205,6 +209,11 @@ object TranslateMessage {
                 }
             }
         }
+    }
+
+    private fun isTranslateMessage(component: Component): Boolean {
+        return component.contents is ComponentUtil.LiteralContentsIgnored &&
+                (component.contents as ComponentUtil.LiteralContentsIgnored).isType(ComponentUtil.LiteralIgnoredType.TRANSLATE)
     }
 
     private fun handleTranslate(component: Component) {

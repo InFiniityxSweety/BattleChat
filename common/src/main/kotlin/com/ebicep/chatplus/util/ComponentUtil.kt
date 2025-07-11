@@ -53,7 +53,8 @@ object ComponentUtil {
 
     enum class LiteralIgnoredType {
         TIMESTAMP,
-        COMPACT
+        COMPACT,
+        TRANSLATE
     }
 
 
