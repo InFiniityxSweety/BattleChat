@@ -6,6 +6,7 @@ import com.ebicep.chatplus.features.internal.MessageFilterFormatted
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
+import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.Component
 
 @Serializable
@@ -53,8 +54,10 @@ class AutoTabCreator {
             return null
         }
         autoTabOptions.forEach {
+            val name = Minecraft.getInstance().player?.gameProfile?.name ?: ""
+            val filterFormatted = MessageFilterFormatted(it.pattern.replace("%PLAYER%", name, ignoreCase = true), it.formatted)
             // check matches and get group index
-            val matchResult: MatchResult = it.find(text) ?: return@forEach
+            val matchResult: MatchResult = filterFormatted.find(text) ?: return@forEach
             val tabName = formatRegex(it.tabNameFormatter, matchResult)
             val pattern = formatRegex(it.regexFormatter, matchResult)
             val autoPrefix = formatRegex(it.autoPrefixFormatter, matchResult)
@@ -85,7 +88,8 @@ class AutoTabCreator {
 
     // replace all in autoPrefix %GROUP_1% %GROUP_2% etc with the corresponding group in the matched regex, start at 1 because 0 is the whole match
     private fun formatRegex(input: String, matchResult: MatchResult): String {
-        var output = input
+        val name = Minecraft.getInstance().player?.gameProfile?.name ?: ""
+        var output = input.replace("%PLAYER%", name, ignoreCase = true)
         for (i in matchResult.groups.indices) {
             val groupValue = matchResult.groups[i]?.value ?: continue
             output = output.replace("%GROUP_$i%", groupValue)
