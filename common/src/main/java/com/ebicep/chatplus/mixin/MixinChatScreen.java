@@ -185,7 +185,7 @@ public abstract class MixinChatScreen extends Screen implements IMixinChatScreen
         ChatPlusScreenAdapter.INSTANCE.handlePageUpDown(false);
     }
 
-    @Inject(method = "mouseScrolled", at = @At(value = "RETURN", opcode = 1), cancellable = true)
+    @Inject(method = "mouseScrolled", at = @At(value = "RETURN", ordinal = 1), cancellable = true)
     private void mouseScrolled(double mouseX, double mouseY, double amountX, double amountY, CallbackInfoReturnable<Boolean> cir) {
         if (!Config.INSTANCE.getValues().getEnabled()) {
             return;
