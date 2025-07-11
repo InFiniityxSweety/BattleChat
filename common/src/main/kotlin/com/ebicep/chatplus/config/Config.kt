@@ -135,6 +135,7 @@ data class ConfigVariables(
     var maxCommandSuggestions: Int = 15,
     var jumpToMessageMode: JumpToMessageMode = JumpToMessageMode.CURSOR,
     var selectChatLinePriority: Int = 100,
+    var selectChatColor: Int = Color(186, 211, 252, 255).rgb,
     var timestampSettings: TimestampMessages.TimestampSettings = TimestampMessages.TimestampSettings(),
     var inputOverFlowAutoFillSettings: InputOverFlowAutoFill.InputOverFlowAutoFillSettings = InputOverFlowAutoFill.InputOverFlowAutoFillSettings(),
     var messageImagePreviewSettings: MessageImagePreview.MessageImagePreviewSettings = MessageImagePreview.MessageImagePreviewSettings(),

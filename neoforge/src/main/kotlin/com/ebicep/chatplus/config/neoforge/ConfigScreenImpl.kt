@@ -134,6 +134,10 @@ object ConfigScreenImpl {
             ) { Config.values.jumpToMessageMode = it },
             entryBuilder.linePriorityField("chatPlus.linePriority.selectChat", Config.values.selectChatLinePriority)
             { Config.values.selectChatLinePriority = it },
+            entryBuilder.alphaField(
+                "chatPlus.chatSettings.selectChat.color",
+                Config.values.selectChatColor
+            ) { Config.values.selectChatColor = it },
             entryBuilder.startSubCategory(Component.translatable("chatPlus.chatSettings.timestampSettings")).with(
                 entryBuilder.booleanToggle(
                     "chatPlus.chatSettings.timestampSettings.enabled",

@@ -55,6 +55,8 @@
   "chatPlus.chatSettings.jumpToMessageMode.middle": "Middle",
   "chatPlus.chatSettings.jumpToMessageMode.bottom": "Bottom",
   "chatPlus.chatSettings.jumpToMessageMode.cursor": "Cursor",
+  "chatPlus.chatSettings.selectChat.color": "Select Chat Color",
+  "chatPlus.chatSettings.selectChat.color.tooltip": "The color of chat lines when they are selected.",
   "chatPlus.chatSettings.timestampSettings": "Timestamp Settings",
   "chatPlus.chatSettings.timestampSettings.enabled": "Enabled",
   "chatPlus.chatSettings.timestampSettings.enabled.tooltip": "Enables/Disables adding timestamps to messages.",
