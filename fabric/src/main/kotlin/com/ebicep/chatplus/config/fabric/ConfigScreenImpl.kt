@@ -244,6 +244,11 @@ object ConfigScreenImpl {
         builder.getOrCreateCategory(Component.translatable("chatPlus.compactMessages.title").withStyle(ChatFormatting.GRAY)).with(
             entryBuilder.booleanToggle("chatPlus.compactMessages.toggle", Config.values.compactMessagesEnabled)
             { Config.values.compactMessagesEnabled = it },
+            entryBuilder.stringField(
+                "chatPlus.compactMessages.format",
+                Config.values.compactMessagesFormat,
+                { Config.values.compactMessagesFormat = it }
+            ),
             entryBuilder.booleanToggle("chatPlus.compactMessages.compactMessagesSendAsNew.toggle", Config.values.compactMessagesSendAsNew)
             { Config.values.compactMessagesSendAsNew = it },
             entryBuilder.booleanToggle("chatPlus.compactMessages.compactMessagesDeleteDuplicate.toggle", Config.values.compactMessagesDeleteDuplicate)
@@ -252,7 +257,6 @@ object ConfigScreenImpl {
                 "chatPlus.compactMessages.refreshFadeTime.toggle",
                 Config.values.compactMessagesRefreshAddedTime
             ) { Config.values.compactMessagesRefreshAddedTime = it },
-
             entryBuilder.intSlider(
                 "chatPlus.compactMessages.searchAmount",
                 Config.values.compactMessagesSearchAmount,

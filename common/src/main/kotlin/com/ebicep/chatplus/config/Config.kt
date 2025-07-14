@@ -147,6 +147,7 @@ data class ConfigVariables(
     var alwaysShowChatToggleKey: KeyWithModifier = KeyWithModifier(InputConstants.getKey("key.keyboard.unknown"), 0),
     // compact messages
     var compactMessagesEnabled: Boolean = true,
+    var compactMessagesFormat: String = " &7(%VALUE%)",
     var compactMessagesSendAsNew: Boolean = true,
     var compactMessagesDeleteDuplicate: Boolean = true,
     var compactMessagesRefreshAddedTime: Boolean = false,

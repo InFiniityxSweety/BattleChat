@@ -68,7 +68,12 @@ object CompactMessages {
                     }
                 }
                 it.chatPlusGuiMessage.timesRepeated = ++message.timesRepeated
-                it.mutableComponent.siblings.add(literalIgnored(" (${it.chatPlusGuiMessage.timesRepeated})", ComponentUtil.LiteralIgnoredType.COMPACT).withStyle(COMPACT_STYLE))
+                it.mutableComponent.siblings.add(
+                    literalIgnored(
+                        formatString(it.chatPlusGuiMessage.timesRepeated.toString()),
+                        ComponentUtil.LiteralIgnoredType.COMPACT
+                    ).withStyle(COMPACT_STYLE)
+                )
                 if (Config.values.compactMessagesSendAsNew && Config.values.compactMessagesDeleteDuplicate) {
                     messages.removeAt(i)
                     break
@@ -109,7 +114,12 @@ object CompactMessages {
                 return@register
             }
             if (it.component.siblings.none { component -> component.contents is ComponentUtil.LiteralContentsIgnored }) {
-                it.component.siblings.add(literalIgnored(" (${it.linkedMessage.timesRepeated})", ComponentUtil.LiteralIgnoredType.COMPACT).withStyle(COMPACT_STYLE))
+                it.component.siblings.add(
+                    literalIgnored(
+                        formatString(it.linkedMessage.timesRepeated.toString()),
+                        ComponentUtil.LiteralIgnoredType.COMPACT
+                    ).withStyle(COMPACT_STYLE)
+                )
             }
         }
     }
@@ -125,6 +135,12 @@ object CompactMessages {
         override fun getTranslatableName(): Component {
             return translatable
         }
+    }
+
+    private fun formatString(value: String): String {
+        return Config.values.compactMessagesFormat
+            .replace("&", "§")
+            .replace("%VALUE%", value)
     }
 
     private fun componentEquals(component1: Component?, component2: Component?): Boolean {

@@ -113,6 +113,8 @@
   "chatPlus.compactMessages.title": "Compact Messages",
   "chatPlus.compactMessages.toggle": "Enabled",
   "chatPlus.compactMessages.toggle.tooltip": "Enables/Disables if messages should be compacted",
+  "chatPlus.compactMessages.format": "Format",
+  "chatPlus.compactMessages.format.tooltip": "Format of the compacted message indicator. Include %VALUE% as the placeholder for the amount of times the message was compacted, and use & to specify color codes.",
   "chatPlus.compactMessages.compactMessagesSendAsNew.toggle": "Send as New",
   "chatPlus.compactMessages.compactMessagesSendAsNew.toggle.tooltip": "Enables/Disables if new message should send as a new message with its compact counter.",
   "chatPlus.compactMessages.compactMessagesDeleteDuplicate.toggle": "Delete Duplicate",
