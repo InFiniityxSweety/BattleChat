@@ -67,7 +67,7 @@ object CompactMessages {
                         }
                     }
                 }
-                it.chatPlusGuiMessage.timesRepeated = message.timesRepeated + 1
+                it.chatPlusGuiMessage.timesRepeated = ++message.timesRepeated
                 it.mutableComponent.siblings.add(literalIgnored(" (${it.chatPlusGuiMessage.timesRepeated})", ComponentUtil.LiteralIgnoredType.COMPACT).withStyle(COMPACT_STYLE))
                 if (Config.values.compactMessagesSendAsNew) {
                     messages.removeAt(addIndex)
