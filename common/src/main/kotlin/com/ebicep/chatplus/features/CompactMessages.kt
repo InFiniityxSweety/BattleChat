@@ -69,8 +69,8 @@ object CompactMessages {
                 }
                 it.chatPlusGuiMessage.timesRepeated = ++message.timesRepeated
                 it.mutableComponent.siblings.add(literalIgnored(" (${it.chatPlusGuiMessage.timesRepeated})", ComponentUtil.LiteralIgnoredType.COMPACT).withStyle(COMPACT_STYLE))
-                if (Config.values.compactMessagesSendAsNew) {
-                    messages.removeAt(addIndex)
+                if (Config.values.compactMessagesSendAsNew && Config.values.compactMessagesDeleteDuplicate) {
+                    messages.removeAt(i)
                     break
                 }
                 if (addIndex == -1 || oldDisplayMessage == null) {
@@ -197,6 +197,9 @@ object CompactMessages {
             if (hoverEvent1.action == HoverEvent.Action.SHOW_TEXT && hoverEvent2.action == HoverEvent.Action.SHOW_TEXT) {
                 val value1 = hoverEvent1.getValue(HoverEvent.Action.SHOW_TEXT)
                 val value2 = hoverEvent2.getValue(HoverEvent.Action.SHOW_TEXT)
+                if (ignoreTimestamps && value1 != null && isTimestampContents(value1) && value2 != null && isTimestampContents(value2)) {
+                    return true
+                }
                 return componentEquals(value1, value2)
             }
             return hoverEvent1 == hoverEvent2
