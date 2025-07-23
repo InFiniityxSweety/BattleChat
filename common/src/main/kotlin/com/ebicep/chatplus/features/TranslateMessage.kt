@@ -15,17 +15,13 @@ import com.ebicep.chatplus.mixin.IMixinChatScreen
 import com.ebicep.chatplus.mixin.IMixinScreen
 import com.ebicep.chatplus.translator.*
 import com.ebicep.chatplus.util.ComponentUtil
-import dev.architectury.event.CompoundEventResult
 import dev.architectury.event.EventResult
-import dev.architectury.event.events.client.ClientChatEvent
 import dev.architectury.event.events.client.ClientRawInputEvent
-import dev.architectury.event.events.client.ClientSystemMessageEvent
 import net.minecraft.ChatFormatting
 import net.minecraft.client.GuiMessageTag
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.components.EditBox
 import net.minecraft.client.gui.screens.Screen
-import net.minecraft.network.chat.ChatType
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.HoverEvent
 
@@ -149,18 +145,10 @@ object TranslateMessage {
             it.dontSendMessage = true
             SelfTranslator(it.normalizeChatMessage, if (inputTranslatePrefix == null) "" else inputTranslatePrefix!!.value).start()
         }
-
-        ClientChatEvent.RECEIVED.register { type: ChatType.Bound, component: Component ->
-            if (!isTranslateMessage(component)) {
-                handleTranslate(component)
+        EventBus.register<AddNewMessageEvent>({ -10 }) {
+            if (!isTranslateMessage(it.rawComponent)) {
+                handleTranslate(it.rawComponent)
             }
-            CompoundEventResult.pass()
-        }
-        ClientSystemMessageEvent.RECEIVED.register { component: Component ->
-            if (!isTranslateMessage(component)) {
-                handleTranslate(component)
-            }
-            CompoundEventResult.pass()
         }
         ClientRawInputEvent.KEY_PRESSED.register { _, keyCode, _, _, modifiers ->
             if (ChatManager.isChatFocused()) {
