@@ -129,6 +129,7 @@ class ChatTab {
     ) {
         this.chatWindow = chatWindow
         this.currentSettings = currentSettings
+        this.settings = mutableListOf(currentSettings)
     }
 
     init {

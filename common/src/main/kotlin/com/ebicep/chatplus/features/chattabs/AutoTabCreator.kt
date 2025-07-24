@@ -72,6 +72,7 @@ class AutoTabCreator {
                     settings.commandsOverrideAutoPrefix = it.commandsOverrideAutoPrefix
                 }
             ).also {
+                it.isAutoTab = true
                 it.temporary = true
             }
             tabSettings.tabs.add(chatTab)
