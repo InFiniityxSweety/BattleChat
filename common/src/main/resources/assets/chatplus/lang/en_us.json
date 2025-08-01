@@ -422,6 +422,8 @@
   "chatPlus.findMessage.textBarElement.toggle": "Find Message Text Bar Element",
   "chatPlus.findMessage.textBarElement.toggle.tooltip": "Adds/Removes the find message text bar element (Box with 'F' to the right of input box).",
   "chatPlus.copyMessage.title": "Copy Message",
+  "chatPlus.copyMessage.copyWholeMessage.toggle": "Copy Whole Message",
+  "chatPlus.copyMessage.copyWholeMessage.toggle.tooltip": "Enables/Disables whether or not copying a line copies the whole message associated with it.",
   "chatPlus.copyMessage.noFormatting.toggle": "Copy Unformatted",
   "chatPlus.copyMessage.noFormatting.toggle.tooltip": "Default copy mode, relevant for older servers that use formatting codes. Using shift while copying will copy using the other mode (formatted/unformatted).",
   "chatPlus.copyMessage.key": "Copy Message Shortcut",

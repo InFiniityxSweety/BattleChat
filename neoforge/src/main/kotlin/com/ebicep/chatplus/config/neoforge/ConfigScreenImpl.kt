@@ -981,6 +981,10 @@ object ConfigScreenImpl {
     private fun addCopyMessageOption(builder: ConfigBuilder, entryBuilder: ConfigEntryBuilder) {
         builder.getOrCreateCategory(Component.translatable("chatPlus.copyMessage.title").withColor(CopyMessage.DEFAULT_COLOR)).with(
             entryBuilder.booleanToggle(
+                "chatPlus.copyMessage.copyWholeMessage.toggle",
+                Config.values.copyWholeMessage
+            ) { Config.values.copyWholeMessage = it },
+            entryBuilder.booleanToggle(
                 "chatPlus.copyMessage.noFormatting.toggle",
                 Config.values.copyNoFormatting
             ) { Config.values.copyNoFormatting = it },

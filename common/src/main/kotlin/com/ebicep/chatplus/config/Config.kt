@@ -217,6 +217,7 @@ data class ConfigVariables(
     // copy message
     var copyMessageKey: KeyWithModifier = KeyWithModifier(InputConstants.getKey("key.keyboard.c"), 2),
     var copyMessageLinePriority: Int = 50,
+    var copyWholeMessage: Boolean = false,
     var copyNoFormatting: Boolean = true,
     var copyMessageFormattingSymbolOverride: String = "",
     var copyMessageSeparator: String = "\n",
