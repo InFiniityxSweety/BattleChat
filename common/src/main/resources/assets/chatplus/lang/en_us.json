@@ -240,6 +240,8 @@
   "chatPlus.chatWindow.tabSettings.hideTabs.tooltip": "Enables/Disables hides the tabs in the chat window, this also prevents them from being moved/clicked.",
   "chatPlus.chatWindow.tabSettings.showTabsWhenChatNotOpen": "Show Tabs When Chat Not Open",
   "chatPlus.chatWindow.tabSettings.showTabsWhenChatNotOpen.tooltip": "Enables/Disables showing the tabs when the chat is not open.",
+  "chatPlus.chatWindow.tabSettings.disableNotifications": "Disable Notifications",
+  "chatPlus.chatWindow.tabSettings.disableNotifications.tooltip": "Enables/Disables disabling notifications from showing, overrides the default nofication setting.",
   "chatPlus.chatWindow.tabSettings.position": "Tabs Position",
   "chatPlus.chatWindow.tabSettings.position.tooltip": "The position of the chat tabs relative to the chat window.",
   "chatPlus.chatWindow.tabSettings.position.top": "Top",

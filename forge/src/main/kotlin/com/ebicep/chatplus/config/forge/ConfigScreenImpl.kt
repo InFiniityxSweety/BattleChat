@@ -492,6 +492,10 @@ object ConfigScreenImpl {
                 "chatPlus.chatWindow.tabSettings.showTabsWhenChatNotOpen",
                 window.tabSettings.showTabsWhenChatNotOpen
             ) { window.tabSettings.showTabsWhenChatNotOpen = it },
+            entryBuilder.booleanToggle(
+                "chatPlus.chatWindow.tabSettings.disableNotifications",
+                window.tabSettings.disableNotifications
+            ) { window.tabSettings.disableNotifications = it },
             entryBuilder.enumSelector(
                 "chatPlus.chatWindow.tabSettings.position",
                 Position::class.java,
