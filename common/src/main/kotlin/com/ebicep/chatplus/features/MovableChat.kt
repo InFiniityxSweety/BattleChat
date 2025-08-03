@@ -23,6 +23,7 @@ import com.ebicep.chatplus.features.internal.OnScreenDisplayEvent
 import com.ebicep.chatplus.features.textbarelements.AddTextBarElementEvent
 import com.ebicep.chatplus.features.textbarelements.MovableChatToggleTextBarElement
 import com.ebicep.chatplus.hud.*
+import com.ebicep.chatplus.hud.ChatManager.resetGlobalSortedTabs
 import com.ebicep.chatplus.hud.ChatPlusScreen.EDIT_BOX_HEIGHT
 import com.ebicep.chatplus.hud.ChatPlusScreen.lastMouseX
 import com.ebicep.chatplus.hud.ChatPlusScreen.lastMouseY
@@ -442,6 +443,7 @@ object MovableChat {
         newRenderer.updateCachedDimension()
 
         Config.values.chatWindows.add(newWindow)
+        resetGlobalSortedTabs()
 
         movingChatBox = true
         var mX = mouseX // aligns tab with front/end of chat box when moving if window was created with mouse outside screen
