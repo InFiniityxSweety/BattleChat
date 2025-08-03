@@ -156,11 +156,17 @@ data class ConfigVariables(
     var compactMessagesSearchAmount: Int = 1,
     var compactMessageComparatorMode: CompactMessages.CompactComparatorMode = CompactMessages.CompactComparatorMode.VANILLA,
     var compactMessageSettings: CompactMessages.CompactMessageCustomSettings = CompactMessages.CompactMessageCustomSettings(),
-    // scrollbar
-    var scrollbarEnabled: Boolean = true,
+    // scrolling
+    var keyNoScroll: InputConstants.Key = InputConstants.getKey("key.keyboard.left.control"),
+    var keyFineScroll: InputConstants.Key = InputConstants.getKey("key.keyboard.left.shift"),
+    var keyLargeScroll: InputConstants.Key = InputConstants.getKey("key.keyboard.left.alt"),
     var invertedScrolling: Boolean = false,
+    var scrollbarEnabled: Boolean = true,
     var scrollbarColor: Int = Color(128, 134, 139, 255).rgb,
     var scrollbarWidth: Int = 6,
+    // peek chat
+    var keyPeekChat: InputConstants.Key = InputConstants.getKey("key.keyboard.p"),
+    var peekChatScrollingEnabled: Boolean = true,
     // animation
     var animationEnabled: Boolean = true,
     var animationDisableOnFocus: Boolean = false,
@@ -243,11 +249,6 @@ data class ConfigVariables(
     var playerHeadChatDisplayShowOnWrapped: Boolean = false,
     var playerHeadChatDisplayOffsetNonHeadMessages: Boolean = false,
     var playerHeadChatDisplayOffsetNonHeadMessagesShowOnWrapped: Boolean = true,
-    // keys binds
-    var keyNoScroll: InputConstants.Key = InputConstants.getKey("key.keyboard.left.control"),
-    var keyFineScroll: InputConstants.Key = InputConstants.getKey("key.keyboard.left.shift"),
-    var keyLargeScroll: InputConstants.Key = InputConstants.getKey("key.keyboard.left.alt"),
-    var keyPeekChat: InputConstants.Key = InputConstants.getKey("key.keyboard.p"),
     // translator
     var translatorEnabled: Boolean = true,
     var translatorTextBarElementEnabled: Boolean = true,

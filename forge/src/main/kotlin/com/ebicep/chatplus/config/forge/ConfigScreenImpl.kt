@@ -64,7 +64,8 @@ object ConfigScreenImpl {
         addGeneralOptions(builder, entryBuilder)
         addHideChatOptions(builder, entryBuilder)
         addCompactMessagesOptions(builder, entryBuilder)
-        addScrollbarOption(builder, entryBuilder)
+        addScrollingOption(builder, entryBuilder)
+        addPeekChatOptions(builder, entryBuilder)
         addAnimationOption(builder, entryBuilder)
         addMovableChatOption(builder, entryBuilder)
         addChatWindowsTabsOption(builder, entryBuilder)
@@ -77,7 +78,6 @@ object ConfigScreenImpl {
         addDeleteMessageOption(builder, entryBuilder)
         addChatScreenShotOption(builder, entryBuilder)
         addPlayerHeadChatDisplayOption(builder, entryBuilder)
-        addKeyBindOptions(builder, entryBuilder)
         addTranslatorOptions(builder, entryBuilder)
         addSpeechToTextOptions(builder, entryBuilder)
         return builder.build()
@@ -333,21 +333,34 @@ object ConfigScreenImpl {
         )
     }
 
-    private fun addScrollbarOption(builder: ConfigBuilder, entryBuilder: ConfigEntryBuilder) {
-        builder.getOrCreateCategory(Component.translatable("chatPlus.scrollbar.title").withColor(Config.values.scrollbarColor)).with(
+    private fun addScrollingOption(builder: ConfigBuilder, entryBuilder: ConfigEntryBuilder) {
+        builder.getOrCreateCategory(Component.translatable("chatPlus.scrolling.title").withColor(Config.values.scrollbarColor)).with(
+            entryBuilder.keyCodeOption("chatPlus.scrolling.noScrollKey", Config.values.keyNoScroll) { Config.values.keyNoScroll = it },
+            entryBuilder.keyCodeOption("chatPlus.scrolling.fineScrollKey", Config.values.keyFineScroll) { Config.values.keyFineScroll = it },
+            entryBuilder.keyCodeOption("chatPlus.scrolling.largeScrollKey", Config.values.keyLargeScroll) { Config.values.keyLargeScroll = it },
             entryBuilder.booleanToggle(
-                "chatPlus.scrollbar.toggle",
-                Config.values.scrollbarEnabled
-            ) { Config.values.scrollbarEnabled = it },
-            entryBuilder.booleanToggle(
-                "chatPlus.scrollbar.invertedScrolling",
+                "chatPlus.scrolling.invertedScrolling",
                 Config.values.invertedScrolling
             ) { Config.values.invertedScrolling = it },
+            entryBuilder.booleanToggle(
+                "chatPlus.scrolling.scrollBar.toggle",
+                Config.values.scrollbarEnabled
+            ) { Config.values.scrollbarEnabled = it },
             entryBuilder.alphaField(
-                "chatPlus.scrollbar.color",
+                "chatPlus.scrolling.scrollBar.color",
                 Config.values.scrollbarColor
             ) { Config.values.scrollbarColor = it },
-            entryBuilder.intField("chatPlus.scrollbar.width", Config.values.scrollbarWidth) { Config.values.scrollbarWidth = it },
+            entryBuilder.intField("chatPlus.scrolling.scrollBar.width", Config.values.scrollbarWidth) { Config.values.scrollbarWidth = it },
+        )
+    }
+
+    private fun addPeekChatOptions(builder: ConfigBuilder, entryBuilder: ConfigEntryBuilder) {
+        builder.getOrCreateCategory(Component.translatable("chatPlus.peekChat").withStyle(ChatFormatting.DARK_GREEN)).with(
+            entryBuilder.keyCodeOption("key.peekChat", Config.values.keyPeekChat) { Config.values.keyPeekChat = it },
+            entryBuilder.booleanToggle(
+                "chatPlus.peekChat.scrolling.toggle",
+                Config.values.peekChatScrollingEnabled
+            ) { Config.values.peekChatScrollingEnabled = it },
         )
     }
 
@@ -1111,15 +1124,6 @@ object ConfigScreenImpl {
                 "chatPlus.playerHeadChatDisplayOffsetNonHeadMessagesShowOnWrapped.toggle",
                 Config.values.playerHeadChatDisplayOffsetNonHeadMessagesShowOnWrapped
             ) { Config.values.playerHeadChatDisplayOffsetNonHeadMessagesShowOnWrapped = it }
-        )
-    }
-
-    private fun addKeyBindOptions(builder: ConfigBuilder, entryBuilder: ConfigEntryBuilder) {
-        builder.getOrCreateCategory(Component.translatable("chatPlus.chatKeyBinds").withStyle(ChatFormatting.DARK_GREEN)).with(
-            entryBuilder.keyCodeOption("key.noScroll", Config.values.keyNoScroll) { Config.values.keyNoScroll = it },
-            entryBuilder.keyCodeOption("key.fineScroll", Config.values.keyFineScroll) { Config.values.keyFineScroll = it },
-            entryBuilder.keyCodeOption("key.largeScroll", Config.values.keyLargeScroll) { Config.values.keyLargeScroll = it },
-            entryBuilder.keyCodeOption("key.peekChat", Config.values.keyPeekChat) { Config.values.keyPeekChat = it }
         )
     }
 

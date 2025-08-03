@@ -60,6 +60,10 @@ object ChatPlusScreenAdapter {
         if (EventBus.post(ChatScreenMouseScrolledEvent(chatScreen, mouseX, mouseY, amountX, amountY)).returnFunction) {
             return true
         }
+        return scrollChat(amountY)
+    }
+
+    fun scrollChat(amountY: Double): Boolean {
         // control = no scroll
         // shift = fine scroll
         // alt = triple scroll
