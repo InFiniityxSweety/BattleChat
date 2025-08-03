@@ -30,6 +30,7 @@ import me.shedaniel.clothconfig2.gui.entries.*
 import me.shedaniel.clothconfig2.impl.builders.DropdownMenuBuilder
 import me.shedaniel.clothconfig2.impl.builders.SubCategoryBuilder
 import net.minecraft.ChatFormatting
+import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.network.chat.Component
 import net.minecraft.sounds.SoundSource
@@ -788,11 +789,15 @@ object ConfigScreenImpl {
                 true,
                 { FilterMessages.Filter("", DEFAULT_COLOR) },
                 { value ->
+                    val sounds = Minecraft.getInstance().soundManager.availableSounds.map { it.path }.sorted()
                     val soundCategory = entryBuilder.startSubCategory(Component.translatable("chatPlus.messageFilter.sound"))
                     soundCategory.add(
-                        entryBuilder.stringField(
+                        entryBuilder.dropDown(
                             "chatPlus.messageFilter.sound.sound",
                             value.sound.sound,
+                            { str -> str },
+                            sounds,
+                            { str: String -> "" },
                             { value.sound.sound = it }
                         )
                     )
