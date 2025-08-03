@@ -13,6 +13,7 @@
     "MixinChatScreen",
     "MixinClientConfigurationPacketListenerImpl",
     "MixinGuiGraphics",
+    "MixinKeyboardHandler",
     "MixinScreen",
     "MixinServerList",
     "MixinTitleScreen",

@@ -11,6 +11,7 @@ import com.ebicep.chatplus.config.migration.MigrationManager
 import com.ebicep.chatplus.config.serializers.KeySerializer
 import com.ebicep.chatplus.config.serializers.KeyWithModifier
 import com.ebicep.chatplus.features.*
+import com.ebicep.chatplus.features.DeleteMessages.F3DMode
 import com.ebicep.chatplus.features.MovableChat.InputBoxSettings
 import com.ebicep.chatplus.features.ScreenshotChat.ScreenshotUploadSettings
 import com.ebicep.chatplus.features.chattabs.TabNotificationSettings
@@ -224,6 +225,7 @@ data class ConfigVariables(
     // delete message
     var deleteMessageEnabled: Boolean = true,
     var deleteMessageKey: KeyWithModifier = KeyWithModifier(InputConstants.getKey("key.keyboard.d"), 2),
+    var deleteMessageF3DMode: F3DMode = F3DMode.SELECTED_TAB,
     // screen shot chat
     var screenshotChatEnabled: Boolean = true,
     var screenshotChatCopyToClipboard: Boolean = true,

@@ -4,6 +4,7 @@ import com.ebicep.chatplus.MOD_COLOR
 import com.ebicep.chatplus.config.*
 import com.ebicep.chatplus.config.serializers.KeyWithModifier
 import com.ebicep.chatplus.features.*
+import com.ebicep.chatplus.features.DeleteMessages.F3DMode
 import com.ebicep.chatplus.features.FilterMessages.DEFAULT_COLOR
 import com.ebicep.chatplus.features.MovableChat.MOVABLE_CHAT_COLOR
 import com.ebicep.chatplus.features.SendNote.NOTE_COLOR
@@ -1025,6 +1026,11 @@ object ConfigScreenImpl {
                 "chatPlus.deleteMessage.key",
                 Config.values.deleteMessageKey
             ),
+            entryBuilder.enumSelector(
+                "chatPlus.deleteMessage.f3DMode",
+                F3DMode::class.java,
+                Config.values.deleteMessageF3DMode
+            ) { Config.values.deleteMessageF3DMode = it },
         )
     }
 

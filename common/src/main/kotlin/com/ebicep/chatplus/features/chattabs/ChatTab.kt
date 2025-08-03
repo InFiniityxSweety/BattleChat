@@ -392,6 +392,7 @@ class ChatTab {
         messages = ArrayList()
         displayedMessages = ArrayList()
         unfilteredDisplayedMessages = ArrayList()
+        unreadCount = 0
     }
 
     fun resetChatScroll() {
