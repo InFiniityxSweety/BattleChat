@@ -24,7 +24,7 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(ChatScreen.class)
+@Mixin(value = ChatScreen.class, priority = Integer.MAX_VALUE)
 @Implements(@Interface(iface = IChatScreen.class, prefix = "chatPlus$"))
 public abstract class MixinChatScreen extends Screen implements IMixinChatScreen, IChatScreen {
 
