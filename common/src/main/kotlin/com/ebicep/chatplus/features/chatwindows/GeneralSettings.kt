@@ -24,6 +24,7 @@ class GeneralSettings {
     var messageAlignment: AlignMessage.Alignment = AlignMessage.Alignment.LEFT
     var messageDirection: MessageDirection = MessageDirection.BOTTOM_UP
     var topDownDirectionWrapInOrder: Boolean = true
+    var resetScrollPositionOnClose: Boolean = true
 
     @Transient
     lateinit var chatWindow: ChatWindow

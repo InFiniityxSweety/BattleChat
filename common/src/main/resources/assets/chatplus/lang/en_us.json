@@ -217,6 +217,8 @@
   "chatPlus.chatWindow.outlineSettings.outline.toggle.tooltip": "Enables/Disables the outline of the chat window.",
   "chatPlus.chatWindow.generalSettings.showWhenChatNotOpen": "Show When Chat Not Open",
   "chatPlus.chatWindow.generalSettings.showWhenChatNotOpen.tooltip": "Enables/Disables showing the outline when the chat is not open.",
+  "chatPlus.chatWindow.generalSettings.resetScrollPositionOnClose": "Reset Scroll Position On Close",
+  "chatPlus.chatWindow.generalSettings.resetScrollPositionOnClose.tooltip": "Enables/Disables if the scroll position should be reset when the chat is closed.",
   "chatPlus.chatWindow.outlineSettings.outlineColor": "Outline Color",
   "chatPlus.chatWindow.outlineSettings.outlineColor.tooltip": "Outline color of the chat window when focused.",
   "chatPlus.chatWindow.outlineSettings.outlineBoxType": "Outline Box Type",

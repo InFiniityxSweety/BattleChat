@@ -768,6 +768,10 @@ object ConfigScreenImpl {
                 "chatPlus.chatWindow.generalSettings.topDownDirectionWrapInOrder.toggle",
                 window.generalSettings.topDownDirectionWrapInOrder
             ) { window.generalSettings.topDownDirectionWrapInOrder = it },
+            entryBuilder.booleanToggle(
+                "chatPlus.chatWindow.generalSettings.resetScrollPositionOnClose",
+                window.generalSettings.resetScrollPositionOnClose
+            ) { window.generalSettings.resetScrollPositionOnClose = it },
         )
     }
 

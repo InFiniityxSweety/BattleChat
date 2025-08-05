@@ -359,7 +359,7 @@ class ChatTab {
             val chatPlusLine = list[j]
             val formattedCharSequence = chatPlusLine.first
             val content = chatPlusLine.second
-            if (ChatManager.isChatFocused() && chatScrollbarPos > 0) {
+            if (chatScrollbarPos > 0) {
                 newMessageSinceScroll = true
                 scrollChat(1)
             }
@@ -399,9 +399,11 @@ class ChatTab {
         unreadCount = 0
     }
 
-    fun resetChatScroll() {
-        chatScrollbarPos = 0
-        this.newMessageSinceScroll = false
+    fun resetChatScroll(reset: Boolean = chatWindow.generalSettings.resetScrollPositionOnClose) {
+        if (reset) {
+            chatScrollbarPos = 0
+            this.newMessageSinceScroll = false
+        }
     }
 
     fun scrollChat(positionIncrease: Int) {
@@ -445,7 +447,7 @@ class ChatTab {
     fun rescaleChat() {
         ChatPlus.LOGGER.info("$this Rescale")
         EventBus.post(ChatTabRescale(chatWindow, this))
-        resetChatScroll()
+        resetChatScroll(true)
         queueRefreshDisplayedMessages(true)
     }
 
@@ -549,7 +551,7 @@ class ChatTab {
             }
             ChatPlus.LOGGER.info("$this Filter time taken: ${System.currentTimeMillis() - filterStart}ms")
         }
-        resetChatScroll()
+        resetChatScroll(true)
 //        ChatPlus.LOGGER.info("Refresh time taken: ${System.currentTimeMillis() - start}ms")
 
         refreshing = false
