@@ -89,6 +89,8 @@ class ChatTab {
         get() = if (!::currentSettings.isInitialized) false else currentSettings.skipOthers
     val commandsOverrideAutoPrefix: Boolean
         get() = if (!::currentSettings.isInitialized) false else currentSettings.commandsOverrideAutoPrefix
+    val disableNotifications: Boolean
+        get() = if (!::currentSettings.isInitialized) false else currentSettings.disableNotifications
 
     fun matches(message: String, coloredMessage: String?): Boolean {
         return currentSettings.matches(message, coloredMessage)

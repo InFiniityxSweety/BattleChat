@@ -507,10 +507,6 @@ object ConfigScreenImpl {
                 "chatPlus.chatWindow.tabSettings.showTabsWhenChatNotOpen",
                 window.tabSettings.showTabsWhenChatNotOpen
             ) { window.tabSettings.showTabsWhenChatNotOpen = it },
-            entryBuilder.booleanToggle(
-                "chatPlus.chatWindow.tabSettings.disableNotifications",
-                window.tabSettings.disableNotifications
-            ) { window.tabSettings.disableNotifications = it },
             entryBuilder.enumSelector(
                 "chatPlus.chatWindow.tabSettings.position",
                 Position::class.java,
@@ -589,6 +585,10 @@ object ConfigScreenImpl {
                         "chatPlus.chatWindow.tabSettings.chatTabs.commandsOverrideAutoPrefix",
                         value.commandsOverrideAutoPrefix
                     ) { value.commandsOverrideAutoPrefix = it },
+                    entryBuilder.booleanToggle(
+                        "chatPlus.chatWindow.tabSettings.chatTabs.disableNotifications",
+                        value.disableNotifications
+                    ) { value.disableNotifications = it },
                 )
             },
             {

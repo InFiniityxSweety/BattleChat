@@ -29,6 +29,7 @@ open class ServerChatTabSettings : MessageFilterFormatted {
     // if true then tab loop will break if message is added to this tab, overrides alwaysAdds
     var skipOthers: Boolean = false
     var commandsOverrideAutoPrefix: Boolean = true
+    var disableNotifications: Boolean = false
 
     @Transient
     lateinit var chatTab: ChatTab
@@ -50,6 +51,7 @@ open class ServerChatTabSettings : MessageFilterFormatted {
             it.alwaysAdd = this.alwaysAdd
             it.skipOthers = this.skipOthers
             it.commandsOverrideAutoPrefix = this.commandsOverrideAutoPrefix
+            it.disableNotifications = this.disableNotifications
         }
     }
 

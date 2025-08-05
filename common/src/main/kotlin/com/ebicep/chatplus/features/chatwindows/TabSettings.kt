@@ -37,7 +37,6 @@ class TabSettings {
     var startRenderTabIndex = 0
     var hideTabs = false
     var showTabsWhenChatNotOpen: Boolean = false
-    var disableNotifications: Boolean = false
     var position: Position = Position.BOTTOM
     var tabTextColorSelected: Int = Color(255, 255, 255, 255).rgb
     var tabTextColorUnselected: Int = Color(153, 153, 153, 255).rgb
@@ -281,7 +280,7 @@ class TabSettings {
             )
         }
         // notification badge
-        if (Config.values.tabNotificationSettings.enabled && chatTab.unreadCount > 0 && !disableNotifications) {
+        if (Config.values.tabNotificationSettings.enabled && chatTab.unreadCount > 0 && !chatTab.disableNotifications) {
             val scale = Config.values.tabNotificationSettings.scale
             poseStack.createPose {
                 poseStack.guiForward(GraphicsUtil.GuiForwardType.ChatTabNotificationBadge)
