@@ -234,6 +234,7 @@ data class ConfigVariables(
     var deleteMessageF3DMode: F3DMode = F3DMode.SELECTED_TAB,
     // screen shot chat
     var screenshotChatEnabled: Boolean = true,
+    var screenshotChatScalePercent: Int = 100,
     var screenshotChatCopyToClipboard: Boolean = true,
     var screenshotChatSaveToFile: Boolean = true, // TODO
     var screenshotChatAutoUpload: Boolean = true,

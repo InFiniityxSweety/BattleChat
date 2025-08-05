@@ -1058,6 +1058,10 @@ object ConfigScreenImpl {
                 "chatPlus.screenshotChat.toggle",
                 Config.values.screenshotChatEnabled
             ) { Config.values.screenshotChatEnabled = it },
+            entryBuilder.intField(
+                "chatPlus.screenshotChat.scale",
+                Config.values.screenshotChatScalePercent
+            ) { Config.values.screenshotChatScalePercent = it },
             entryBuilder.booleanToggle(
                 "chatPlus.screenshotChatCopyToClipboard.toggle",
                 Config.values.screenshotChatCopyToClipboard

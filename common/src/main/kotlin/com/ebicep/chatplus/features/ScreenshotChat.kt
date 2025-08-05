@@ -172,14 +172,15 @@ object ScreenshotChat {
 
         val chatRenderer = ChatManager.selectedWindow.renderer
         val lineHeight = chatRenderer.lineHeight.toFloat()
+        val scale = Config.values.screenshotChatScalePercent / 100
         var width = when (screenshotWindowsMode) {
             ScreenshotWindowsMode.STACK -> linesOrdered.maxOf { it.key.renderer.width } / chatRenderer.scale.toFloat()
             ScreenshotWindowsMode.SPLIT -> linesOrdered.map { it.key.renderer.width }.sum() / chatRenderer.scale.toFloat()
-        }
+        } * scale
         var height = when (screenshotWindowsMode) {
             ScreenshotWindowsMode.STACK -> linesOrdered.map { it.value }.flatten().size * lineHeight
             ScreenshotWindowsMode.SPLIT -> linesOrdered.maxOf { it.value.size } * lineHeight
-        }
+        } * scale
         val renderTarget: RenderTarget = TextureTarget(width.toInt(), height.toInt(), true, false)
         renderTarget.setClearColor(TRANSPARENCY_COLOR.red / 255f, TRANSPARENCY_COLOR.green / 255f, TRANSPARENCY_COLOR.blue / 255f, 0f)
         renderTarget.clear(false)

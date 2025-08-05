@@ -450,6 +450,8 @@
   "chatPlus.screenshotChat.tooltip": "Left-Click to take a screenshot of the currently selected chat.\n\nRight-Click to take a screenshot of all chat windows.\n\n3s Cooldown.",
   "chatPlus.screenshotChat.toggle": "Enabled",
   "chatPlus.screenshotChat.toggle.tooltip": "Enables/Disables being able to take a screenshot of the chat.",
+  "chatPlus.screenshotChat.scale": "Scale",
+  "chatPlus.screenshotChat.scale.tooltip": "The scale of the screenshot, 200 is 2x scale.",
   "chatPlus.screenshotChatCopyToClipboard.toggle": "Copy to Clipboard",
   "chatPlus.screenshotChatCopyToClipboard.toggle.tooltip": "Enables/Disables copying the screenshot to the clipboard.",
   "chatPlus.screenshotChatSaveToFile.toggle": "Save to File",
