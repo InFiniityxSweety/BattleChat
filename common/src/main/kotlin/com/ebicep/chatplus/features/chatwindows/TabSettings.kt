@@ -13,6 +13,7 @@ import com.ebicep.chatplus.features.chattabs.ChatTabs.createDefaultTab
 import com.ebicep.chatplus.features.internal.Debug
 import com.ebicep.chatplus.hud.ChatManager
 import com.ebicep.chatplus.hud.ChatManager.resetGlobalSortedTabs
+import com.ebicep.chatplus.hud.ChatPlusScreen
 import com.ebicep.chatplus.util.GraphicsUtil
 import com.ebicep.chatplus.util.GraphicsUtil.createPose
 import com.ebicep.chatplus.util.GraphicsUtil.drawImage
@@ -144,6 +145,10 @@ class TabSettings {
         selectedTabIndex = tabs.indexOf(newTab)
         queueUpdateConfig = true
         EventBus.post(ChatTabSwitchEvent(oldTab, newTab))
+        val autoSend = newTab.autoSend
+        if (autoSend.isNotEmpty()) {
+            ChatPlusScreen.sendChatMessage(message = autoSend, addToSent = false)
+        }
     }
 
     fun getClickedTab(x: Double, y: Double): ChatTab? {

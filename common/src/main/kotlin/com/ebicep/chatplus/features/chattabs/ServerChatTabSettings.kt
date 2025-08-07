@@ -17,6 +17,7 @@ open class ServerChatTabSettings : MessageFilterFormatted {
             }
         }
 
+    var autoSend: String = ""
     var autoPrefix: String = ""
 
     // priority of tab, when adding messages, tabs are sorted by priority first
@@ -46,6 +47,7 @@ open class ServerChatTabSettings : MessageFilterFormatted {
         ).also {
             it.serverPattern = MessageFilter(this.serverPattern.pattern)
             it.name = this.name
+            it.autoSend = this.autoSend
             it.autoPrefix = this.autoPrefix
             it.priority = this.priority
             it.alwaysAdd = this.alwaysAdd

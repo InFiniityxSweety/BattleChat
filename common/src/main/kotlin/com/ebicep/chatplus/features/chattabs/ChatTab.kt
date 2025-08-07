@@ -79,6 +79,8 @@ class ChatTab {
 
     val name: String
         get() = if (!::currentSettings.isInitialized) "" else currentSettings.name
+    val autoSend: String
+        get() = if (!::currentSettings.isInitialized) "" else currentSettings.autoSend
     val autoPrefix: String
         get() = if (!::currentSettings.isInitialized) "" else currentSettings.autoPrefix
     val priority: Int
