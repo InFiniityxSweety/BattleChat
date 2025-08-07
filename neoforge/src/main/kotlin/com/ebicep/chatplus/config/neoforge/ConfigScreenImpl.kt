@@ -1068,10 +1068,12 @@ object ConfigScreenImpl {
                 "chatPlus.screenshotChat.toggle",
                 Config.values.screenshotChatEnabled
             ) { Config.values.screenshotChatEnabled = it },
-            entryBuilder.intField(
+            entryBuilder.percentSlider(
                 "chatPlus.screenshotChat.scale",
-                Config.values.screenshotChatScalePercent
-            ) { Config.values.screenshotChatScalePercent = it },
+                Config.values.screenshotChatScale,
+                0.25f,
+                5f
+            ) { Config.values.screenshotChatScale = it },
             entryBuilder.booleanToggle(
                 "chatPlus.screenshotChatCopyToClipboard.toggle",
                 Config.values.screenshotChatCopyToClipboard
@@ -1385,18 +1387,18 @@ object ConfigScreenImpl {
         variable: Float,
         saveConsumer: Consumer<Float>,
     ): IntegerSliderEntry {
-        return percentSlider(translatable, variable, 0, 1, saveConsumer)
+        return percentSlider(translatable, variable, 0f, 1f, saveConsumer)
     }
 
     private fun ConfigEntryBuilder.percentSlider(
         translatable: String,
         variable: Float,
-        min: Int,
-        max: Int,
+        min: Float,
+        max: Float,
         saveConsumer: Consumer<Float>,
     ): IntegerSliderEntry {
         val intValue = (variable * 100).toInt()
-        return startIntSlider(Component.translatable(translatable), intValue, min * 100, max * 100)
+        return startIntSlider(Component.translatable(translatable), intValue, (min * 100).toInt(), (max * 100).toInt())
             .setDefaultValue(intValue)
             .setTooltip(Optional.of(ComponentUtil.splitLines(Component.translatable("$translatable.tooltip")).toTypedArray()))
             .setTextGetter { Component.literal("$it%") }

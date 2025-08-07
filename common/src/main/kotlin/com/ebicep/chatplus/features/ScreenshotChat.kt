@@ -88,7 +88,12 @@ object ScreenshotChat {
                 if (lastScreenshotSettings == null) {
                     lastScreenshotSettings = ScreenshotSettings(Config.values.screenshotDefaultScreenShotMode, Config.values.screenshotDefaultScreenBackgroundMode)
                 }
-                screenshot(lastScreenshotSettings!!)
+                try {
+                    screenshot(lastScreenshotSettings!!)
+                } catch (e: Exception) {
+                    ChatPlus.LOGGER.error(e)
+                    ChatPlus.sendMessage(Component.literal("Error Taking Screenshot: " + e.message).withStyle(ChatFormatting.RED))
+                }
             }
         }
         EventBus.register<ScreenShotChatEvent> {
@@ -172,7 +177,7 @@ object ScreenshotChat {
 
         val chatRenderer = ChatManager.selectedWindow.renderer
         val lineHeight = chatRenderer.lineHeight.toFloat()
-        val scale = Config.values.screenshotChatScalePercent / 100
+        val scale = Config.values.screenshotChatScale
         var width = when (screenshotWindowsMode) {
             ScreenshotWindowsMode.STACK -> linesOrdered.maxOf { it.key.renderer.width } / chatRenderer.scale.toFloat()
             ScreenshotWindowsMode.SPLIT -> linesOrdered.map { it.key.renderer.width }.sum() / chatRenderer.scale.toFloat()
@@ -188,7 +193,7 @@ object ScreenshotChat {
         val minecraft = Minecraft.getInstance()
         val guiGraphics = GuiGraphics(minecraft, minecraft.renderBuffers().bufferSource())
         val poseStack = guiGraphics.pose()
-        poseStack.scale((minecraft.window.guiScaledWidth / width).toFloat(), (minecraft.window.guiScaledHeight / height).toFloat(), 1f)
+        poseStack.scale((minecraft.window.guiScaledWidth / width).toFloat() * scale, (minecraft.window.guiScaledHeight / height).toFloat() * scale, 1f)
         when (screenshotWindowsMode) {
             ScreenshotWindowsMode.STACK -> {
                 var h = 0.0
