@@ -75,7 +75,7 @@ class TabSettings {
         selectedTabIndex = Mth.clamp(selectedTabIndex, 0, tabs.size - 1)
 
         tabs.forEach {
-            it.updateServerIPRegex()
+            it.updateServerSettings()
             it.updateCurrentSettings()
         }
         resetSortedChatTabs(false)
@@ -285,7 +285,7 @@ class TabSettings {
             )
         }
         // notification badge
-        if (Config.values.tabNotificationSettings.enabled && chatTab.unreadCount > 0 && !chatTab.disableNotifications) {
+        if (Config.values.tabNotificationSettings.enabled && chatTab.unreadCount > 0 && !chatTab.notificationSettings.disableNotifications) {
             val scale = Config.values.tabNotificationSettings.scale
             poseStack.createPose {
                 poseStack.guiForward(GraphicsUtil.GuiForwardType.ChatTabNotificationBadge)

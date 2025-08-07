@@ -35,7 +35,7 @@ object V1 : Migrator<SchemaV1> {
             it.generalSettings.messageDirection = old.messageDirection
 
             old.chatTabs.forEach {
-                it.updateServerIPRegex()
+                it.updateServerSettings()
             }
             it.tabSettings.tabs = old.chatTabs
             it.tabSettings.updateTabSettings()

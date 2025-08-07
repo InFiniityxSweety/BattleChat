@@ -91,8 +91,8 @@ class ChatTab {
         get() = if (!::currentSettings.isInitialized) false else currentSettings.skipOthers
     val commandsOverrideAutoPrefix: Boolean
         get() = if (!::currentSettings.isInitialized) false else currentSettings.commandsOverrideAutoPrefix
-    val disableNotifications: Boolean
-        get() = if (!::currentSettings.isInitialized) false else currentSettings.disableNotifications
+    val notificationSettings: ServerChatTabNotificationSettings
+        get() = if (!::currentSettings.isInitialized) ServerChatTabNotificationSettings() else currentSettings.notificationSettings
 
     fun matches(message: String, coloredMessage: String?): Boolean {
         return currentSettings.matches(message, coloredMessage)
@@ -140,7 +140,7 @@ class ChatTab {
         if (settings.isNotEmpty()) {
             this.currentSettings = settings.first()
         }
-        updateServerIPRegex()
+        updateServerSettings()
         updateCurrentSettings()
     }
 
@@ -208,10 +208,11 @@ class ChatTab {
     @Transient
     lateinit var chatWindow: ChatWindow
 
-    fun updateServerIPRegex() {
+    fun updateServerSettings() {
         this.settings.forEach {
             it.updateRegex()
             it.serverPattern.updateRegex()
+            it.notificationSettings.notificationMatch.updateRegex()
         }
     }
 
@@ -291,7 +292,10 @@ class ChatTab {
         }
         val newDisplayMessageResult = this.addNewDisplayMessage(mutableComponent, addedTime, tag, chatPlusGuiMessage)
         if (chatWindow.tabSettings.selectedTab != this) {
-            this.unreadCount++
+            val notificationMatch = notificationSettings.notificationMatch
+            if (notificationMatch.matches(rawComponent)) {
+                this.unreadCount++
+            }
         }
         return NewMessageResult(chatTabAddNewMessageEvent, removedMessages, newDisplayMessageResult)
     }

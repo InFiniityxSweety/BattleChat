@@ -72,12 +72,15 @@ class AutoTabCreator {
                     settings.alwaysAdd = it.alwaysAdd
                     settings.skipOthers = it.skipOthers
                     settings.commandsOverrideAutoPrefix = it.commandsOverrideAutoPrefix
-                    settings.disableNotifications = it.disableNotifications
+                    settings.notificationSettings = it.notificationSettings.clone().also { notificationSettings ->
+                        notificationSettings.notificationMatch.pattern = formatRegex(it.notificationSettings.notificationMatch.pattern, matchResult)
+                    }
                 }
             ).also {
                 it.isAutoTab = true
                 it.temporary = true
             }
+            chatTab.updateServerSettings()
             tabSettings.tabs.add(chatTab)
             tabSettings.resetSortedChatTabs()
             return AutoTabData(it, chatTab)
@@ -87,7 +90,7 @@ class AutoTabCreator {
 
     data class AutoTabData(
         val autoTabOptions: AutoTabOptions,
-        val chatTab: ChatTab
+        val chatTab: ChatTab,
     )
 
     // replace all in autoPrefix %GROUP_1% %GROUP_2% etc with the corresponding group in the matched regex, start at 1 because 0 is the whole match
@@ -115,7 +118,7 @@ class AutoTabCreator {
         var alwaysAdd: Boolean = false
         var skipOthers: Boolean = false
         var commandsOverrideAutoPrefix: Boolean = true
-        var disableNotifications: Boolean = false
+        var notificationSettings: ServerChatTabNotificationSettings = ServerChatTabNotificationSettings()
         var temporary: Boolean = true
 
         constructor(pattern: String) : super(pattern)

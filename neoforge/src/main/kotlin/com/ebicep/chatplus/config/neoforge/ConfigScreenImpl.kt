@@ -586,10 +586,21 @@ object ConfigScreenImpl {
                         "chatPlus.chatWindow.tabSettings.chatTabs.commandsOverrideAutoPrefix",
                         value.commandsOverrideAutoPrefix
                     ) { value.commandsOverrideAutoPrefix = it },
-                    entryBuilder.booleanToggle(
-                        "chatPlus.chatWindow.tabSettings.chatTabs.disableNotifications",
-                        value.disableNotifications
-                    ) { value.disableNotifications = it },
+                    entryBuilder.startSubCategory(Component.translatable("chatPlus.chatWindow.tabSettings.chatTabs.notificationSettings")).with(
+                        entryBuilder.booleanToggle(
+                            "chatPlus.chatWindow.tabSettings.chatTabs.notificationSettings.disableNotifications",
+                            value.notificationSettings.disableNotifications
+                        ) { value.notificationSettings.disableNotifications = it },
+                        entryBuilder.stringField(
+                            "chatPlus.chatWindow.tabSettings.chatTabs.notificationSettings.notificationMatch.pattern",
+                            value.notificationSettings.notificationMatch.pattern,
+                            { value.notificationSettings.notificationMatch.pattern = it }
+                        ),
+                        entryBuilder.booleanToggle(
+                            "chatPlus.chatWindow.tabSettings.chatTabs.notificationSettings.notificationMatch.formatted",
+                            value.notificationSettings.notificationMatch.formatted
+                        ) { value.notificationSettings.notificationMatch.formatted = it },
+                    ).build(),
                 )
             },
             {
@@ -655,10 +666,21 @@ object ConfigScreenImpl {
                             "chatPlus.chatWindow.autoTabCreator.autoTabOptions.commandsOverrideAutoPrefix",
                             value.commandsOverrideAutoPrefix
                         ) { value.commandsOverrideAutoPrefix = it },
-                        entryBuilder.booleanToggle(
-                            "chatPlus.chatWindow.autoTabCreator.autoTabOptions.disableNotifications",
-                            value.disableNotifications
-                        ) { value.disableNotifications = it },
+                        entryBuilder.startSubCategory(Component.translatable("chatPlus.chatWindow.autoTabCreator.autoTabOptions.notificationSettings")).with(
+                            entryBuilder.booleanToggle(
+                                "chatPlus.chatWindow.autoTabCreator.autoTabOptions.notificationSettings.disableNotifications",
+                                value.notificationSettings.disableNotifications
+                            ) { value.notificationSettings.disableNotifications = it },
+                            entryBuilder.stringField(
+                                "chatPlus.chatWindow.autoTabCreator.autoTabOptions.notificationSettings.notificationMatch.pattern",
+                                value.notificationSettings.notificationMatch.pattern,
+                                { value.notificationSettings.notificationMatch.pattern = it }
+                            ),
+                            entryBuilder.booleanToggle(
+                                "chatPlus.chatWindow.autoTabCreator.autoTabOptions.notificationSettings.notificationMatch.formatted",
+                                value.notificationSettings.notificationMatch.formatted
+                            ) { value.notificationSettings.notificationMatch.formatted = it },
+                        ).build(),
                         entryBuilder.booleanToggle(
                             "chatPlus.chatWindow.autoTabCreator.autoTabOptions.temporary",
                             value.temporary
