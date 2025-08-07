@@ -60,16 +60,19 @@ class AutoTabCreator {
             val matchResult: MatchResult = filterFormatted.find(text) ?: return@forEach
             val tabName = formatRegex(it.tabNameFormatter, matchResult)
             val pattern = formatRegex(it.regexFormatter, matchResult)
+            val autoSend = formatRegex(it.autoSendFormatter, matchResult)
             val autoPrefix = formatRegex(it.autoPrefixFormatter, matchResult)
             val chatTab = ChatTab(
                 chatWindow,
                 ServerChatTabSettings(pattern, it.formatted).also { settings ->
                     settings.name = tabName
+                    settings.autoSend = autoSend
                     settings.autoPrefix = autoPrefix
                     settings.priority = it.priority
                     settings.alwaysAdd = it.alwaysAdd
                     settings.skipOthers = it.skipOthers
                     settings.commandsOverrideAutoPrefix = it.commandsOverrideAutoPrefix
+                    settings.disableNotifications = it.disableNotifications
                 }
             ).also {
                 it.isAutoTab = true
@@ -106,11 +109,13 @@ class AutoTabCreator {
         var skipOthersOnCreation: Boolean = true
         var tabNameFormatter: String = ""
         var regexFormatter: String = ""
+        var autoSendFormatter: String = ""
         var autoPrefixFormatter: String = ""
         var priority: Int = 0
         var alwaysAdd: Boolean = false
         var skipOthers: Boolean = false
         var commandsOverrideAutoPrefix: Boolean = true
+        var disableNotifications: Boolean = false
         var temporary: Boolean = true
 
         constructor(pattern: String) : super(pattern)

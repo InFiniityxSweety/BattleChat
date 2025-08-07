@@ -630,6 +630,11 @@ object ConfigScreenImpl {
                             { value.tabNameFormatter = it }
                         ),
                         entryBuilder.stringField(
+                            "chatPlus.chatWindow.autoTabCreator.autoTabOptions.autoSendFormatter",
+                            value.autoSendFormatter,
+                            { value.autoSendFormatter = it }
+                        ),
+                        entryBuilder.stringField(
                             "chatPlus.chatWindow.autoTabCreator.autoTabOptions.autoPrefixFormatter",
                             value.autoPrefixFormatter,
                             { value.autoPrefixFormatter = it }
@@ -650,6 +655,10 @@ object ConfigScreenImpl {
                             "chatPlus.chatWindow.autoTabCreator.autoTabOptions.commandsOverrideAutoPrefix",
                             value.commandsOverrideAutoPrefix
                         ) { value.commandsOverrideAutoPrefix = it },
+                        entryBuilder.booleanToggle(
+                            "chatPlus.chatWindow.autoTabCreator.autoTabOptions.disableNotifications",
+                            value.disableNotifications
+                        ) { value.disableNotifications = it },
                         entryBuilder.booleanToggle(
                             "chatPlus.chatWindow.autoTabCreator.autoTabOptions.temporary",
                             value.temporary
