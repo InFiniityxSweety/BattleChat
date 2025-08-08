@@ -586,6 +586,11 @@ object ConfigScreenImpl {
                         "chatPlus.chatWindow.tabSettings.chatTabs.commandsOverrideAutoPrefix",
                         value.commandsOverrideAutoPrefix
                     ) { value.commandsOverrideAutoPrefix = it },
+                    entryBuilder.stringField(
+                        "chatPlus.chatWindow.tabSettings.chatTabs.commandsSuggestionsPattern",
+                        value.commandsSuggestionsPattern.pattern,
+                        { value.commandsSuggestionsPattern.pattern = it }
+                    ),
                     entryBuilder.startSubCategory(Component.translatable("chatPlus.chatWindow.tabSettings.chatTabs.notificationSettings")).with(
                         entryBuilder.booleanToggle(
                             "chatPlus.chatWindow.tabSettings.chatTabs.notificationSettings.disableNotifications",

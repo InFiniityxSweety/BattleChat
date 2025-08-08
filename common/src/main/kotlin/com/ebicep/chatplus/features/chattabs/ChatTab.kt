@@ -212,6 +212,7 @@ class ChatTab {
         this.settings.forEach {
             it.updateRegex()
             it.serverPattern.updateRegex()
+            it.commandsSuggestionsPattern.updateRegex()
             it.notificationSettings.notificationMatch.updateRegex()
         }
     }

@@ -2,6 +2,7 @@ package com.ebicep.chatplus.features.chattabs
 
 import com.ebicep.chatplus.events.EventBus
 import com.ebicep.chatplus.features.chatwindows.ChatWindow
+import com.ebicep.chatplus.features.internal.MessageFilter
 import com.ebicep.chatplus.features.internal.MessageFilterFormatted
 
 import kotlinx.serialization.Serializable
@@ -72,6 +73,7 @@ class AutoTabCreator {
                     settings.alwaysAdd = it.alwaysAdd
                     settings.skipOthers = it.skipOthers
                     settings.commandsOverrideAutoPrefix = it.commandsOverrideAutoPrefix
+                    settings.commandsSuggestionsPattern = MessageFilter(formatRegex(it.commandsSuggestionsPattern.pattern, matchResult))
                     settings.notificationSettings = it.notificationSettings.clone().also { notificationSettings ->
                         notificationSettings.notificationMatch.pattern = formatRegex(it.notificationSettings.notificationMatch.pattern, matchResult)
                     }
@@ -118,6 +120,7 @@ class AutoTabCreator {
         var alwaysAdd: Boolean = false
         var skipOthers: Boolean = false
         var commandsOverrideAutoPrefix: Boolean = true
+        var commandsSuggestionsPattern: MessageFilter = MessageFilter("(?s).*")
         var notificationSettings: ServerChatTabNotificationSettings = ServerChatTabNotificationSettings()
         var temporary: Boolean = true
 

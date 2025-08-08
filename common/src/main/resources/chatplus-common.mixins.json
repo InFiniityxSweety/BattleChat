@@ -12,6 +12,7 @@
     "MixinChatComponent",
     "MixinChatScreen",
     "MixinClientConfigurationPacketListenerImpl",
+    "MixinCommandSuggestions",
     "MixinGuiGraphics",
     "MixinKeyboardHandler",
     "MixinMouseHandler",
