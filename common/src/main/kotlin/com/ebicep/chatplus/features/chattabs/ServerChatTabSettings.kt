@@ -1,9 +1,12 @@
 package com.ebicep.chatplus.features.chattabs
 
+import com.ebicep.chatplus.config.EnumTranslatableName
 import com.ebicep.chatplus.features.internal.MessageFilter
 import com.ebicep.chatplus.features.internal.MessageFilterFormatted
+import com.mojang.brigadier.suggestion.Suggestion
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
+import net.minecraft.network.chat.Component
 
 @Serializable
 open class ServerChatTabSettings : MessageFilterFormatted {
@@ -30,7 +33,7 @@ open class ServerChatTabSettings : MessageFilterFormatted {
     // if true then tab loop will break if message is added to this tab, overrides alwaysAdds
     var skipOthers: Boolean = false
     var commandsOverrideAutoPrefix: Boolean = true
-    var commandsSuggestionsPattern: MessageFilter = MessageFilter("(?s).*")
+    var suggestionsPatterns: MutableList<ServerChatTabCommandSuggestion> = mutableListOf()
     var notificationSettings: ServerChatTabNotificationSettings = ServerChatTabNotificationSettings()
 
     @Transient
@@ -54,8 +57,30 @@ open class ServerChatTabSettings : MessageFilterFormatted {
             it.alwaysAdd = this.alwaysAdd
             it.skipOthers = this.skipOthers
             it.commandsOverrideAutoPrefix = this.commandsOverrideAutoPrefix
-            it.commandsSuggestionsPattern = MessageFilter(this.commandsSuggestionsPattern.pattern)
+            it.suggestionsPatterns = this.suggestionsPatterns.map { it.clone() }.toMutableList()
             it.notificationSettings = this.notificationSettings.clone()
+        }
+    }
+
+    fun modifyCommandSuggestions(input: String, suggestions: MutableList<Suggestion>) {
+        for (pattern in suggestionsPatterns) {
+            if (!pattern.commandMatcher.matches(input)) {
+                continue
+            }
+            when (pattern.mode) {
+                ServerChatTabCommandSuggestion.SuggestionMode.FILTER -> {
+                    suggestions.removeIf { !pattern.suggestionMatcher.matches(it.text) }
+                }
+
+                ServerChatTabCommandSuggestion.SuggestionMode.SORT -> {
+                    val matchCache: MutableMap<Suggestion, Boolean> = HashMap<Suggestion, Boolean>()
+                    for (s in suggestions) {
+                        matchCache.put(s, pattern.suggestionMatcher.matches(s.text))
+                    }
+                    suggestions.sortWith(compareBy { !matchCache[it]!! })
+                }
+            }
+            break
         }
     }
 
@@ -74,5 +99,42 @@ data class ServerChatTabNotificationSettings(
                 this.notificationMatch.formatted
             )
         )
+    }
+}
+
+@Serializable
+data class ServerChatTabCommandSuggestion(
+    val commandMatcher: MessageFilter = MessageFilter(""),
+    val suggestionMatcher: MessageFilter = MessageFilter(""),
+    var mode: SuggestionMode = SuggestionMode.FILTER,
+) {
+    fun clone(): ServerChatTabCommandSuggestion {
+        return ServerChatTabCommandSuggestion(
+            MessageFilter(
+                this.commandMatcher.pattern,
+            ),
+            MessageFilter(
+                this.suggestionMatcher.pattern,
+            )
+        )
+    }
+
+    fun updateRegex() {
+        commandMatcher.updateRegex()
+        suggestionMatcher.updateRegex()
+    }
+
+    @Serializable
+    enum class SuggestionMode(val key: String) : EnumTranslatableName {
+        FILTER("chatPlus.chatWindow.tabSettings.chatTabs.suggestionsPatterns.suggestionMode.filter"),
+        SORT("chatPlus.chatWindow.tabSettings.chatTabs.suggestionsPatterns.suggestionMode.sort"),
+
+        ;
+
+        val translatable: Component = Component.translatable(key)
+
+        override fun getTranslatableName(): Component {
+            return translatable
+        }
     }
 }

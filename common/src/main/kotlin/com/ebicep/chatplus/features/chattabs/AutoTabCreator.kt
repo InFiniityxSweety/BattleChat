@@ -73,7 +73,12 @@ class AutoTabCreator {
                     settings.alwaysAdd = it.alwaysAdd
                     settings.skipOthers = it.skipOthers
                     settings.commandsOverrideAutoPrefix = it.commandsOverrideAutoPrefix
-                    settings.commandsSuggestionsPattern = MessageFilter(formatRegex(it.commandsSuggestionsPattern.pattern, matchResult))
+                    settings.suggestionsPatterns = it.suggestionsPatterns.map {
+                        ServerChatTabCommandSuggestion(
+                            MessageFilter(formatRegex(it.commandMatcher.pattern, matchResult)),
+                            MessageFilter(formatRegex(it.suggestionMatcher.pattern, matchResult))
+                        )
+                    }.toMutableList()
                     settings.notificationSettings = it.notificationSettings.clone().also { notificationSettings ->
                         notificationSettings.notificationMatch.pattern = formatRegex(it.notificationSettings.notificationMatch.pattern, matchResult)
                     }
@@ -120,7 +125,7 @@ class AutoTabCreator {
         var alwaysAdd: Boolean = false
         var skipOthers: Boolean = false
         var commandsOverrideAutoPrefix: Boolean = true
-        var commandsSuggestionsPattern: MessageFilter = MessageFilter("(?s).*")
+        var suggestionsPatterns: MutableList<ServerChatTabCommandSuggestion> = mutableListOf()
         var notificationSettings: ServerChatTabNotificationSettings = ServerChatTabNotificationSettings()
         var temporary: Boolean = true
 

@@ -8,10 +8,7 @@ import com.ebicep.chatplus.features.DeleteMessages.F3DMode
 import com.ebicep.chatplus.features.FilterMessages.DEFAULT_COLOR
 import com.ebicep.chatplus.features.MovableChat.MOVABLE_CHAT_COLOR
 import com.ebicep.chatplus.features.SendNote.NOTE_COLOR
-import com.ebicep.chatplus.features.chattabs.AutoTabCreator
-import com.ebicep.chatplus.features.chattabs.CHAT_TAB_HEIGHT
-import com.ebicep.chatplus.features.chattabs.ChatTab
-import com.ebicep.chatplus.features.chattabs.ServerChatTabSettings
+import com.ebicep.chatplus.features.chattabs.*
 import com.ebicep.chatplus.features.chatwindows.ChatWindow
 import com.ebicep.chatplus.features.chatwindows.OutlineSettings
 import com.ebicep.chatplus.features.chatwindows.TabSettings.Position
@@ -586,10 +583,32 @@ object ConfigScreenImpl {
                         "chatPlus.chatWindow.tabSettings.chatTabs.commandsOverrideAutoPrefix",
                         value.commandsOverrideAutoPrefix
                     ) { value.commandsOverrideAutoPrefix = it },
-                    entryBuilder.stringField(
-                        "chatPlus.chatWindow.tabSettings.chatTabs.commandsSuggestionsPattern",
-                        value.commandsSuggestionsPattern.pattern,
-                        { value.commandsSuggestionsPattern.pattern = it }
+                    getCustomListOption(
+                        "chatPlus.chatWindow.tabSettings.chatTabs.suggestionsPatterns",
+                        value.suggestionsPatterns,
+                        { value.suggestionsPatterns = it },
+                        true,
+                        { ServerChatTabCommandSuggestion(MessageFilter("/"), MessageFilter("(?s).*")) },
+                        { value ->
+                            listOf(
+                                entryBuilder.stringField(
+                                    "chatPlus.chatWindow.tabSettings.chatTabs.suggestionsPatterns.commandMatcher",
+                                    value.commandMatcher.pattern,
+                                    { value.commandMatcher.pattern = it }
+                                ),
+                                entryBuilder.stringField(
+                                    "chatPlus.chatWindow.tabSettings.chatTabs.suggestionsPatterns.suggestionMatcher",
+                                    value.suggestionMatcher.pattern,
+                                    { value.suggestionMatcher.pattern = it }
+                                ),
+                                entryBuilder.enumSelector(
+                                    "chatPlus.chatWindow.tabSettings.chatTabs.suggestionsPatterns.suggestionMode",
+                                    ServerChatTabCommandSuggestion.SuggestionMode::class.java,
+                                    value.mode
+                                ) { value.mode = it },
+                            )
+                        },
+                        { Component.literal(it.commandMatcher.pattern + it.suggestionMatcher.pattern) }
                     ),
                     entryBuilder.startSubCategory(Component.translatable("chatPlus.chatWindow.tabSettings.chatTabs.notificationSettings")).with(
                         entryBuilder.booleanToggle(
@@ -671,6 +690,33 @@ object ConfigScreenImpl {
                             "chatPlus.chatWindow.autoTabCreator.autoTabOptions.commandsOverrideAutoPrefix",
                             value.commandsOverrideAutoPrefix
                         ) { value.commandsOverrideAutoPrefix = it },
+                        getCustomListOption(
+                            "chatPlus.chatWindow.autoTabCreator.autoTabOptions.suggestionsPatterns",
+                            value.suggestionsPatterns,
+                            { value.suggestionsPatterns = it },
+                            true,
+                            { ServerChatTabCommandSuggestion(MessageFilter("/"), MessageFilter("(?s).*")) },
+                            { value ->
+                                listOf(
+                                    entryBuilder.stringField(
+                                        "chatPlus.chatWindow.autoTabCreator.autoTabOptions.suggestionsPatterns.commandMatcher",
+                                        value.commandMatcher.pattern,
+                                        { value.commandMatcher.pattern = it }
+                                    ),
+                                    entryBuilder.stringField(
+                                        "chatPlus.chatWindow.autoTabCreator.autoTabOptions.suggestionsPatterns.suggestionMatcher",
+                                        value.suggestionMatcher.pattern,
+                                        { value.suggestionMatcher.pattern = it }
+                                    ),
+                                    entryBuilder.enumSelector(
+                                        "chatPlus.chatWindow.autoTabCreator.autoTabOptions.suggestionsPatterns.suggestionMode",
+                                        ServerChatTabCommandSuggestion.SuggestionMode::class.java,
+                                        value.mode
+                                    ) { value.mode = it },
+                                )
+                            },
+                            { Component.literal(it.commandMatcher.pattern + it.suggestionMatcher.pattern) }
+                        ),
                         entryBuilder.startSubCategory(Component.translatable("chatPlus.chatWindow.autoTabCreator.autoTabOptions.notificationSettings")).with(
                             entryBuilder.booleanToggle(
                                 "chatPlus.chatWindow.autoTabCreator.autoTabOptions.notificationSettings.disableNotifications",
