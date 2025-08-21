@@ -94,7 +94,7 @@ object TextBarElements {
     }
 
     private fun cacheTextBarElementXs() {
-        var currentX = (chatPlusScreen as IChatScreen).chatPlusWidth + SPACER
+        var currentX = (chatPlusScreen as IChatScreen).chatPlusWidth + SPACER + if (Config.values.vanillaInputBox) 0 else Config.values.inputBoxSettings.startX
         textBarElements.forEach {
             textBarElementsStartX[it] = currentX
             currentX += it.getPaddedWidth() + SPACER
@@ -105,6 +105,6 @@ object TextBarElements {
 
 data class AddTextBarElementEvent(
     val screen: ChatScreen,
-    val elements: MutableList<TextBarElement>
+    val elements: MutableList<TextBarElement>,
 ) : Event
 
