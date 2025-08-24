@@ -856,6 +856,11 @@ object MovableChat {
             return start
         }
 
+        fun renderBottom(): Boolean {
+            val calculatedStartY = getCalculatedStartY()
+            return Minecraft.getInstance().window.guiScaledHeight - calculatedStartY < calculatedStartY
+        }
+
         companion object {
             const val INPUT_BOX_PADDING = 4
             const val PADDED_INPUT_BOX_HEIGHT = EDIT_BOX_HEIGHT - INPUT_BOX_PADDING // center ish height

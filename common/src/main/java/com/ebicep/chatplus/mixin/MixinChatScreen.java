@@ -141,6 +141,15 @@ public abstract class MixinChatScreen extends Screen implements IMixinChatScreen
         return Config.INSTANCE.getValues().getMaxCommandSuggestions();
     }
 
+    @ModifyArg(method = "init", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/CommandSuggestions;<init>(Lnet/minecraft/client/Minecraft;" +
+            "Lnet/minecraft/client/gui/screens/Screen;Lnet/minecraft/client/gui/components/EditBox;Lnet/minecraft/client/gui/Font;ZZIIZI)V"), index = 8)
+    private boolean modifyChatScreenCommandSuggestionsAnchor(boolean bl) {
+        if (!Config.INSTANCE.getValues().getEnabled() || Config.INSTANCE.getValues().getVanillaInputBox()) {
+            return bl;
+        }
+        return Config.INSTANCE.getValues().getInputBoxSettings().renderBottom();
+    }
+
     @Inject(method = "removed", at = @At("HEAD"))
     private void removed(CallbackInfo ci) {
         if (!Config.INSTANCE.getValues().getEnabled()) {

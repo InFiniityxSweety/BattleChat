@@ -32,7 +32,7 @@ class TranslateSpeakTextBarElement(private val chatPlusScreen: ChatScreen) : Tex
         var selectorFilteredLanguages: List<Language> = mutableListOf()
         var selectorLastHoveredLanguage: Language? = null
         val selectorRenderBottom: Boolean
-            get() = Config.values.vanillaInputBox || Minecraft.getInstance().window.guiScaledHeight - Config.values.inputBoxSettings.getCalculatedStartY() < Config.values.inputBoxSettings.getCalculatedStartY()
+            get() = Config.values.vanillaInputBox || Config.values.inputBoxSettings.renderBottom()
         val selectorStartY: Int
             get() = if (Config.values.vanillaInputBox) {
                 Minecraft.getInstance().window.guiScaledHeight - 12 - EDIT_BOX_HEIGHT - 1
