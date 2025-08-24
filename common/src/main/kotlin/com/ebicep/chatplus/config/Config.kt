@@ -154,7 +154,7 @@ data class ConfigVariables(
     var compactMessagesDeleteDuplicate: Boolean = true,
     var compactMessagesRefreshAddedTime: Boolean = false,
     var compactMessagesSearchAmount: Int = 1,
-    var compactMessageComparatorMode: CompactMessages.CompactComparatorMode = CompactMessages.CompactComparatorMode.VANILLA,
+    var compactMessageComparatorMode: CompactMessages.CompactComparatorMode = CompactMessages.CompactComparatorMode.CUSTOM,
     var compactMessageSettings: CompactMessages.CompactMessageCustomSettings = CompactMessages.CompactMessageCustomSettings(),
     // scrolling
     var keyNoScroll: InputConstants.Key = InputConstants.getKey("key.keyboard.left.control"),
