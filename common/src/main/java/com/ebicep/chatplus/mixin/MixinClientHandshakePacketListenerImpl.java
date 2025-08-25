@@ -6,6 +6,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ClientHandshakePacketListenerImpl;
 import net.minecraft.client.multiplayer.ServerData;
+import net.minecraft.client.multiplayer.TransferState;
 import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
@@ -29,6 +30,7 @@ public class MixinClientHandshakePacketListenerImpl {
             boolean bl,
             Duration duration,
             Consumer<Component> consumer,
+            TransferState transferState,
             CallbackInfo ci
     ) {
         if (serverData != null) {

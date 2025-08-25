@@ -5,7 +5,7 @@ import com.ebicep.chatplus.config.ConfigScreen
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.Screen
 import net.neoforged.fml.ModLoadingContext
-import net.neoforged.neoforge.client.ConfigScreenHandler
+import net.neoforged.neoforge.client.gui.IConfigScreenFactory
 
 
 object ChatPlusPlatformInitImpl {
@@ -13,8 +13,8 @@ object ChatPlusPlatformInitImpl {
     @JvmStatic
     fun platformInit() {
         ChatPlus.init()
-        ModLoadingContext.get().registerExtensionPoint(ConfigScreenHandler.ConfigScreenFactory::class.java) {
-            ConfigScreenHandler.ConfigScreenFactory { _: Minecraft, screen: Screen ->
+        ModLoadingContext.get().registerExtensionPoint(IConfigScreenFactory::class.java) {
+            IConfigScreenFactory { _: Minecraft, screen: Screen ->
                 ConfigScreen.getConfigScreen(screen)
             }
         }
