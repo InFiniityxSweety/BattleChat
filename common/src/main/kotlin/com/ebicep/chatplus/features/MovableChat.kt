@@ -27,10 +27,7 @@ import com.ebicep.chatplus.hud.ChatManager.resetGlobalSortedTabs
 import com.ebicep.chatplus.hud.ChatPlusScreen.EDIT_BOX_HEIGHT
 import com.ebicep.chatplus.hud.ChatPlusScreen.lastMouseX
 import com.ebicep.chatplus.hud.ChatPlusScreen.lastMouseY
-import com.ebicep.chatplus.mixin.IMixinChatScreen
 import com.ebicep.chatplus.mixin.IMixinScreen
-import com.ebicep.chatplus.util.ComponentUtil.withColor
-import com.ebicep.chatplus.util.GraphicsUtil
 import com.ebicep.chatplus.util.GraphicsUtil.createPose
 import com.ebicep.chatplus.util.GraphicsUtil.drawString0
 import com.ebicep.chatplus.util.GraphicsUtil.fill0
@@ -258,10 +255,10 @@ object MovableChat {
                     renderer.internalWidth,
                     it.chatWindow == ChatManager.selectedWindow
                 )
+                it.returnFunction = true
             }
-            it.returnFunction = true
         }
-        EventBus.register<ChatRenderPostLinesEvent>({ 50 }, { movingChat }) {
+        EventBus.register<ChatRenderPostLinesRenderEvent>({ 50 }, { movingChat }) {
             if (!moving) {
                 return@register
             }

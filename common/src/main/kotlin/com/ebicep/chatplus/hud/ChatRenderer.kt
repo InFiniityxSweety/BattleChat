@@ -75,11 +75,16 @@ data class ChatRenderPreLinesRenderEvent(
     val guiTicks: Int,
 ) : Event
 
-data class ChatRenderPostLinesEvent(
+data class ChatRenderPostLinesRenderEvent(
     val guiGraphics: GuiGraphics,
     val chatWindow: ChatWindow,
     var displayMessageIndex: Int,
-    var returnFunction: Boolean = false
+    var returnFunction: Boolean = false,
+) : Event
+
+data class ChatRenderPostLinesEvent(
+    val guiGraphics: GuiGraphics,
+    val chatWindow: ChatWindow,
 ) : Event
 
 enum class HeightType {
@@ -324,10 +329,12 @@ class ChatRenderer {
             }
             ++displayMessageIndex
         }
-        if (EventBus.post(ChatRenderPostLinesEvent(guiGraphics, chatWindow, displayMessageIndex)).returnFunction) {
+        if (EventBus.post(ChatRenderPostLinesRenderEvent(guiGraphics, chatWindow, displayMessageIndex)).returnFunction) {
             return
         }
         poseStack.popMatrix()
+
+        EventBus.post(ChatRenderPostLinesEvent(guiGraphics, chatWindow))
 
         if (chatFocused && Debug.debug && chatWindow == ChatManager.selectedWindow) {
             poseStack.createPose {

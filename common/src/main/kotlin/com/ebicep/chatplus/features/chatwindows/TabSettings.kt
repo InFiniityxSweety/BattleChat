@@ -14,11 +14,9 @@ import com.ebicep.chatplus.features.internal.Debug
 import com.ebicep.chatplus.hud.ChatManager
 import com.ebicep.chatplus.hud.ChatManager.resetGlobalSortedTabs
 import com.ebicep.chatplus.hud.ChatPlusScreen
-import com.ebicep.chatplus.util.GraphicsUtil
 import com.ebicep.chatplus.util.GraphicsUtil.createPose
 import com.ebicep.chatplus.util.GraphicsUtil.drawImage
 import com.ebicep.chatplus.util.GraphicsUtil.drawString0
-import com.ebicep.chatplus.util.GraphicsUtil.guiForward
 import com.ebicep.chatplus.util.GraphicsUtil.translate0
 import com.ebicep.chatplus.util.KotlinUtil.reduceAlpha
 import com.ebicep.chatplus.util.Resources
@@ -228,14 +226,20 @@ class TabSettings {
                     }
                 }
             }
-            poseStack.createPose {
+            // notification badge
+            if (Config.values.tabNotificationSettings.enabled && !hideTabs && !chatWindow.generalSettings.disabled) {
                 tabs.forEachIndexed { index, chatTab ->
-                    val startX = chatTab.xStart
-                    val startY = chatTab.yStart
+                    if (index < startRenderTabIndex) {
+                        return@forEachIndexed
+                    }
+                    if (chatTab.unreadCount <= 0) {
+                        return@forEachIndexed
+                    }
+                    poseStack.createPose {
+                        val startX = chatTab.xStart
+                        val startY = chatTab.yStart
 
-                    poseStack.translate0(x = startX)
-                    // notification badge
-                    if (Config.values.tabNotificationSettings.enabled && !chatTab.read) {
+                        poseStack.translate0(x = startX)
                         val scale = Config.values.tabNotificationSettings.scale
                         poseStack.createPose {
                             poseStack.translate0(

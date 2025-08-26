@@ -61,7 +61,7 @@ object TextBarElements {
                 element.onClickEvent(it)
             }
         }
-        EventBus.register<ChatScreenRenderEvent> {
+        EventBus.register<ChatScreenRenderEvent>({ 1 }) {
             val guiGraphics = it.guiGraphics
             val mouseX = it.mouseX
             val mouseY = it.mouseY

@@ -35,7 +35,7 @@ object ChatTabs {
                 window.tabSettings.tabs.forEach { checkTabRefresh(window, it) }
             }
         }
-        EventBus.register<ChatRenderPreLinesEvent>({ 100 }) {
+        EventBus.register<ChatRenderPostLinesEvent> {
             val chatFocused: Boolean = ChatManager.isChatFocused()
             if (chatFocused || it.chatWindow.tabSettings.showTabsWhenChatNotOpen) {
                 it.chatWindow.tabSettings.renderTabs(guiGraphics = it.guiGraphics)

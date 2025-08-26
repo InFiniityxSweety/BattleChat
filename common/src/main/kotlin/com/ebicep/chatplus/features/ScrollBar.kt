@@ -32,7 +32,7 @@ object ScrollBar {
             }
             it.maxWidth -= max(0, barWidth)
         }
-        EventBus.register<ChatRenderPostLinesEvent> {
+        EventBus.register<ChatRenderPostLinesRenderEvent> {
             if (!Config.values.scrollbarEnabled) {
                 return@register
             }

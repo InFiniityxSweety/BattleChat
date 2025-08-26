@@ -92,7 +92,7 @@ object Debug {
                 )
             }
         }
-        EventBus.register<ChatRenderPostLinesEvent> {
+        EventBus.register<ChatRenderPostLinesRenderEvent> {
             if (!debug) {
                 return@register
             }
