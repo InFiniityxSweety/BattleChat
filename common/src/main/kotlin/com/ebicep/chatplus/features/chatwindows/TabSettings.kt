@@ -13,6 +13,7 @@ import com.ebicep.chatplus.features.chattabs.ChatTabs.createDefaultTab
 import com.ebicep.chatplus.features.internal.Debug
 import com.ebicep.chatplus.hud.ChatManager
 import com.ebicep.chatplus.hud.ChatManager.resetGlobalSortedTabs
+import com.ebicep.chatplus.hud.ChatPlusScreen
 import com.ebicep.chatplus.util.GraphicsUtil.createPose
 import com.ebicep.chatplus.util.GraphicsUtil.drawImage
 import com.ebicep.chatplus.util.GraphicsUtil.drawString0
@@ -51,6 +52,7 @@ class TabSettings {
                 value
             }
             selectedTabIndex = Mth.clamp(selectedTabIndex, 0, tabs.size - 1)
+            selectedTab.unreadCount = 0
             field.forEach { it.chatWindow = chatWindow }
             resetSortedChatTabs()
         }
@@ -71,8 +73,8 @@ class TabSettings {
         selectedTabIndex = Mth.clamp(selectedTabIndex, 0, tabs.size - 1)
 
         tabs.forEach {
-            it.updateRegex()
-            it.updateServerIPRegex()
+            it.updateServerSettings()
+            it.updateCurrentSettings()
         }
         resetSortedChatTabs(false)
     }
@@ -96,6 +98,12 @@ class TabSettings {
         sortedTabs = tabs.sortedBy { -it.priority }
         if (resetGlobal && Config.loaded) {
             resetGlobalSortedTabs()
+        }
+    }
+
+    fun updateTabSettings(ip: String? = null) {
+        tabs.forEach {
+            it.updateCurrentSettings(ip ?: Minecraft.getInstance().player?.connection?.serverData?.ip)
         }
     }
 
@@ -135,6 +143,10 @@ class TabSettings {
         selectedTabIndex = tabs.indexOf(newTab)
         queueUpdateConfig = true
         EventBus.post(ChatTabSwitchEvent(oldTab, newTab))
+        val autoSend = newTab.autoSend
+        if (autoSend.isNotEmpty()) {
+            ChatPlusScreen.sendChatMessage(message = autoSend, addToSent = false)
+        }
     }
 
     fun getClickedTab(x: Double, y: Double): ChatTab? {
@@ -214,14 +226,20 @@ class TabSettings {
                     }
                 }
             }
-            poseStack.createPose {
+            // notification badge
+            if (Config.values.tabNotificationSettings.enabled && !hideTabs && !chatWindow.generalSettings.disabled) {
                 tabs.forEachIndexed { index, chatTab ->
-                    val startX = chatTab.xStart
-                    val startY = chatTab.yStart
+                    if (index < startRenderTabIndex) {
+                        return@forEachIndexed
+                    }
+                    if (chatTab.unreadCount <= 0) {
+                        return@forEachIndexed
+                    }
+                    poseStack.createPose {
+                        val startX = chatTab.xStart
+                        val startY = chatTab.yStart
 
-                    poseStack.translate0(x = startX)
-                    // notification badge
-                    if (Config.values.tabNotificationSettings.enabled && !chatTab.read) {
+                        poseStack.translate0(x = startX)
                         val scale = Config.values.tabNotificationSettings.scale
                         poseStack.createPose {
                             poseStack.translate0(
@@ -230,6 +248,14 @@ class TabSettings {
                             )
                             poseStack.scale(scale, scale)
                             guiGraphics.drawImage(Resources.NOTIFICATION_BADGE)
+                            if (Config.values.tabNotificationSettings.showCount) {
+                                guiGraphics.drawString0(
+                                    chatTab.unreadCount.toString(),
+                                    Resources.NOTIFICATION_BADGE.width / 2 - Minecraft.getInstance().font.width(chatTab.unreadCount.toString()) / 2,
+                                    Resources.NOTIFICATION_BADGE.height / 2 - Minecraft.getInstance().font.lineHeight / 2,
+                                    Config.values.tabNotificationSettings.countColor
+                                )
+                            }
                         }
                     }
                 }
@@ -298,6 +324,23 @@ class TabSettings {
             totalWidth += it.width + CHAT_TAB_X_SPACE
         }
         return totalWidth - CHAT_TAB_X_SPACE
+    }
+
+    fun cloneTab(chatTab: ChatTab) {
+        val mutableList = tabs.toMutableList()
+        mutableList.add(chatTab.clone())
+        tabs = mutableList
+        updateTabSettings()
+        resetGlobalSortedTabs()
+    }
+
+    fun removeTab(chatTab: ChatTab) {
+        if (!tabs.contains(chatTab)) {
+            return
+        }
+        val mutableList = tabs.toMutableList()
+        mutableList.remove(chatTab)
+        tabs = mutableList
     }
 
     @Serializable
