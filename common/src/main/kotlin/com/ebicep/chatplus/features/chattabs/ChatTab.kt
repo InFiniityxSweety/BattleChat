@@ -217,7 +217,7 @@ class ChatTab {
         }
     }
 
-    fun updateCurrentSettings(ip: String? = Minecraft.getInstance().player?.connection?.serverData?.ip) {
+    fun updateCurrentSettings(ip: String? = Minecraft.getInstance()?.player?.connection?.serverData?.ip) {
         val patterns = "(${settings.joinToString(", ") { it.serverPattern.pattern }})"
         ChatPlus.LOGGER.info("Updating current settings for $patterns given $ip")
         var newCurrent: ServerChatTabSettings? = null
