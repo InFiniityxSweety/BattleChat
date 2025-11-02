@@ -65,7 +65,7 @@ object PlayerHeadChatDisplay {
                 if (playerInfo != null) {
                     val uuid = playerInfo.profile.id
                     playerNameUUIDs[word] = TimedUUID(uuid, System.currentTimeMillis())
-                    playerHeads[uuid] = HeadData({ playerInfo.skin.texture }, Minecraft.getInstance().level?.getPlayerByUUID(uuid)?.isModelPartShown(PlayerModelPart.HAT) == true)
+                    playerHeads[uuid] = HeadData({ playerInfo.skin.body.texturePath() }, Minecraft.getInstance().level?.getPlayerByUUID(uuid)?.isModelPartShown(PlayerModelPart.HAT) == true)
                     it.senderUUID = uuid
                     return@register
                 }

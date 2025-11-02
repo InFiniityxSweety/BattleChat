@@ -139,7 +139,7 @@ class TranslateSpeakTextBarElement(private val chatPlusScreen: ChatScreen) : Tex
             chatPlusScreen.callRebuildWidgets()
             return
         }
-        event.returnFunction = selectorLanguageSearch.isFocused && selectorLanguageSearch.mouseClicked(event.mouseX, event.mouseY, event.button)
+        event.returnFunction = selectorLanguageSearch.isFocused && selectorLanguageSearch.mouseClicked(event.mouseButtonEvent, false)
     }
 
     override fun onHover(guiGraphics: GuiGraphics, pMouseX: Int, pMouseY: Int) {

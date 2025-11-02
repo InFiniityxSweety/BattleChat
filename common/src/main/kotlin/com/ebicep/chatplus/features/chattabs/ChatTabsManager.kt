@@ -12,7 +12,6 @@ import com.ebicep.chatplus.hud.*
 import com.ebicep.chatplus.hud.ChatManager.selectedWindow
 import com.ebicep.chatplus.mixin.IMixinChatScreen
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.screens.Screen
 import net.minecraft.util.Mth
 
 
@@ -79,7 +78,7 @@ object ChatTabs {
                 selectedWindow.tabSettings.handleClickedTab(mouseX, mouseY)
             } else if (it.button == 1 && Config.values.tabEditorScreen) {
                 val clickedTab = selectedWindow.tabSettings.getClickedTab(mouseX, mouseY) ?: return@register
-                if (Config.values.windowEditorScreen && Screen.hasShiftDown()) {
+                if (Config.values.windowEditorScreen && Minecraft.getInstance().hasShiftDown()) {
                     Minecraft.getInstance().setScreen(Editor.windowEditor(it.screen, selectedWindow))
                 } else {
                     Minecraft.getInstance().setScreen(Editor.tabEditor(it.screen, clickedTab))

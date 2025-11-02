@@ -72,13 +72,14 @@ object SpeechToText {
             color
         )
         if (Config.values.speechToTextTranslateEnabled) {
-            guiGraphics.renderOutline(
+            guiGraphics.submitOutline(
                 centerWidth - width / 2 - 5,
                 35,
                 width + 10,
                 17,
                 (0xFF55FF55).toInt()
             )
+            guiGraphics.renderDeferredElements()
         }
     }
 
@@ -228,11 +229,11 @@ class MicrophoneThread : Thread("ChatPlusMicrophoneThread") {
                 }
             }
         }
-        ClientRawInputEvent.KEY_PRESSED.register { _, keyCode, _, _, _ ->
+        ClientRawInputEvent.KEY_PRESSED.register { _, _, keyEvent ->
             if (!Config.values.speechToTextEnabled) {
                 return@register EventResult.pass()
             }
-            val quickSend = keyCode == Config.values.speechToTextQuickSendKey.value && !ChatManager.isChatFocused()
+            val quickSend = keyEvent.key() == Config.values.speechToTextQuickSendKey.value && !ChatManager.isChatFocused()
             if (canQuickSend && quickSend) {
                 quickSendTimer = -1
                 doWithMessage { message, _ ->

@@ -6,7 +6,6 @@ import com.ebicep.chatplus.events.EventBus
 import com.ebicep.chatplus.features.internal.OnScreenDisplayEvent
 import com.ebicep.chatplus.hud.ChatManager
 import com.ebicep.chatplus.hud.ChatRenderPreLinesEvent
-import com.ebicep.chatplus.util.ComponentUtil.withColor
 import dev.architectury.event.EventResult
 import dev.architectury.event.events.client.ClientRawInputEvent
 import net.minecraft.network.chat.Component
@@ -33,16 +32,17 @@ object HideChat {
             hidden = true
         }
         var onCooldown = false
-        ClientRawInputEvent.KEY_PRESSED.register { _, keyCode, _, action, modifiers ->
+        ClientRawInputEvent.KEY_PRESSED.register { _, keyCode, keyEvent ->
             if (ChatManager.isChatFocused()) {
                 return@register EventResult.pass()
             }
-            val hideKeyDown = Config.values.hideChatToggleKey.isDown(keyCode, modifiers)
-            val alwaysShowChatDown = Config.values.alwaysShowChatToggleKey.isDown(keyCode, modifiers)
+            val modifiers = keyEvent.modifiers
+            val hideKeyDown = Config.values.hideChatToggleKey.isDown(keyEvent.key(), modifiers)
+            val alwaysShowChatDown = Config.values.alwaysShowChatToggleKey.isDown(keyEvent.key(), modifiers)
             if (!hideKeyDown && !alwaysShowChatDown) {
                 return@register EventResult.pass()
             }
-            if (action == 0) { // release
+            if (keyCode == 0) { // release
                 onCooldown = false
                 return@register EventResult.pass()
             }

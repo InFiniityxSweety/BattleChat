@@ -13,6 +13,8 @@ import com.mojang.blaze3d.platform.InputConstants
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.gui.screens.ChatScreen
+import net.minecraft.client.input.KeyEvent
+import net.minecraft.client.input.MouseButtonEvent
 import net.minecraft.util.Mth
 
 object ChatPlusScreenAdapter {
@@ -38,14 +40,14 @@ object ChatPlusScreenAdapter {
         return EventBus.post(ChatScreenInputBoxEditEvent(chatScreen, str)).returnFunction
     }
 
-    fun handleKeyPressed(chatScreen: ChatScreen, keyCode: Int, scanCode: Int, modifiers: Int): Boolean {
-        val event = ChatScreenKeyPressedEvent(chatScreen, keyCode, scanCode, modifiers)
+    fun handleKeyPressed(chatScreen: ChatScreen, keyEvent: KeyEvent): Boolean {
+        val event = ChatScreenKeyPressedEvent(chatScreen, keyEvent)
         EventBus.post(ChatScreenInputEvent(event))
         return event.returnFunction
     }
 
-    fun handleKeyReleased(chatScreen: ChatScreen, keyCode: Int, scanCode: Int, modifiers: Int) {
-        val event = ChatScreenKeyReleasedEvent(chatScreen, keyCode, scanCode, modifiers)
+    fun handleKeyReleased(chatScreen: ChatScreen, keyEvent: KeyEvent) {
+        val event = ChatScreenKeyReleasedEvent(chatScreen, keyEvent)
         EventBus.post(ChatScreenInputEvent(event))
     }
 
@@ -69,7 +71,7 @@ object ChatPlusScreenAdapter {
         // control = no scroll
         // shift = fine scroll
         // alt = triple scroll
-        val window = Minecraft.getInstance().window.window
+        val window = Minecraft.getInstance().window
         if (InputConstants.isKeyDown(window, Config.values.keyNoScroll.value)) {
             return true
         }
@@ -84,20 +86,20 @@ object ChatPlusScreenAdapter {
         return false
     }
 
-    fun handleMouseClicked(chatScreen: ChatScreen, mouseX: Double, mouseY: Double, pButton: Int): Boolean {
-        val event = ChatScreenMouseClickedEvent(chatScreen, mouseX, mouseY, pButton)
+    fun handleMouseClicked(chatScreen: ChatScreen, mouseButtonEvent: MouseButtonEvent): Boolean {
+        val event = ChatScreenMouseClickedEvent(chatScreen, mouseButtonEvent)
         EventBus.post(ChatScreenInputEvent(event))
         return event.returnFunction
     }
 
-    fun handleMouseReleased(chatScreen: ChatScreen, mouseX: Double, mouseY: Double, pButton: Int): Boolean {
-        val event = ChatScreenMouseReleasedEvent(chatScreen, mouseX, mouseY, pButton)
+    fun handleMouseReleased(chatScreen: ChatScreen, mouseButtonEvent: MouseButtonEvent): Boolean {
+        val event = ChatScreenMouseReleasedEvent(chatScreen, mouseButtonEvent)
         EventBus.post(ChatScreenInputEvent(event))
         return event.returnFunction
     }
 
-    fun handleMouseDragged(chatScreen: ChatScreen, mouseX: Double, mouseY: Double, pButton: Int, pDragX: Double, pDragY: Double) {
-        EventBus.post(ChatScreenMouseDraggedEvent(chatScreen, mouseX, mouseY, pButton, pDragX, pDragY))
+    fun handleMouseDragged(chatScreen: ChatScreen, mouseButtonEvent: MouseButtonEvent, deltaX: Double, deltaY: Double) {
+        EventBus.post(ChatScreenMouseDraggedEvent(chatScreen, mouseButtonEvent, deltaX, deltaY))
     }
 
     fun handleMoveInHistory(chatScreen: ChatScreen, pMsgPos: Int) {

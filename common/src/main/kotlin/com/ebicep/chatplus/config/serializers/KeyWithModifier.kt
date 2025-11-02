@@ -8,7 +8,7 @@ import com.ebicep.chatplus.util.KeyUtil.isDown
 import com.ebicep.chatplus.util.KeyUtil.isModifier
 import com.mojang.blaze3d.platform.InputConstants
 import kotlinx.serialization.Serializable
-import net.minecraft.client.gui.screens.Screen
+import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.Component
 
 @Serializable
@@ -21,9 +21,9 @@ data class KeyWithModifier(
     fun isDown(): Boolean {
         val keyDown = key.isDown()
         val modifierDown = modifier == 0.toShort() ||
-                modifier == 1.toShort() && Screen.hasAltDown() ||
-                modifier == 2.toShort() && Screen.hasControlDown() ||
-                modifier == 4.toShort() && Screen.hasShiftDown()
+                modifier == 1.toShort() && Minecraft.getInstance().hasAltDown() ||
+                modifier == 2.toShort() && Minecraft.getInstance().hasControlDown() ||
+                modifier == 4.toShort() && Minecraft.getInstance().hasShiftDown()
         return keyDown && modifierDown
     }
 
@@ -38,9 +38,9 @@ data class KeyWithModifier(
                 val button = inputEvent.button
                 val mouseDown = KeyUtil.isMouseButton(button) && button == key.value
                 val modifierDown = modifier == 0.toShort() ||
-                        modifier == 1.toShort() && Screen.hasAltDown() ||
-                        modifier == 2.toShort() && Screen.hasControlDown() ||
-                        modifier == 4.toShort() && Screen.hasShiftDown()
+                        modifier == 1.toShort() && Minecraft.getInstance().hasAltDown() ||
+                        modifier == 2.toShort() && Minecraft.getInstance().hasControlDown() ||
+                        modifier == 4.toShort() && Minecraft.getInstance().hasShiftDown()
                 return mouseDown && modifierDown
             }
 

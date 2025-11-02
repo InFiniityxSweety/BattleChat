@@ -27,7 +27,6 @@ import kotlinx.serialization.Serializable
 import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.ChatScreen
-import net.minecraft.client.gui.screens.Screen
 import net.minecraft.network.chat.Component
 import java.awt.Color
 
@@ -60,7 +59,7 @@ object FindMessage {
                 return@register
             }
             findShortcutUsed = true
-            val shiftDown = Screen.hasShiftDown()
+            val shiftDown = Minecraft.getInstance().hasShiftDown()
             toggle(it.screen, if (shiftDown) getOtherMode() else Config.values.findMessageDefaultMode)
             it.returnFunction = true
         }
@@ -127,7 +126,7 @@ object FindMessage {
                 it.screen as IMixinChatScreen
                 it.screen as IChatScreen
                 val editBox = it.screen.input ?: return@register
-                it.guiGraphics.renderOutline(
+                it.guiGraphics.submitOutline(
                     editBox.x - 2,
                     editBox.y - (if (Config.values.vanillaInputBox) 2 else 4),
                     it.screen.chatPlusWidth - (if (Config.values.vanillaInputBox) 2 else -2),

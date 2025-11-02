@@ -5,6 +5,7 @@ import com.ebicep.chatplus.hud.ChatScreenKeyPressedEvent
 import com.ebicep.chatplus.hud.ChatScreenMouseClickedEvent
 import com.mojang.blaze3d.platform.InputConstants
 import net.minecraft.client.Minecraft
+import net.minecraft.client.input.InputQuirks
 import net.minecraft.network.chat.Component
 import org.lwjgl.glfw.GLFW
 
@@ -14,9 +15,9 @@ object KeyUtil {
         if (value == -1) return false
         val window = Minecraft.getInstance().window ?: return false
         return if (isMouseButton(value)) {
-            GLFW.glfwGetMouseButton(window.window, value) == GLFW.GLFW_PRESS
+            GLFW.glfwGetMouseButton(window.handle(), value) == GLFW.GLFW_PRESS
         } else {
-            InputConstants.isKeyDown(window.window, value)
+            InputConstants.isKeyDown(window, value)
         }
     }
 
@@ -43,12 +44,10 @@ object KeyUtil {
     fun isAlt(value: Int): Boolean = value == InputConstants.KEY_LALT || value == InputConstants.KEY_RALT
 
     fun InputConstants.Key.isControl(): Boolean =
-        if (Minecraft.ON_OSX) value == InputConstants.KEY_LWIN || value == InputConstants.KEY_RWIN
-        else value == InputConstants.KEY_LCONTROL || value == InputConstants.KEY_RCONTROL
+        value == InputQuirks.EDIT_SHORTCUT_KEY_LEFT || value == InputQuirks.EDIT_SHORTCUT_KEY_RIGHT
 
     fun isControl(value: Int): Boolean =
-        if (Minecraft.ON_OSX) value == InputConstants.KEY_LWIN || value == InputConstants.KEY_RWIN
-        else value == InputConstants.KEY_LCONTROL || value == InputConstants.KEY_RCONTROL
+        value == InputQuirks.EDIT_SHORTCUT_KEY_LEFT || value == InputQuirks.EDIT_SHORTCUT_KEY_RIGHT
 
     fun InputConstants.Key.isShift(): Boolean = value == InputConstants.KEY_LSHIFT || value == InputConstants.KEY_RSHIFT
 

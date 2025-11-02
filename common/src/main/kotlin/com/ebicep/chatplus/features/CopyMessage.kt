@@ -12,7 +12,6 @@ import com.ebicep.chatplus.util.TimeStampedMessages
 import com.ebicep.chatplus.util.Timestamped
 import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.screens.Screen
 import java.awt.Color
 
 object CopyMessage {
@@ -79,7 +78,7 @@ object CopyMessage {
 
     private fun copyToClipboard(str: String) {
         val keyboardHandler = Minecraft.getInstance().keyboardHandler
-        if ((Config.values.copyNoFormatting && !Screen.hasShiftDown()) || (!Config.values.copyNoFormatting && Screen.hasShiftDown())) {
+        if ((Config.values.copyNoFormatting && !Minecraft.getInstance().hasShiftDown()) || (!Config.values.copyNoFormatting && Minecraft.getInstance().hasShiftDown())) {
             keyboardHandler.clipboard = ChatFormatting.stripFormatting(str)!!
         } else {
             if (Config.values.copyMessageFormattingSymbolOverride.isEmpty()) {

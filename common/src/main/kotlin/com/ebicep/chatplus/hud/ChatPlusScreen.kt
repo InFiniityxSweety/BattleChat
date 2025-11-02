@@ -11,6 +11,8 @@ import com.mojang.blaze3d.platform.InputConstants
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.gui.screens.ChatScreen
+import net.minecraft.client.input.KeyEvent
+import net.minecraft.client.input.MouseButtonEvent
 import org.apache.commons.lang3.StringUtils
 import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean
@@ -47,7 +49,7 @@ object ChatPlusScreen {
         if (messages.isEmpty()) {
             return
         }
-        val screen = chatScreen ?: ChatScreen("")
+        val screen = chatScreen ?: ChatScreen("", false)
         val messageToSend = screen.normalizeChatMessage(messages[0])
         if (addToSent) {
             ChatManager.addSentMessage(messageToSend)
@@ -177,27 +179,42 @@ class ChatScreenInputEvent(
 
 data class ChatScreenKeyPressedEvent(
     override val screen: ChatScreen,
-    val keyCode: Int,
-    val scanCode: Int,
-    val modifiers: Int,
+    val keyEvent: KeyEvent,
     override var returnFunction: Boolean = false,
-) : InputEvent
+) : InputEvent  {
+    val keyCode: Int
+        get() = keyEvent.key()
+    val scanCode: Int
+        get() = keyEvent.scancode()
+    val modifiers: Int
+        get() = keyEvent.modifiers();
+}
 
 data class ChatScreenKeyReleasedEvent(
     override val screen: ChatScreen,
-    val keyCode: Int,
-    val scanCode: Int,
-    val modifiers: Int,
-    override var returnFunction: Boolean = false, //unused
-) : InputEvent
+    val keyEvent: KeyEvent,
+    override var returnFunction: Boolean = false,
+) : InputEvent  {
+    val keyCode: Int
+        get() = keyEvent.key()
+    val scanCode: Int
+        get() = keyEvent.scancode()
+    val modifiers: Int
+        get() = keyEvent.modifiers();
+}
 
 data class ChatScreenMouseClickedEvent(
     override val screen: ChatScreen,
-    val mouseX: Double,
-    val mouseY: Double,
-    val button: Int,
+    val mouseButtonEvent: MouseButtonEvent,
     override var returnFunction: Boolean = false,
-) : InputEvent
+) : InputEvent {
+    val mouseX: Double
+        get() = mouseButtonEvent.x()
+    val mouseY: Double
+        get() = mouseButtonEvent.y()
+    val button: Int
+        get() = mouseButtonEvent.button()
+}
 
 data class ChatScreenMouseScrolledEvent(
     val screen: ChatScreen,
@@ -210,20 +227,30 @@ data class ChatScreenMouseScrolledEvent(
 
 data class ChatScreenMouseDraggedEvent(
     val screen: ChatScreen,
-    val mouseX: Double,
-    val mouseY: Double,
-    val button: Int,
+    val mouseButtonEvent: MouseButtonEvent,
     val dragX: Double,
     val dragY: Double,
-) : Event
+) : Event  {
+    val mouseX: Double
+        get() = mouseButtonEvent.x()
+    val mouseY: Double
+        get() = mouseButtonEvent.y()
+    val button: Int
+        get() = mouseButtonEvent.button()
+}
 
 data class ChatScreenMouseReleasedEvent(
     override val screen: ChatScreen,
-    val mouseX: Double,
-    val mouseY: Double,
-    val button: Int,
+    val mouseButtonEvent: MouseButtonEvent,
     override var returnFunction: Boolean = false,
-) : InputEvent
+) : InputEvent {
+    val mouseX: Double
+        get() = mouseButtonEvent.x()
+    val mouseY: Double
+        get() = mouseButtonEvent.y()
+    val button: Int
+        get() = mouseButtonEvent.button()
+}
 
 data class ChatScreenRenderEvent(
     val screen: ChatScreen,

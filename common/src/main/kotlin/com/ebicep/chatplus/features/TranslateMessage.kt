@@ -21,7 +21,6 @@ import net.minecraft.ChatFormatting
 import net.minecraft.client.GuiMessageTag
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.components.EditBox
-import net.minecraft.client.gui.screens.Screen
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.HoverEvent
 
@@ -96,7 +95,7 @@ object TranslateMessage {
             if (languageSpeakEnabled) {
                 it.returnFunction = inputTranslatePrefix != null &&
                         inputTranslatePrefix!!.isFocused &&
-                        inputTranslatePrefix!!.mouseClicked(it.mouseX, it.mouseY, it.button)
+                        inputTranslatePrefix!!.mouseClicked(it.mouseButtonEvent, false)
             }
         }
         EventBus.register<ChatScreenRenderEvent> {
@@ -120,7 +119,7 @@ object TranslateMessage {
                 if (values.vanillaInputBox) height - 2 else inputBoxSettings.getCalculatedStartY() + MovableChat.InputBoxSettings.PADDED_INPUT_BOX_HEIGHT,
                 minecraft.options.getBackgroundColor(Int.MIN_VALUE)
             )
-            guiGraphics.renderOutline(
+            guiGraphics.submitOutline(
                 startX,
                 startY,
                 TRANSLATE_PREFIX_INPUT_WIDTH,
@@ -157,11 +156,11 @@ object TranslateMessage {
                 handleTranslate(it.rawComponent)
             }
         }
-        ClientRawInputEvent.KEY_PRESSED.register { _, keyCode, _, _, modifiers ->
+        ClientRawInputEvent.KEY_PRESSED.register { _, _, keyEvent ->
             if (ChatManager.isChatFocused()) {
                 return@register EventResult.pass()
             }
-            if (keyCode != values.translateKey.key.value || modifiers != values.translateKey.modifier.toInt()) {
+            if (keyEvent.key() != values.translateKey.key.value || keyEvent.modifiers() != values.translateKey.modifier.toInt()) {
                 return@register EventResult.pass()
             }
             languageSpeakEnabled = true
@@ -178,7 +177,7 @@ object TranslateMessage {
             if (!values.translatorEnabled || !values.translateClickEnabled) {
                 return@register
             }
-            if (it.button != 0 || !Screen.hasControlDown()) {
+            if (it.button != 0 || !Minecraft.getInstance().hasControlDown()) {
                 return@register
             }
             if (System.currentTimeMillis() - translateClickCooldown < 2_000) {

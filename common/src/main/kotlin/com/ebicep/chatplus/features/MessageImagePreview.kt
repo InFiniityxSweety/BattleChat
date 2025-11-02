@@ -20,7 +20,6 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.screens.Screen
 import net.minecraft.client.renderer.texture.DynamicTexture
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.HoverEvent
@@ -70,7 +69,7 @@ object MessageImagePreview {
             if (!Config.values.messageImagePreviewSettings.enabled) {
                 return@register
             }
-            if (it.button != 1 || !Screen.hasControlDown()) {
+            if (it.button != 1 || !Minecraft.getInstance().hasControlDown()) {
                 return@register
             }
             ChatManager.globalSelectedTab.getHoveredOverMessageLine(it.mouseX, it.mouseY)?.let { message ->

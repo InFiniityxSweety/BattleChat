@@ -16,6 +16,8 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.ChatScreen;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import org.spongepowered.asm.mixin.*;
@@ -169,18 +171,18 @@ public abstract class MixinChatScreen extends Screen implements IMixinChatScreen
     }
 
     @Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true)
-    private void keyPressed(int key, int scancode, int modifiers, CallbackInfoReturnable<Boolean> cir) {
+    private void keyPressed(KeyEvent keyEvent, CallbackInfoReturnable<Boolean> cir) {
         if (!Config.INSTANCE.getValues().getEnabled()) {
             return;
         }
-        if (ChatPlusScreenAdapter.INSTANCE.handleKeyPressed(thisScreen(), key, scancode, modifiers)) {
+        if (ChatPlusScreenAdapter.INSTANCE.handleKeyPressed(thisScreen(), keyEvent)) {
             cir.setReturnValue(true);
             cir.cancel();
         }
     }
 
     @Inject(method = "keyPressed", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/ChatComponent;scrollChat(I)V", ordinal = 0))
-    private void keyPressedPageUp(int key, int scancode, int modifiers, CallbackInfoReturnable<Boolean> cir) {
+    private void keyPressedPageUp(KeyEvent keyEvent, CallbackInfoReturnable<Boolean> cir) {
         if (!Config.INSTANCE.getValues().getEnabled()) {
             return;
         }
@@ -188,7 +190,7 @@ public abstract class MixinChatScreen extends Screen implements IMixinChatScreen
     }
 
     @Inject(method = "keyPressed", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/ChatComponent;scrollChat(I)V", ordinal = 1))
-    private void keyPressedPageDown(int key, int scancode, int modifiers, CallbackInfoReturnable<Boolean> cir) {
+    private void keyPressedPageDown(KeyEvent keyEvent, CallbackInfoReturnable<Boolean> cir) {
         if (!Config.INSTANCE.getValues().getEnabled()) {
             return;
         }
@@ -206,7 +208,7 @@ public abstract class MixinChatScreen extends Screen implements IMixinChatScreen
         }
     }
 
-    @ModifyExpressionValue(method = "mouseClicked", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/CommandSuggestions;mouseClicked(DDI)Z"))
+    @ModifyExpressionValue(method = "mouseClicked", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/CommandSuggestions;mouseClicked(Lnet/minecraft/client/input/MouseButtonEvent;)Z"))
     private boolean mouseClickedCommandSuggestions(boolean original, @Share("clicked") LocalBooleanRef booleanRef) {
         if (!Config.INSTANCE.getValues().getEnabled()) {
             return original;
@@ -215,21 +217,21 @@ public abstract class MixinChatScreen extends Screen implements IMixinChatScreen
         return original;
     }
 
-    @Inject(method = "mouseClicked", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/CommandSuggestions;mouseClicked(DDI)Z", shift = At.Shift.AFTER), cancellable = true)
-    private void mouseClickedAfter(double mouseX, double mouseY, int button, CallbackInfoReturnable<Boolean> cir, @Share("clicked") LocalBooleanRef booleanRef) {
+    @Inject(method = "mouseClicked", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/CommandSuggestions;mouseClicked(Lnet/minecraft/client/input/MouseButtonEvent;)Z", shift = At.Shift.AFTER), cancellable = true)
+    private void mouseClickedAfter(MouseButtonEvent mouseButtonEvent, boolean bl, CallbackInfoReturnable<Boolean> cir, @Share("clicked") LocalBooleanRef booleanRef) {
         if (!Config.INSTANCE.getValues().getEnabled()) {
             return;
         }
         if (booleanRef.get()) {
             return;
         }
-        if (ChatPlusScreenAdapter.INSTANCE.handleMouseClicked(thisScreen(), mouseX, mouseY, button)) {
+        if (ChatPlusScreenAdapter.INSTANCE.handleMouseClicked(thisScreen(), mouseButtonEvent)) {
             cir.setReturnValue(true);
             cir.cancel();
         }
     }
 
-    @ModifyExpressionValue(method = "mouseClicked", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/EditBox;mouseClicked(DDI)Z"))
+    @ModifyExpressionValue(method = "mouseClicked", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/CommandSuggestions;mouseClicked(Lnet/minecraft/client/input/MouseButtonEvent;)Z"))
     private boolean mouseClickedEditBox(boolean original) {
         if (!Config.INSTANCE.getValues().getEnabled()) {
             return original;
@@ -238,31 +240,31 @@ public abstract class MixinChatScreen extends Screen implements IMixinChatScreen
     }
 
     @Override
-    public boolean mouseReleased(double mouseX, double mouseY, int button) {
+    public boolean mouseReleased(MouseButtonEvent mouseButtonEvent) {
         if (!Config.INSTANCE.getValues().getEnabled()) {
-            return super.mouseReleased(mouseX, mouseY, button);
+            return super.mouseReleased(mouseButtonEvent);
         }
-        return ChatPlusScreenAdapter.INSTANCE.handleMouseReleased(thisScreen(), mouseX, mouseY, button);
+        return ChatPlusScreenAdapter.INSTANCE.handleMouseReleased(thisScreen(), mouseButtonEvent);
     }
 
     @Override
-    public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+    public boolean mouseDragged(MouseButtonEvent mouseButtonEvent, double deltaX, double deltaY) {
         if (!Config.INSTANCE.getValues().getEnabled()) {
-            return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
+            return super.mouseDragged(mouseButtonEvent, deltaX, deltaY);
         }
-        ChatPlusScreenAdapter.INSTANCE.handleMouseDragged(thisScreen(), mouseX, mouseY, button, deltaX, deltaY);
-        if (!ChatManager.INSTANCE.isChatFocused() || button != 0) { // forgot why this is here
-            return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
+        ChatPlusScreenAdapter.INSTANCE.handleMouseDragged(thisScreen(), mouseButtonEvent, deltaX, deltaY);
+        if (!ChatManager.INSTANCE.isChatFocused() || mouseButtonEvent.button() != 0) { // forgot why this is here
+            return super.mouseDragged(mouseButtonEvent, deltaX, deltaY);
         }
         return true;
     }
 
     @Override
-    public boolean keyReleased(int i, int j, int k) {
+    public boolean keyReleased(KeyEvent keyEvent) {
         if (Config.INSTANCE.getValues().getEnabled()) {
-            ChatPlusScreenAdapter.INSTANCE.handleKeyReleased(thisScreen(), i, j, k);
+            ChatPlusScreenAdapter.INSTANCE.handleKeyReleased(thisScreen(), keyEvent);
         }
-        return super.keyReleased(i, j, k);
+        return super.keyReleased(keyEvent);
     }
 
     @Inject(method = "moveInHistory", at = @At("HEAD"), cancellable = true)

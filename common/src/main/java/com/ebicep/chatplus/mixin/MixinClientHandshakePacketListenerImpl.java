@@ -5,6 +5,7 @@ import com.ebicep.chatplus.features.chatwindows.ChatWindow;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ClientHandshakePacketListenerImpl;
+import net.minecraft.client.multiplayer.LevelLoadTracker;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.multiplayer.TransferState;
 import net.minecraft.network.Connection;
@@ -30,6 +31,7 @@ public class MixinClientHandshakePacketListenerImpl {
             boolean bl,
             Duration duration,
             Consumer<Component> consumer,
+            LevelLoadTracker levelLoadTracker,
             TransferState transferState,
             CallbackInfo ci
     ) {

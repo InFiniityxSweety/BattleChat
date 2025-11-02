@@ -5,7 +5,7 @@ import com.ebicep.chatplus.events.EventBus
 import com.ebicep.chatplus.features.chattabs.ChatTab
 import com.ebicep.chatplus.features.chatwindows.ChatWindow
 import com.ebicep.chatplus.hud.*
-import net.minecraft.client.gui.screens.Screen
+import net.minecraft.client.Minecraft
 import java.util.*
 
 object SelectChat {
@@ -71,7 +71,7 @@ object SelectChat {
             val selectedTab = ChatManager.globalSelectedTab
             selectedTab.getHoveredOverMessageLine()?.let { message ->
                 val selected = getTabSelectedMessages(selectedTab)
-                if (Screen.hasShiftDown() && lastSelected != null) {
+                if (Minecraft.getInstance().hasShiftDown() && lastSelected != null) {
                     val displayedMessages = selectedTab.displayedMessages
                     val lastSelectedIndex = displayedMessages.indexOf(lastSelected)
                     val messageIndex = displayedMessages.indexOf(message)

@@ -69,7 +69,6 @@ import java.io.*
 import java.net.HttpURLConnection
 import java.net.URI
 import java.net.URL
-import java.net.URLEncoder
 import java.nio.channels.Channels
 import java.util.*
 import javax.imageio.ImageIO
@@ -525,9 +524,6 @@ object ScreenshotChat {
     }
 
     private fun copy(bufferedImage: BufferedImage) {
-        if (Minecraft.ON_OSX) {
-            return
-        }
         try {
             val clipboard = Toolkit.getDefaultToolkit().systemClipboard
             val transferable = getTransferableImage(bufferedImage)
