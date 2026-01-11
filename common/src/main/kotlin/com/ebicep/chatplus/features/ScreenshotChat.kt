@@ -23,15 +23,15 @@ import com.ebicep.chatplus.util.GraphicsUtil.drawString0
 import com.ebicep.chatplus.util.GraphicsUtil.fill0
 import com.ebicep.chatplus.util.GraphicsUtil.translate0
 import com.google.gson.JsonParser
-import com.mojang.blaze3d.buffers.GpuBuffer
-import com.mojang.blaze3d.pipeline.BlendFunction
-import com.mojang.blaze3d.pipeline.RenderPipeline
+import com.mojang.blaze3d.pipeline.RenderTarget
 import com.mojang.blaze3d.pipeline.TextureTarget
-import com.mojang.blaze3d.platform.DepthTestFunction
 import com.mojang.blaze3d.platform.NativeImage
-import com.mojang.blaze3d.shaders.UniformType
+import com.mojang.blaze3d.systems.CommandEncoder
+import com.mojang.blaze3d.systems.GpuDevice
 import com.mojang.blaze3d.systems.RenderSystem
-import com.mojang.blaze3d.vertex.*
+import com.mojang.blaze3d.vertex.BufferBuilder
+import com.mojang.blaze3d.vertex.ByteBufferBuilder
+import com.mojang.blaze3d.vertex.VertexConsumer
 import it.unimi.dsi.fastutil.objects.Object2ObjectSortedMaps
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
@@ -44,16 +44,16 @@ import net.minecraft.client.GuiMessage
 import net.minecraft.client.Minecraft
 import net.minecraft.client.Screenshot
 import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.render.GuiRenderer
+import net.minecraft.client.gui.render.pip.PictureInPictureRenderer
 import net.minecraft.client.gui.render.state.GuiRenderState
-import net.minecraft.client.renderer.MultiBufferSource
-import net.minecraft.client.renderer.RenderStateShard
-import net.minecraft.client.renderer.RenderType
+import net.minecraft.client.renderer.*
+import net.minecraft.client.renderer.fog.FogRenderer
 import net.minecraft.network.chat.ClickEvent
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.HoverEvent
 import net.minecraft.network.chat.HoverEvent.ShowText
 import net.minecraft.network.chat.Style
-import net.minecraft.resources.ResourceLocation
 import org.lwjgl.stb.STBImage
 import java.awt.Color
 import java.awt.Image
@@ -70,62 +70,46 @@ import java.net.HttpURLConnection
 import java.net.URI
 import java.net.URL
 import java.nio.channels.Channels
-import java.util.*
 import javax.imageio.ImageIO
 
-/**
- * Modified from
- * <a href="https://github.com/comp500/ScreenshotToClipboard">ScreenshotToClipboard</a> and
- * <a href="https://github.com/ramidzkh/fabrishot">fabrishot</a>
- */
 object ScreenshotChat {
 
-    val PIPELINE = RenderPipeline.Builder()
-        .withLocation(ResourceLocation.fromNamespaceAndPath(MOD_ID, "pipeline/screenshot_text_render"))
-        .withVertexShader("core/position_tex_color")
-        .withFragmentShader("core/position_tex_color")
-        .withVertexFormat(DefaultVertexFormat.POSITION_TEX_COLOR, VertexFormat.Mode.QUADS)
-        .withSampler("Sampler0")
-        .withUniform("DynamicTransforms", UniformType.UNIFORM_BUFFER)
-        .withUniform("Projection", UniformType.UNIFORM_BUFFER)
-        .withDepthTestFunction(DepthTestFunction.LEQUAL_DEPTH_TEST)
-        .withBlend(BlendFunction.TRANSLUCENT)
-        .build()
-    var RENDER_TYPE: RenderType = RenderType.create(
-        "$MOD_ID:screenshot",
-        786432,
-        PIPELINE,
-        RenderType.CompositeState.builder()
-            .setLightmapState(RenderStateShard.LIGHTMAP)
-            .setLayeringState(RenderStateShard.LayeringStateShard.VIEW_OFFSET_Z_LAYERING)
-            .createCompositeState(false)
-    )
-//    var TEXTURED: Function<ResourceLocation?, RenderType?>? = Util.memoize<ResourceLocation, RenderType> { resourceLocation: ResourceLocation ->
-//        RenderType.create(
-//            "$MOD_ID:textured",
-//            786432,
-//            PIPELINE,
-//            RenderType.CompositeState
-//                .builder()
-//                .setTextureState(RenderStateShard.TextureStateShard(resourceLocation, TriState.FALSE, false))
-//                .createCompositeState(false)
-//        )
-//    }
+    private fun createRenderType(renderTarget: RenderTarget): RenderType {
+        return RenderType.create(
+            "$MOD_ID:screenshot",
+            786432,
+            RenderPipelines.TEXT,
+            RenderType.CompositeState.builder()
+                .setLightmapState(RenderStateShard.LIGHTMAP)
+                .setOutputState(RenderStateShard.OutputStateShard("${MOD_ID}_target") {
+                    renderTarget
+                })
+                .setTextureState(RenderStateShard.NO_TEXTURE)
+                .createCompositeState(false)
+        )
+    }
 
+    class ChatPlusBufferSource(bufferAllocator: ByteBufferBuilder, renderTarget: RenderTarget) :
+        MultiBufferSource.BufferSource(bufferAllocator, Object2ObjectSortedMaps.emptyMap()) {
 
-    class ChatPlusBufferSource(bufferAllocator: ByteBufferBuilder) : MultiBufferSource.BufferSource(bufferAllocator, Object2ObjectSortedMaps.emptyMap()) {
-
-        var bufferBuilder: BufferBuilder = BufferBuilder(this.sharedBuffer, RENDER_TYPE.mode(), RENDER_TYPE.format())
+        private val renderType = createRenderType(renderTarget)
+        private var bufferBuilder: BufferBuilder = BufferBuilder(this.sharedBuffer, renderType.mode(), renderType.format())
 
         override fun getBuffer(renderType: RenderType): VertexConsumer {
             return this.bufferBuilder
         }
 
+        fun endDraw() {
+            this.startedBuilders[renderType] = this.bufferBuilder
+            endBatch(renderType)
+        }
+
     }
 
-    val SCREENSHOT_COLOR = -1
+    const val SCREENSHOT_COLOR = -1
     private val TRANSPARENCY_COLOR = Color(54, 57, 63, 255)
 
+    var renderTarget: RenderTarget? = null
     private var takeScreenshot = false
     private var lastScreenShotTick = -1L
     private var linesOrdered = LinkedHashMap<ChatWindow, MutableList<ChatTab.ChatPlusGuiMessageLine>>()
@@ -225,10 +209,6 @@ object ScreenshotChat {
 
     @OptIn(DelicateCoroutinesApi::class)
     private fun screenshot(screenshotSettings: ScreenshotSettings) {
-        // TODO
-        ChatPlus.sendMessage(Component.literal("Screenshot feature disabled in 1.21.6+ for now!").withStyle(ChatFormatting.RED))
-        return
-
         val screenshotWindowsMode = Config.values.screenshotDefaultScreenShotWindowsMode
         val screenshotMode = screenshotSettings.screenshotMode
         val screenshotBackgroundMode = screenshotSettings.screenshotBackgroundMode
@@ -254,15 +234,22 @@ object ScreenshotChat {
         ChatPlus.LOGGER.info("screenshotting = width: $width, height: $height")
         val minecraft = Minecraft.getInstance()
         try {
-            val renderTarget = TextureTarget("ChatPlusScreenshot", width.toInt(), height.toInt(), true)
-            val vertexProvider = ChatPlusBufferSource(ByteBufferBuilder(512))
-            val vertexConsumer = vertexProvider.getBuffer(RENDER_TYPE) as BufferBuilder
+            renderTarget = TextureTarget("ChatPlusScreenshot", width.toInt(), height.toInt(), true)
+            val device: GpuDevice = RenderSystem.getDevice()
+            val commandEncoder: CommandEncoder = device.createCommandEncoder()
+            val vertexProvider = ChatPlusBufferSource(ByteBufferBuilder(512), renderTarget!!)
             val guiRenderState = GuiRenderState()
             val guiGraphics = GuiGraphics(minecraft, guiRenderState)
+            val guiRenderer = GuiRenderer(
+                guiRenderState,
+                vertexProvider,
+                SubmitNodeStorage(),
+                minecraft.gameRenderer.featureRenderDispatcher,
+                emptyList<PictureInPictureRenderer<*>>()
+            )
             val poseStack = guiGraphics.pose()
+            commandEncoder.clearColorTexture(renderTarget!!.colorTexture!!, TRANSPARENCY_COLOR.rgb)
             poseStack.scale((minecraft.window.guiScaledWidth / width).toFloat() * scale, (minecraft.window.guiScaledHeight / height).toFloat() * scale)
-            val wasPlayerHeadEnabled = Config.values.playerHeadChatDisplayEnabled // TODO image rendering (SEE BELOW)
-            Config.values.playerHeadChatDisplayEnabled = false
             when (screenshotWindowsMode) {
                 ScreenshotWindowsMode.STACK -> {
                     var h = 0.0
@@ -288,43 +275,10 @@ object ScreenshotChat {
                     }
                 }
             }
-            RENDER_TYPE.setupRenderState()
-            val meshData = vertexConsumer.build()!!
-            val gpuBuffer: GpuBuffer = PIPELINE.vertexFormat.uploadImmediateVertexBuffer(meshData.vertexBuffer())
-            val gpuBuffer2: GpuBuffer?
-            val indexType: VertexFormat.IndexType?
-            val indexBuffer = meshData.indexBuffer()
-            if (indexBuffer == null) {
-                val autoStorageIndexBuffer = RenderSystem.getSequentialBuffer(meshData.drawState().mode())
-                gpuBuffer2 = autoStorageIndexBuffer.getBuffer(meshData.drawState().indexCount())
-                indexType = autoStorageIndexBuffer.type()
-            } else {
-                gpuBuffer2 = PIPELINE.vertexFormat.uploadImmediateIndexBuffer(indexBuffer)
-                indexType = meshData.drawState().indexType()
-            }
-            RenderSystem.getDevice()
-                .createCommandEncoder()
-                .createRenderPass(
-                    { "chatPlusScreenshot" },
-                    renderTarget.colorTextureView,
-                    OptionalInt.of(TRANSPARENCY_COLOR.rgb),
-                    null,
-                    OptionalDouble.empty()
-                )
-                .use { renderPass ->
-                    renderPass.setPipeline(PIPELINE)
-//                    RenderSystem.bindDefaultUniforms(renderPass)
-                    renderPass.setVertexBuffer(0, gpuBuffer)
-                    renderPass.setIndexBuffer(gpuBuffer2, indexType)
-                    renderPass.drawIndexed(0, 0, meshData.drawState().indexCount(), 1)
-                }
-            meshData.close()
-            RENDER_TYPE.clearRenderState()
-            if (wasPlayerHeadEnabled) {
-                Config.values.playerHeadChatDisplayEnabled = true
-            }
+            guiRenderer.render(minecraft.gameRenderer.fogRenderer.getBuffer(FogRenderer.FogMode.NONE))
+            vertexProvider.endDraw()
             try {
-                Screenshot.takeScreenshot(renderTarget) { nativeImage ->
+                Screenshot.takeScreenshot(renderTarget!!) { nativeImage ->
                     val image: Image = getImage(nativeImage)
                     val bufferedImage: BufferedImage = imageToBufferedImage(image)
                     ChatPlus.sendMessage(
@@ -362,8 +316,11 @@ object ScreenshotChat {
             } catch (e: Exception) {
                 ChatPlus.LOGGER.error("Error taking screenshot", e)
             }
+            guiRenderer.close()
         } catch (e: Exception) {
             ChatPlus.LOGGER.error("Error preparing screenshot", e)
+        } finally {
+            renderTarget = null
         }
     }
 

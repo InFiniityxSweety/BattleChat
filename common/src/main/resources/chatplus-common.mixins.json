@@ -15,6 +15,7 @@
     "MixinClientHandshakePacketListenerImpl",
     "MixinCommandSuggestions",
     "MixinGuiGraphics",
+    "MixinGuiRenderer",
     "MixinKeyboardHandler",
     "MixinMouseHandler",
     "MixinNativeImage",
