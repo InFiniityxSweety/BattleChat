@@ -16,7 +16,7 @@ import com.ebicep.chatplus.util.GraphicsUtil.translate0
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.components.PlayerFaceRenderer
 import net.minecraft.client.multiplayer.PlayerInfo
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import net.minecraft.world.entity.player.PlayerModelPart
 import java.util.*
 
@@ -32,7 +32,7 @@ object PlayerHeadChatDisplay {
 
     data class TimedUUID(val uuid: UUID, val lastUsed: Long)
 
-    data class HeadData(val texture: () -> ResourceLocation, val showHat: Boolean)
+    data class HeadData(val texture: () -> Identifier, val showHat: Boolean)
 
     init {
         EventBus.register<ChatPlusMinuteEvent> {
@@ -81,6 +81,7 @@ object PlayerHeadChatDisplay {
             val messageOffset = getMessageOffset(it.chatWindow)
             if (!Config.values.playerHeadChatDisplayShowOnWrapped && chatPlusGuiMessageLine.wrappedIndex != 0) {
                 if (Config.values.playerHeadChatDisplayOffsetNonHeadMessagesShowOnWrapped) {
+                    it.x += messageOffset
                     poseStack.translate0(x = messageOffset)
                 }
                 return@register
@@ -89,6 +90,7 @@ object PlayerHeadChatDisplay {
             val senderUUID = chatPlusGuiMessage.senderUUID
             if (senderUUID == null) {
                 if (Config.values.playerHeadChatDisplayOffsetNonHeadMessages) {
+                    it.x += messageOffset
                     poseStack.translate0(x = messageOffset)
                 }
                 return@register
@@ -96,14 +98,16 @@ object PlayerHeadChatDisplay {
             val headData: HeadData? = playerHeads[senderUUID]
             if (headData == null) {
                 if (Config.values.playerHeadChatDisplayOffsetNonHeadMessages) {
+                    it.x += messageOffset
                     poseStack.translate0(x = messageOffset)
                 }
                 return@register
             }
+            it.x += messageOffset
             poseStack.translate0(x = messageOffset)
             poseStack.createPose {
                 poseStack.translate0(x = -HEAD_WIDTH_PADDED.toDouble())
-                it.textColor
+//                it.x += -HEAD_WIDTH_PADDED
                 playerFaceRendererDraw(
                     guiGraphics,
                     headData.texture.invoke(),

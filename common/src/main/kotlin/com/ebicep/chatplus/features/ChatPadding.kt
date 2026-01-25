@@ -10,6 +10,7 @@ import com.ebicep.chatplus.util.GraphicsUtil.fill0
 import com.ebicep.chatplus.util.GraphicsUtil.translate0
 import com.ebicep.chatplus.util.KotlinUtil.reduceAlpha
 import net.minecraft.client.GuiMessage
+import net.minecraft.client.gui.components.ChatComponent
 import kotlin.math.max
 import kotlin.math.roundToInt
 
@@ -24,6 +25,7 @@ object ChatPadding {
             if (xTranslation == 0) {
                 return@register
             }
+            it.x += xTranslation
             poseStack.translate0(x = xTranslation)
         }
         EventBus.register<ChatTabAddDisplayMessageEvent> {
@@ -54,14 +56,18 @@ object ChatPadding {
             if (ticksLived >= 200 && !chatFocused) {
                 return@register
             }
-            val fadeOpacity = if (chatFocused) 1.0 else renderer.getTimeFactor(ticksLived)
+            val fadeOpacity = if (chatFocused) {
+                ChatComponent.AlphaCalculator.FULLY_VISIBLE
+            } else {
+                ChatComponent.AlphaCalculator.timeBased(ticksLived)
+            }
             // bottom padding
             it.guiGraphics.fill0(
                 renderer.rescaledX,
                 renderer.rescaledY,
                 renderer.rescaledEndX,
                 renderer.rescaledY - (bottomPadding / chatWindow.generalSettings.scale),
-                reduceAlpha(chatWindow.generalSettings.getUpdatedBackgroundColor(), fadeOpacity)
+                reduceAlpha(chatWindow.generalSettings.getUpdatedBackgroundColor(), fadeOpacity.calculate(line))
             )
 //            // top padding
 //            if (chatFocused) {

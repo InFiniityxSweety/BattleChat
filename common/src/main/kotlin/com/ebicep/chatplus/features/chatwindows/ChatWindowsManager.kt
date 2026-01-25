@@ -6,7 +6,9 @@ import com.ebicep.chatplus.features.chattabs.CHAT_TAB_HEIGHT
 import com.ebicep.chatplus.features.chattabs.CHAT_TAB_Y_OFFSET
 import com.ebicep.chatplus.hud.*
 import com.ebicep.chatplus.util.GraphicsUtil.createPose
+import net.minecraft.client.gui.Font
 import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.components.ChatComponent
 
 object ChatWindowsManager {
 
@@ -121,15 +123,20 @@ object ChatWindowsManager {
         EventBus.post(WindowSwitchEvent(oldWindow, newWindow))
     }
 
-    fun renderAll(guiGraphics: GuiGraphics, i: Int, j: Int, k: Int) {
+    fun renderAll(guiGraphics: GuiGraphics, font: Font, guiTicks: Int, mouseX: Int, mouseY: Int, chatFocused: Boolean, bl2: Boolean) {
         EventBus.post(RenderWindowsPreEvent(guiGraphics))
+        val chatGraphicsAccess = if (chatFocused) {
+            ChatComponent.DrawingFocusedGraphicsAccess(guiGraphics, font, mouseX, mouseY, bl2)
+        } else {
+            ChatComponent.DrawingBackgroundGraphicsAccess(guiGraphics)
+        }
         Config.values.chatWindows.forEachIndexed { index, it ->
             if (it.generalSettings.disabled) {
                 return@forEachIndexed
             }
             val poseStack = guiGraphics.pose()
             poseStack.createPose {
-                it.renderer.render(it, guiGraphics, i, j, k)
+                it.renderer.render(it, guiGraphics, chatGraphicsAccess, guiTicks, chatFocused)
             }
         }
         EventBus.post(RenderWindowsPostEvent(guiGraphics))
@@ -139,7 +146,7 @@ object ChatWindowsManager {
 
 data class WindowSwitchEvent(
     val oldWindow: ChatWindow,
-    val newWindow: ChatWindow
+    val newWindow: ChatWindow,
 )
 
 data class RenderWindowsPreEvent(val guiGraphics: GuiGraphics)

@@ -3,10 +3,7 @@ package com.ebicep.chatplus
 import com.ebicep.chatplus.config.Config
 import com.ebicep.chatplus.events.Events
 import com.ebicep.chatplus.features.internal.FeatureManager
-import com.ebicep.chatplus.hud.ChatManager
 import com.ebicep.chatplus.translator.LanguageManager
-import com.ebicep.chatplus.util.ComponentUtil
-import com.mojang.blaze3d.platform.NativeImage
 import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.Component
@@ -40,7 +37,7 @@ object ChatPlus {
 //        val nativeImage: NativeImage = Screenshot.takeScreenshot(Minecraft.getInstance().mainRenderTarget)
 //        val dynamicTexture = DynamicTexture(nativeImage)
 //        dynamicTexture.dumpContents(
-//            ResourceLocation.fromNamespaceAndPath(MOD_ID, "test3"),
+//            Identifier.fromNamespaceAndPath(MOD_ID, "test3"),
 //            File(Minecraft.getInstance().gameDirectory, Screenshot.SCREENSHOT_DIR).toPath()
 //        )
     }
@@ -120,7 +117,7 @@ object ChatPlus {
 //        val nativeImage: NativeImage = Screenshot.takeScreenshot(renderTarget)
 //        val dynamicTexture = DynamicTexture(nativeImage)
 //        dynamicTexture.dumpContents(
-//            ResourceLocation.fromNamespaceAndPath(MOD_ID, "test3"),
+//            Identifier.fromNamespaceAndPath(MOD_ID, "test3"),
 //            File(Minecraft.getInstance().gameDirectory, Screenshot.SCREENSHOT_DIR).toPath()
 //        )
 //        renderTarget.destroyBuffers();

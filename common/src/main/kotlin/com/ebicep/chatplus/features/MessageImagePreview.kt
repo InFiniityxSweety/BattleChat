@@ -23,7 +23,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.texture.DynamicTexture
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.HoverEvent
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import java.awt.Color
 import java.awt.image.BufferedImage
 import java.io.ByteArrayInputStream
@@ -122,7 +122,7 @@ object MessageImagePreview {
                 images.filterNotNull().forEachIndexed { index, url ->
                     imageCache[url]?.let {
                         poseStack.createPose {
-                            fun draw(resourceLocation: ResourceLocation, chatPlusTexture: ChatPlusTexture) {
+                            fun draw(resourceLocation: Identifier, chatPlusTexture: ChatPlusTexture) {
                                 val nativeImage = chatPlusTexture.nativeImage
                                 val scale = minOf(windowWidth * .4f / nativeImage.width.toFloat(), windowHeight * .4f / nativeImage.height.toFloat())
                                 val width = nativeImage.width * scale
@@ -374,9 +374,9 @@ object MessageImagePreview {
     private fun loadImage(
         pngBytes: ByteArray?,
         prefix: String,
-        onResource: (resourceLocation: ResourceLocation, texture: ChatPlusTexture) -> Unit,
+        onResource: (resourceLocation: Identifier, texture: ChatPlusTexture) -> Unit,
         afterLoad: (String) -> Unit,
-        urlString: String
+        urlString: String,
     ) {
         try {
             val nativeImage = ByteArrayInputStream(pngBytes).use { inputStream ->
@@ -384,7 +384,7 @@ object MessageImagePreview {
             }
 
             nativeImage.use { image ->
-                val resourceLocation = ResourceLocation.tryBuild(MOD_ID, "${prefix}_${System.currentTimeMillis()}") ?: throw IllegalArgumentException("Invalid ResourceLocation")
+                val resourceLocation = Identifier.tryBuild(MOD_ID, "${prefix}_${System.currentTimeMillis()}") ?: throw IllegalArgumentException("Invalid Identifier")
                 val chatPlusTexture = ChatPlusTexture(image)
                 Minecraft.getInstance().textureManager.register(resourceLocation, chatPlusTexture)
                 onResource(resourceLocation, chatPlusTexture)
@@ -397,7 +397,7 @@ object MessageImagePreview {
     }
 
     data class ChatPlusImage(
-        var resourceLocations: MutableList<ResourceLocation?> = mutableListOf(),
+        var resourceLocations: MutableList<Identifier?> = mutableListOf(),
         var chatPlusTextures: MutableList<ChatPlusTexture?> = mutableListOf(),
         var currentFrame: Float = 1f,
         var maxFrames: Int = 1,

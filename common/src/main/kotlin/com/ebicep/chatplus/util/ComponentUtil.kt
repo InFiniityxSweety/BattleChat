@@ -5,8 +5,8 @@ import com.ebicep.chatplus.mixin.IMixinStringSplitter
 import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.*
-import net.minecraft.util.FormattedCharSequence
 import net.minecraft.network.chat.contents.PlainTextContents
+import net.minecraft.util.FormattedCharSequence
 import java.awt.Color
 import java.util.*
 
@@ -24,11 +24,11 @@ object ComponentUtil {
             return text
         }
 
-        override fun <T> visit(arg: FormattedText.ContentConsumer<T>): Optional<T> {
+        override fun <T : Any> visit(arg: FormattedText.ContentConsumer<T>): Optional<T> {
             return arg.accept(this.text)
         }
 
-        override fun <T> visit(arg: FormattedText.StyledContentConsumer<T>, arg2: Style): Optional<T> {
+        override fun <T : Any> visit(arg: FormattedText.StyledContentConsumer<T>, arg2: Style): Optional<T> {
             return arg.accept(arg2, this.text)
         }
 
@@ -152,7 +152,7 @@ object ComponentUtil {
     fun getWidthRanges(
         sequence: FormattedCharSequence,
         originalString: String,
-        regex: Regex
+        regex: Regex,
     ): List<Pair<Float, Float>> {
         val widthProvider = (Minecraft.getInstance().font.splitter as IMixinStringSplitter).callGetWidthProvider()
         val matches = regex.findAll(ChatFormatting.stripFormatting(originalString)!!).toList()

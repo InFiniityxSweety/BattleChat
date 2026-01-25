@@ -6,6 +6,7 @@ import com.ebicep.chatplus.events.EventBus
 import com.ebicep.chatplus.features.chatwindows.ChatWindow
 import com.ebicep.chatplus.hud.ChatManager
 import com.ebicep.chatplus.hud.ChatManager.globalSelectedTab
+import com.ebicep.chatplus.hud.ChatRenderLineTextEvent
 import com.ebicep.chatplus.hud.ChatRenderPreLinesRenderEvent
 import com.ebicep.chatplus.util.GraphicsUtil.translate0
 import net.minecraft.util.Mth
@@ -21,6 +22,15 @@ object Animations {
                 return@register
             }
             it.guiGraphics.pose().translate0(y = getAnimationMessageTransitionOffset(it.chatWindow))
+        }
+        EventBus.register<ChatRenderLineTextEvent> {
+            if (!Config.values.animationEnabled) {
+                return@register
+            }
+            if (Config.values.animationDisableOnFocus && ChatManager.isChatFocused()) {
+                return@register
+            }
+            it.y += getAnimationMessageTransitionOffset(it.chatWindow)
         }
     }
 

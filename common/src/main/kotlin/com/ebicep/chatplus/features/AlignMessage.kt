@@ -27,6 +27,7 @@ object AlignMessage {
             if (alignment == Alignment.RIGHT && Config.values.scrollbarEnabled) {
                 xTranslation -= max(0, Config.values.scrollbarWidth)
             }
+            it.x += xTranslation.toInt()
             it.guiGraphics.pose().translate0(x = xTranslation)
         }
         EventBus.register<ChatTabAddDisplayMessageEvent>({ -1 }) {

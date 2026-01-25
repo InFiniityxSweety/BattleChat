@@ -10,8 +10,11 @@ import com.ebicep.chatplus.features.chatwindows.ChatWindow
 import com.ebicep.chatplus.hud.ChatManager
 import com.ebicep.chatplus.hud.ChatPlusScreen
 import net.minecraft.client.Minecraft
+import net.minecraft.client.StringSplitter
 import net.minecraft.network.chat.Style
+import net.minecraft.util.FormattedCharSink
 import net.minecraft.util.Mth
+import org.apache.commons.lang3.mutable.MutableObject
 import kotlin.math.min
 
 object ChatPositionTranslator {
@@ -118,7 +121,20 @@ object ChatPositionTranslator {
     fun getComponentStyleAt(chatTab: ChatTab, mX: Double, mY: Double): Style? {
         val messageLineAt = getMessageLineAt(chatTab, MessageAtType.COMPONENT, mX, mY)
         return if (messageLineAt.messageLine != null) {
-            Minecraft.getInstance().font.splitter.componentStyleAtWidth(messageLineAt.messageLine.line.content(), Mth.floor(messageLineAt.messageAtEvent.finalChat.x))
+            val formattedCharSequence = messageLineAt.messageLine.line.content()
+            val i = Mth.floor(messageLineAt.messageAtEvent.finalChat.x)
+
+            val widthLimitedCharSink: StringSplitter.WidthLimitedCharSink = Minecraft.getInstance().font.splitter.WidthLimitedCharSink(i.toFloat())
+            val mutableObject: MutableObject<Style> = MutableObject()
+            formattedCharSequence.accept(FormattedCharSink { ix: Int, style: Style, j: Int ->
+                if (!widthLimitedCharSink.accept(ix, style, j)) {
+                    mutableObject.value = style
+                    false
+                } else {
+                    true
+                }
+            })
+            mutableObject.get()
         } else {
             null
         }

@@ -2,14 +2,13 @@ package com.ebicep.chatplus.util
 
 import com.ebicep.chatplus.mixin.IMixinGuiGraphics
 import com.mojang.blaze3d.pipeline.RenderPipeline
-import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Font
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.renderer.RenderPipelines
 import net.minecraft.locale.Language
 import net.minecraft.network.chat.FormattedText
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import net.minecraft.util.FormattedCharSequence
 import org.joml.Matrix3x2fStack
 
@@ -71,25 +70,6 @@ object GraphicsUtil {
 
     fun Matrix3x2fStack.translate0(x: Int = 0, y: Int = 0) {
         translate(x.toFloat(), y.toFloat())
-    }
-
-    /**
-     * Moves the pose stack forward by default 5 (anything new rendered will be on top)
-     */
-//    fun PoseStack.guiForward(amount: Double = 5.0) {
-//        translate(0.0, 0.0, amount / 100)
-//    }
-
-    fun <T> PoseStack.guiForward(guiForwardType: GuiForwardType<T>, modifier: () -> T) {
-        translate(0.0, 0.0, guiForwardType.getAmount(modifier) / 1000)
-    }
-
-    fun PoseStack.guiForward(guiForwardType: GuiForwardType<Unit>) {
-        translate(0.0, 0.0, guiForwardType.getAmount {} / 1000)
-    }
-
-    fun PoseStack.guiForward(guiForwardType: GuiForwardType<Boolean> = GuiForwardType.Default, backwards: Boolean = false) {
-        translate(0.0, 0.0, guiForwardType.getAmount { backwards } / 1000)
     }
 
     fun GuiGraphics.fill0(i: Float, j: Float, k: Float, l: Float, m: Int) {
@@ -257,7 +237,7 @@ object GraphicsUtil {
 
     fun GuiGraphics.blit0(
         renderPipeline: RenderPipeline,
-        resourceLocation: ResourceLocation,
+        resourceLocation: Identifier,
         i: Float, // starting x-coordinate for the blit.
         j: Float, // starting y-coordinate for the blit.
         f: Float, // starting u-coordinate in the texture.
@@ -287,7 +267,7 @@ object GraphicsUtil {
 
     private fun GuiGraphics.innerBlit0(
         renderPipeline: RenderPipeline,
-        resourceLocation: ResourceLocation,
+        resourceLocation: Identifier,
         i: Float, // starting x-coordinate for the blit.
         j: Float, // ending x-coordinate for the blit.
         k: Float, // starting y-coordinate for the blit.
@@ -306,11 +286,11 @@ object GraphicsUtil {
         this.drawImage(resources.resourceLocation, resources.width, resources.height)
     }
 
-    fun GuiGraphics.drawImage(resourceLocation: ResourceLocation, width: Int, height: Int) {
+    fun GuiGraphics.drawImage(resourceLocation: Identifier, width: Int, height: Int) {
         this.drawImage(resourceLocation, width.toFloat(), height.toFloat())
     }
 
-    fun GuiGraphics.drawImage(resourceLocation: ResourceLocation, width: Float, height: Float) {
+    fun GuiGraphics.drawImage(resourceLocation: Identifier, width: Float, height: Float) {
         this.innerBlit0(
             RenderPipelines.GUI_TEXTURED,
             resourceLocation,
@@ -328,13 +308,13 @@ object GraphicsUtil {
 
     object PlayerHeadUtils {
 
-        fun playerFaceRendererDraw(guiGraphics: GuiGraphics, resourceLocation: ResourceLocation, i: Float, j: Float, k: Float) {
+        fun playerFaceRendererDraw(guiGraphics: GuiGraphics, resourceLocation: Identifier, i: Float, j: Float, k: Float) {
             this.playerFaceRendererDraw(guiGraphics, resourceLocation, i, j, k, renderHat = true, renderUpsideDown = false, l = -1)
         }
 
         fun playerFaceRendererDraw(
             guiGraphics: GuiGraphics,
-            resourceLocation: ResourceLocation,
+            resourceLocation: Identifier,
             i: Float,
             j: Float,
             k: Float,
@@ -364,7 +344,7 @@ object GraphicsUtil {
             }
         }
 
-        private fun playerFaceRendererDrawHat(guiGraphics: GuiGraphics, resourceLocation: ResourceLocation, i: Float, j: Float, k: Float, bl: Boolean, l: Int) {
+        private fun playerFaceRendererDrawHat(guiGraphics: GuiGraphics, resourceLocation: Identifier, i: Float, j: Float, k: Float, bl: Boolean, l: Int) {
             val m = 8 + (if (bl) 8 else 0)
             val n = 8 * (if (bl) -1 else 1)
             guiGraphics.blit0(
