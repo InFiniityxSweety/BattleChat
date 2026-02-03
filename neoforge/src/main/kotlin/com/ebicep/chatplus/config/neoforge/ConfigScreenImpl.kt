@@ -211,6 +211,7 @@ object ConfigScreenImpl {
                     Config.values.messageImagePreviewSettings.previewLineColor
                 ) { Config.values.messageImagePreviewSettings.previewLineColor = it },
             ).build(),
+            entryBuilder.booleanToggle("chatPlus.chatSettings.debugLogging", Config.values.debugLogging) { Config.values.debugLogging = it },
         )
     }
 

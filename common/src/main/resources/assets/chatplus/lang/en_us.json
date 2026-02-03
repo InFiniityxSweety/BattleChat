@@ -93,6 +93,8 @@
   "chatPlus.chatSettings.messageImagePreview.enabled.tooltip": "Enables/Disables showing image previews in chat. Control right click to load the image.",
   "chatPlus.chatSettings.messageImagePreview.color": "Color",
   "chatPlus.chatSettings.messageImagePreview.color.tooltip": "The background color of messages with image previews.",
+  "chatPlus.chatSettings.debugLogging": "Debug Logging",
+  "chatPlus.chatSettings.debugLogging.tooltip": "Enables/Disables debug logging to your logs.",
   "chatPlus.hideChat.title": "Hide Chat",
   "chatPlus.hideChat.toggle": "Enabled",
   "chatPlus.hideChat.toggle.tooltip": "Enables/Disables hiding the chat.",

@@ -140,6 +140,7 @@ data class ConfigVariables(
     var timestampSettings: TimestampMessages.TimestampSettings = TimestampMessages.TimestampSettings(),
     var inputOverFlowAutoFillSettings: InputOverFlowAutoFill.InputOverFlowAutoFillSettings = InputOverFlowAutoFill.InputOverFlowAutoFillSettings(),
     var messageImagePreviewSettings: MessageImagePreview.MessageImagePreviewSettings = MessageImagePreview.MessageImagePreviewSettings(),
+    var debugLogging: Boolean = false,
     // hide chat
     var hideChatEnabled: Boolean = false,
     var hideChatShowWhenFocused: Boolean = true,

@@ -483,7 +483,7 @@ object MovableChat {
         mouseX: Double,
         mouseY: Double,
     ) {
-        ChatPlus.LOGGER.info("Removed $selectedTab from $chatWindow to create new window")
+        ChatPlus.debugLog("Removed $selectedTab from $chatWindow to create new window")
         removeTabFromWindow(chatWindow, selectedTab)
         val oldRenderer = chatWindow.renderer
 
@@ -498,7 +498,7 @@ object MovableChat {
             TOP -> (mouseY + innerTabYOffset + oldRenderer.getTotalLineHeight()).roundToInt() + CHAT_TAB_Y_OFFSET
             BOTTOM -> (mouseY - innerTabYOffset - CHAT_TAB_Y_OFFSET).roundToInt()
         }
-        ChatPlus.LOGGER.info("New window at $newX, $newY")
+        ChatPlus.debugLog("New window at $newX, $newY")
         newRenderer.x = newRenderer.getUpdatedX(newX)
         newRenderer.y = newRenderer.getUpdatedY(newY)
         newRenderer.internalX = newRenderer.x
