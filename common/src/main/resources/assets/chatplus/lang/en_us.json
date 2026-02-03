@@ -537,6 +537,8 @@
   "chatPlus.translator.senderNameGroupIndex": "Group Index",
   "chatPlus.translator.senderNameGroupIndex.tooltip": "Group index of the sender's name in the regex pattern.",
   "chatPlus.translator.translateInvalid": "Invalid Language",
+  "chatPlus.translator.translateFrom": "Translate From",
+  "chatPlus.translator.translateFrom.tooltip": "Language to translate from. Helpful if Auto Detect can't detect the language but you know.",
   "chatPlus.translator.translateTo": "Translate To",
   "chatPlus.translator.translateTo.tooltip": "Language to translate to.",
   "chatPlus.translator.translateSelf": "Self Language",

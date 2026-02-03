@@ -1239,6 +1239,17 @@ object ConfigScreenImpl {
                 Config.values.translatorTextBarElementEnabled
             ) { Config.values.translatorTextBarElementEnabled = it },
             entryBuilder.dropDown(
+                "chatPlus.translator.translateFrom",
+                Config.values.translateFrom,
+                { str -> str },
+                languageNames,
+                { str: String -> if (languageNames.contains(str)) "" else "chatPlus.translator.translateInvalid" },
+                { str: String ->
+                    Config.values.translateFrom = str
+                    LanguageManager.updateTranslateLanguages()
+                }
+            ),
+            entryBuilder.dropDown(
                 "chatPlus.translator.translateTo",
                 Config.values.translateTo,
                 { str -> str },

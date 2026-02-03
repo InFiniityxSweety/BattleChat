@@ -254,6 +254,7 @@ data class ConfigVariables(
     var translatorEnabled: Boolean = true,
     var translatorTextBarElementEnabled: Boolean = true,
     var translatorRegexes: MutableList<MessageFilter> = mutableListOf(),
+    var translateFrom: String = "Auto Detect",
     var translateTo: String = "Auto Detect",
     var translateSelf: String = "Auto Detect",
     var translateSpeak: String = "English",
