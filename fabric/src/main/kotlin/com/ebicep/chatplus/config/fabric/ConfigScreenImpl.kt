@@ -404,10 +404,22 @@ object ConfigScreenImpl {
                 "chatPlus.chatWindow.tabSettings.chatTabs.scrollCycleTabEnabled.toggle",
                 Config.values.scrollCycleTabEnabled
             ) { Config.values.scrollCycleTabEnabled = it },
-            entryBuilder.booleanToggle(
-                "chatPlus.chatWindow.tabSettings.chatTabs.arrowCycleTabEnabled.toggle",
-                Config.values.arrowCycleTabEnabled
-            ) { Config.values.arrowCycleTabEnabled = it },
+            entryBuilder.keyCodeOptionWithModifier(
+                "chatPlus.chatWindow.tabSettings.chatTabs.keyCycleTabLeft",
+                Config.values.keyCycleTabLeft
+            ),
+            entryBuilder.keyCodeOptionWithModifier(
+                "chatPlus.chatWindow.tabSettings.chatTabs.keyCycleTabRight",
+                Config.values.keyCycleTabRight
+            ),
+            entryBuilder.keyCodeOptionWithModifier(
+                "chatPlus.chatWindow.tabSettings.chatTabs.keyCycleTabLeftChatClosed",
+                Config.values.keyCycleTabLeftChatClosed
+            ),
+            entryBuilder.keyCodeOptionWithModifier(
+                "chatPlus.chatWindow.tabSettings.chatTabs.keyCycleTabRightChatClosed",
+                Config.values.keyCycleTabRightChatClosed
+            ),
             entryBuilder.booleanToggle(
                 "chatPlus.chatWindow.tabSettings.chatTabs.inputBoxAutoAdjustChatWindowEnabled.toggle",
                 Config.values.inputBoxAutoAdjustChatWindowEnabled
