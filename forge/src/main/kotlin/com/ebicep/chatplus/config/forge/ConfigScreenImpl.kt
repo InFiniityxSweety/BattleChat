@@ -261,12 +261,21 @@ object ConfigScreenImpl {
                 "chatPlus.compactMessages.refreshFadeTime.toggle",
                 Config.values.compactMessagesRefreshAddedTime
             ) { Config.values.compactMessagesRefreshAddedTime = it },
+            entryBuilder.enumSelector(
+                "chatPlus.compactMessages.mode",
+                CompactMessages.CompactMode::class.java,
+                Config.values.compactMessagesMode
+            ) { Config.values.compactMessagesMode = it },
             entryBuilder.intSlider(
                 "chatPlus.compactMessages.searchAmount",
                 Config.values.compactMessagesSearchAmount,
                 1,
                 25
             ) { Config.values.compactMessagesSearchAmount = it },
+            entryBuilder.intField(
+                "chatPlus.compactMessages.timeSeconds",
+                Config.values.compactMessagesTimeSeconds
+            ) { Config.values.compactMessagesTimeSeconds = it },
             entryBuilder.enumSelector(
                 "chatPlus.compactMessages.comparatorMode",
                 CompactMessages.CompactComparatorMode::class.java,

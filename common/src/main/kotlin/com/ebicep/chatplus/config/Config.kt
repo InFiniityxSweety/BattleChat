@@ -155,6 +155,8 @@ data class ConfigVariables(
     var compactMessagesDeleteDuplicate: Boolean = true,
     var compactMessagesRefreshAddedTime: Boolean = false,
     var compactMessagesSearchAmount: Int = 1,
+    var compactMessagesTimeSeconds: Int = 30,
+    var compactMessagesMode: CompactMessages.CompactMode = CompactMessages.CompactMode.LATEST,
     var compactMessageComparatorMode: CompactMessages.CompactComparatorMode = CompactMessages.CompactComparatorMode.CUSTOM,
     var compactMessageSettings: CompactMessages.CompactMessageCustomSettings = CompactMessages.CompactMessageCustomSettings(),
     // scrolling
