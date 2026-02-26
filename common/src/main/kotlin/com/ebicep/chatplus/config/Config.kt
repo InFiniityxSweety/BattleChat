@@ -148,6 +148,7 @@ data class ConfigVariables(
     var hideChatToggleKey: KeyWithModifier = KeyWithModifier(InputConstants.getKey("key.keyboard.unknown"), 0),
     var alwaysShowChat: Boolean = false,
     var alwaysShowChatToggleKey: KeyWithModifier = KeyWithModifier(InputConstants.getKey("key.keyboard.unknown"), 0),
+    var hideChatHideWhenDebugScreen: Boolean = false,
     // compact messages
     var compactMessagesEnabled: Boolean = true,
     var compactMessagesFormat: String = " &7(%VALUE%)",

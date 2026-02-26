@@ -226,6 +226,10 @@ object ConfigScreenImpl {
                 Config.values.hideChatShowWhenFocused
             ) { Config.values.hideChatShowWhenFocused = it },
             entryBuilder.booleanToggle(
+                "chatPlus.hideChat.hideWhenDebugScreen.toggle",
+                Config.values.hideChatHideWhenDebugScreen
+            ) { Config.values.hideChatHideWhenDebugScreen = it },
+            entryBuilder.booleanToggle(
                 "chatPlus.hideChat.showHiddenOnScreen.toggle",
                 Config.values.hideChatShowHiddenOnScreen
             ) { Config.values.hideChatShowHiddenOnScreen = it },

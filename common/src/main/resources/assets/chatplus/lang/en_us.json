@@ -100,6 +100,8 @@
   "chatPlus.hideChat.toggle.tooltip": "Enables/Disables hiding the chat.",
   "chatPlus.hideChat.showWhenFocused.toggle": "Show When Focused",
   "chatPlus.hideChat.showWhenFocused.toggle.tooltip": "If hide chat is enabled, this will show the chat when it is focused.",
+  "chatPlus.hideChat.hideWhenDebugScreen.toggle": "Hide When Debug Screen Shown",
+  "chatPlus.hideChat.hideWhenDebugScreen.toggle.tooltip": "Enables/Disables hiding the chat when the debug (F3) screen is shown.",
   "chatPlus.hideChat.showHiddenOnScreen.toggle": "Show Hidden On Screen",
   "chatPlus.hideChat.showHiddenOnScreen.toggle.tooltip": "If the chat is hidden then 'Chat Hidden' will be displayed on the top center of the screen.",
   "chatPlus.hideChat.key": "Hide Chat Key",
