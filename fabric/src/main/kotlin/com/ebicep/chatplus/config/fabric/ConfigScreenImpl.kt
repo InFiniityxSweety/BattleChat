@@ -497,7 +497,11 @@ object ConfigScreenImpl {
             entryBuilder.percentSlider(
                 "chatPlus.chatWindow.generalSettings.unfocusedOutlineColorOpacityReduction",
                 1 - window.outlineSettings.unfocusedOutlineColorOpacityMultiplier
-            ) { window.outlineSettings.unfocusedOutlineColorOpacityMultiplier = 1 - it }
+            ) { window.outlineSettings.unfocusedOutlineColorOpacityMultiplier = 1 - it },
+            entryBuilder.booleanToggle(
+                "chatPlus.chatWindow.generalSettings.reduceUnfocusedOutlineOpacityWhenClosed",
+                window.outlineSettings.reduceUnfocusedOutlineOpacityWhenClosed
+            ) { window.outlineSettings.reduceUnfocusedOutlineOpacityWhenClosed = it }
         )
     }
 
@@ -813,6 +817,10 @@ object ConfigScreenImpl {
                 "chatPlus.chatWindow.generalSettings.unfocusedBackgroundColorOpacityReduction",
                 1 - window.generalSettings.unfocusedBackgroundColorOpacityMultiplier
             ) { window.generalSettings.unfocusedBackgroundColorOpacityMultiplier = 1 - it },
+            entryBuilder.booleanToggle(
+                "chatPlus.chatWindow.generalSettings.reduceUnfocusedBackgroundOpacityWhenClosed",
+                window.generalSettings.reduceUnfocusedBackgroundOpacityWhenClosed
+            ) { window.generalSettings.reduceUnfocusedBackgroundOpacityWhenClosed = it },
             entryBuilder.percentSlider(
                 "chatPlus.chatWindow.generalSettings.chatTextSize",
                 window.generalSettings.scale
@@ -829,6 +837,10 @@ object ConfigScreenImpl {
                 "chatPlus.chatWindow.generalSettings.unfocusedTextOpacityReduction",
                 1 - window.generalSettings.unfocusedTextOpacityMultiplier
             ) { window.generalSettings.unfocusedTextOpacityMultiplier = 1 - it },
+            entryBuilder.booleanToggle(
+                "chatPlus.chatWindow.generalSettings.reduceUnfocusedTextOpacityWhenClosed",
+                window.generalSettings.reduceUnfocusedTextOpacityWhenClosed
+            ) { window.generalSettings.reduceUnfocusedTextOpacityWhenClosed = it },
             entryBuilder.percentSlider(
                 "chatPlus.chatWindow.generalSettings.unfocusedHeight",
                 window.generalSettings.unfocusedHeight
