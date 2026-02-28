@@ -410,10 +410,14 @@ class ChatRenderer {
             status = UpdateWidthStatus.LOWER_MIN_WITH_SPACE
         }
         if (w <= 0) {
-            w = MIN_WIDTH.coerceAtMost(guiWidth - x)
+            w = if (Config.values.allowWindowsOutsideScreen && guiWidth - x <= 0) {
+                MIN_WIDTH
+            } else {
+                MIN_WIDTH.coerceAtMost(guiWidth - x)
+            }
             status = UpdateWidthStatus.LESS_THAN_ZERO
         }
-        if (x + w >= guiWidth) {
+        if (!Config.values.allowWindowsOutsideScreen && x + w >= guiWidth) {
             w = guiWidth - x
             status = UpdateWidthStatus.GREATER_THAN_GUI_WIDTH
         }
@@ -436,12 +440,15 @@ class ChatRenderer {
         if (lowerThanMin && hasSpace) {
             h = minHeight
         }
-        val maxHeightScaled = getMaxHeightScaled()
-        if (h > maxHeightScaled) {
-            h = maxHeightScaled
-        }
-        if (h >= internalY) {
-            h = maxHeightScaled
+        // When allowWindowsOutsideScreen is on, do not auto-fit height to screen (so moving chat up keeps height)
+        if (!Config.values.allowWindowsOutsideScreen) {
+            val maxHeightScaled = getMaxHeightScaled()
+            if (h > maxHeightScaled) {
+                h = maxHeightScaled
+            }
+            if (h >= internalY) {
+                h = maxHeightScaled
+            }
         }
         return h
     }
@@ -451,6 +458,9 @@ class ChatRenderer {
     }
 
     fun getUpdatedX(startingX: Int): Int {
+        if (Config.values.allowWindowsOutsideScreen) {
+            return startingX
+        }
         var x = startingX
         if (x + internalWidth >= Minecraft.getInstance().window.guiScaledWidth) {
             x = Minecraft.getInstance().window.guiScaledWidth - internalWidth
@@ -473,6 +483,9 @@ class ChatRenderer {
         var y = startingY
         if (y == -1) {
             y = Minecraft.getInstance().window.guiScaledHeight
+        }
+        if (Config.values.allowWindowsOutsideScreen) {
+            return y
         }
         if (y < 0) {
             y += Minecraft.getInstance().window.guiScaledHeight

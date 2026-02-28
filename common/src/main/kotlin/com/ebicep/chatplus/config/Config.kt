@@ -193,6 +193,7 @@ data class ConfigVariables(
     var movableChatColor: Int = Color(255, 255, 255, 200).rgb,
     var movableChatSelectedColor: Int = Color(0, 255, 0, 200).rgb,
     var movableChatToggleTextBarElement: Boolean = false, // TODO add enabled
+    var allowWindowsOutsideScreen: Boolean = false,
     var inputBoxSettings: InputBoxSettings = InputBoxSettings(),
     // notes
     var sendNoteEnabled: Boolean = true,

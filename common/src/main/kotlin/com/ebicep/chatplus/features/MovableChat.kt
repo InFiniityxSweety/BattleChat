@@ -332,40 +332,56 @@ object MovableChat {
             val renderer = chatWindow.renderer
             val mouseX = it.mouseX.toDouble()
             val mouseY = it.mouseY.toDouble()
+            val allowOutside = Config.values.allowWindowsOutsideScreen
             if (movingChatWidth) {
-                val newWidth: Double = Mth.clamp(
-                    (mouseX + xDisplacement) - renderer.getUpdatedX(),
-                    MIN_WIDTH.toDouble(),
+                val newWidthRaw = (mouseX + xDisplacement) - renderer.getUpdatedX()
+                val maxWidth = if (allowOutside) {
+                    9999.0 // allow large width when outside screen
+                } else {
                     Minecraft.getInstance().window.guiScaledWidth - renderer.getUpdatedX().toDouble()
-                )
+                }
+                val newWidth: Double = Mth.clamp(newWidthRaw, MIN_WIDTH.toDouble(), maxWidth)
                 val width = newWidth.roundToInt()
                 renderer.width = width
             }
             if (movingChatHeight) {
-                val newHeight: Double = Mth.clamp(
-                    renderer.getUpdatedY() - (mouseY + yDisplacement),
-                    renderer.getMinHeight().toDouble(),
+                val newHeightRaw = renderer.getUpdatedY() - (mouseY + yDisplacement)
+                val maxHeight = if (allowOutside) {
+                    9999.0 // allow large height when outside screen
+                } else {
                     renderer.getMaxHeightScaled(HeightType.RAW).toDouble()
+                }
+                val newHeight: Double = Mth.clamp(
+                    newHeightRaw,
+                    renderer.getMinHeight().toDouble(),
+                    maxHeight
                 )
                 val height = newHeight.roundToInt()
                 val heightNormalized = renderer.getNormalizedHeight(height)
                 renderer.height = heightNormalized
             }
             if (movingChatBox && dragging) {
-                renderer.x = Mth.clamp(
-                    (mouseX - xDisplacement).roundToInt(),
-                    0,
-                    Minecraft.getInstance().window.guiScaledWidth - renderer.getUpdatedWidthValue()
-                )
-                val minYScaled = renderer.getMinYScaled()
-                val maxYScaled = renderer.getMaxYScaled()
-                var newY = Mth.clamp(
-                    (mouseY - yDisplacement).roundToInt(),
-                    minYScaled,
-                    maxYScaled
-                )
-                if (newY == maxYScaled) {
-                    newY = renderer.getDefaultY()
+                val newX = (mouseX - xDisplacement).roundToInt()
+                val newYRaw = (mouseY - yDisplacement).roundToInt()
+                renderer.x = if (allowOutside) {
+                    newX
+                } else {
+                    Mth.clamp(
+                        newX,
+                        0,
+                        Minecraft.getInstance().window.guiScaledWidth - renderer.getUpdatedWidthValue()
+                    )
+                }
+                val newY = if (allowOutside) {
+                    newYRaw
+                } else {
+                    val minYScaled = renderer.getMinYScaled()
+                    val maxYScaled = renderer.getMaxYScaled()
+                    var y = Mth.clamp(newYRaw, minYScaled, maxYScaled)
+                    if (y == maxYScaled) {
+                        y = renderer.getDefaultY()
+                    }
+                    y
                 }
                 renderer.y = newY
             }

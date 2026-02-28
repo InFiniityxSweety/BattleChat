@@ -909,6 +909,10 @@ object ConfigScreenImpl {
                 "chatPlus.movableChat.textBarElement.toggle",
                 Config.values.movableChatToggleTextBarElement
             ) { Config.values.movableChatToggleTextBarElement = it },
+            entryBuilder.booleanToggle(
+                "chatPlus.movableChat.allowWindowsOutsideScreen.toggle",
+                Config.values.allowWindowsOutsideScreen
+            ) { Config.values.allowWindowsOutsideScreen = it },
         )
     }
 

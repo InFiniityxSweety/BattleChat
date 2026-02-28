@@ -395,6 +395,8 @@
   "chatPlus.movableChat.selectedColor.tooltip": "Selected color of clickable region to resize the chat when movable chat is enabled.",
   "chatPlus.movableChat.textBarElement.toggle": "Movable Chat Toggle Text Bar Element",
   "chatPlus.movableChat.textBarElement.toggle.tooltip": "Adds/Removes the movable chat text bar element (Box with 'M' to the right of input box) that toggles movable chat.",
+  "chatPlus.movableChat.allowWindowsOutsideScreen.toggle": "Allow Windows Outside Screen",
+  "chatPlus.movableChat.allowWindowsOutsideScreen.toggle.tooltip": "When enabled, chat windows can be moved and resized outside the visible screen area.",
   "chatPlus.sendNote.title": "Send Note",
   "chatPlus.sendNote.toggle": "Enabled",
   "chatPlus.sendNote.toggle.tooltip": "Enables/Disables sending notes to the chat.",
