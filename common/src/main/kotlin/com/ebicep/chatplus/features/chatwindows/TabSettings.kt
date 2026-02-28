@@ -235,6 +235,9 @@ class TabSettings {
                     if (chatTab.unreadCount <= 0) {
                         return@forEachIndexed
                     }
+                    if (!chatTab.notificationSettings.disableNotifications) {
+                        return@forEachIndexed
+                    }
                     poseStack.createPose {
                         val startX = chatTab.xStart
                         val startY = chatTab.yStart
