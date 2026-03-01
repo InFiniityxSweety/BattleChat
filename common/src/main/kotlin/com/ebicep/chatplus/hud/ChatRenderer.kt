@@ -406,7 +406,9 @@ class ChatRenderer {
         val anchor = runCatching { chatWindow.generalSettings.anchorPoint }.getOrElse { AnchorPoint.BOTTOM_LEFT }
         val screenW = Minecraft.getInstance().window.guiScaledWidth
         val raw = anchor.anchorXToAbsolute(x, internalWidth, screenW)
-        if (Config.values.allowWindowsOutsideScreen) return raw
+        if (Config.values.allowWindowsOutsideScreen) {
+            return raw
+        }
         return raw.coerceIn(0, maxOf(0, screenW - internalWidth))
     }
 
@@ -420,8 +422,12 @@ class ChatRenderer {
         val anchor = runCatching { chatWindow.generalSettings.anchorPoint }.getOrElse { AnchorPoint.BOTTOM_LEFT }
         val screenH = Minecraft.getInstance().window.guiScaledHeight
         val raw = anchor.anchorYToAbsolute(y, internalHeight, screenH)
-        if (Config.values.allowWindowsOutsideScreen) return raw
-        return raw.coerceIn(getMinYScaled(), getMaxYScaled())
+        if (Config.values.allowWindowsOutsideScreen) {
+            return raw
+        }
+        val minY = getMinYScaled()
+        val maxY = getMaxYScaled()
+        return raw.coerceIn(minOf(minY, maxY), maxOf(minY, maxY))
     }
 
     fun getTimeFactor(ticksLived: Int): Double {
