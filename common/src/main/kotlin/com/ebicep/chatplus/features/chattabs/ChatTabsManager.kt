@@ -40,7 +40,10 @@ object ChatTabs {
         }
         EventBus.register<ChatRenderPreLinesEvent>({ 100 }) {
             val chatFocused: Boolean = ChatManager.isChatFocused()
-            if (chatFocused || it.chatWindow.tabSettings.showTabsWhenChatNotOpen) {
+            if (!it.chatWindow.tabSettings.tabPositionsInitialized) {
+                it.chatWindow.tabSettings.tabPositionsInitialized = true
+                it.chatWindow.tabSettings.renderTabs(guiGraphics = it.guiGraphics)
+            } else if (chatFocused || it.chatWindow.tabSettings.showTabsWhenChatNotOpen) {
                 it.chatWindow.tabSettings.renderTabs(guiGraphics = it.guiGraphics)
             }
         }
