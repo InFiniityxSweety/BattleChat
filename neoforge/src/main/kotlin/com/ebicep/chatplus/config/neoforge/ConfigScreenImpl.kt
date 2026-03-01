@@ -8,7 +8,10 @@ import com.ebicep.chatplus.features.DeleteMessages.F3DMode
 import com.ebicep.chatplus.features.FilterMessages.DEFAULT_COLOR
 import com.ebicep.chatplus.features.MovableChat.MOVABLE_CHAT_COLOR
 import com.ebicep.chatplus.features.SendNote.NOTE_COLOR
-import com.ebicep.chatplus.features.chattabs.*
+import com.ebicep.chatplus.features.chattabs.AutoTabCreator
+import com.ebicep.chatplus.features.chattabs.ChatTab
+import com.ebicep.chatplus.features.chattabs.ServerChatTabCommandSuggestion
+import com.ebicep.chatplus.features.chattabs.ServerChatTabSettings
 import com.ebicep.chatplus.features.chatwindows.ChatWindow
 import com.ebicep.chatplus.features.chatwindows.OutlineSettings
 import com.ebicep.chatplus.features.chatwindows.TabSettings.Position
@@ -539,14 +542,8 @@ object ConfigScreenImpl {
                 Position::class.java,
                 window.tabSettings.position
             ) {
-                val oldPosition = window.tabSettings.position
                 window.tabSettings.position = it
-                if (oldPosition != it) {
-                    when (oldPosition) {
-                        Position.TOP -> window.renderer.y -= CHAT_TAB_HEIGHT
-                        Position.BOTTOM -> window.renderer.y += CHAT_TAB_HEIGHT
-                    }
-                }
+                window.renderer.updateCachedDimension()
             },
             entryBuilder.percentSlider(
                 "chatPlus.chatWindow.tabSettings.unfocusedTabOpacityReduction",
@@ -865,6 +862,23 @@ object ConfigScreenImpl {
                 "chatPlus.chatWindow.generalSettings.lineSpacing",
                 window.generalSettings.lineSpacing
             ) { window.generalSettings.lineSpacing = it },
+            entryBuilder.enumSelector(
+                "chatPlus.chatWindow.generalSettings.anchorPoint",
+                AnchorPoint::class.java,
+                window.generalSettings.anchorPoint
+            ) {
+                val renderer = window.renderer
+                // Capture current absolute position before the anchor changes
+                val absX = renderer.internalX
+                val absY = renderer.internalY
+                window.generalSettings.anchorPoint = it
+                // Re-encode x/y relative to the new anchor so the window stays in the same place.
+                // Setting renderer.x/y with absolute values triggers the setter which converts them
+                // to the new anchor-relative representation using the now-updated anchor.
+                renderer.x = absX
+                renderer.y = absY
+                renderer.updateCachedDimension()
+            },
             entryBuilder.enumSelector(
                 "chatPlus.chatWindow.generalSettings.messageAlignment",
                 AlignMessage.Alignment::class.java,

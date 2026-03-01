@@ -334,6 +334,7 @@ object MovableChat {
             val mouseY = it.mouseY.toDouble()
             val allowOutside = Config.values.allowWindowsOutsideScreen
             if (movingChatWidth) {
+                val currentInternalX = renderer.internalX
                 val newWidthRaw = (mouseX + xDisplacement) - renderer.getUpdatedX()
                 val maxWidth = if (allowOutside) {
                     9999.0 // allow large width when outside screen
@@ -343,9 +344,14 @@ object MovableChat {
                 val newWidth: Double = Mth.clamp(newWidthRaw, MIN_WIDTH.toDouble(), maxWidth)
                 val width = newWidth.roundToInt()
                 renderer.width = width
+                // After changing width, re-anchor x so the left edge stays fixed.
+                // The width setter updates internalWidth, so this call uses the new width
+                // to compute the correct anchor-relative x that preserves currentInternalX.
+                renderer.x = currentInternalX
             }
             if (movingChatHeight) {
-                val newHeightRaw = renderer.getUpdatedY() - (mouseY + yDisplacement)
+                val currentInternalY = renderer.getUpdatedY()
+                val newHeightRaw = currentInternalY - (mouseY + yDisplacement)
                 val maxHeight = if (allowOutside) {
                     9999.0 // allow large height when outside screen
                 } else {
@@ -359,6 +365,10 @@ object MovableChat {
                 val height = newHeight.roundToInt()
                 val heightNormalized = renderer.getNormalizedHeight(height)
                 renderer.height = heightNormalized
+                // After changing height, re-anchor y so the bottom edge stays fixed.
+                // The height setter updates internalHeight, so this call uses the new height
+                // to compute the correct anchor-relative y that preserves currentInternalY.
+                renderer.y = currentInternalY
             }
             if (movingChatBox && dragging) {
                 val newX = (mouseX - xDisplacement).roundToInt()
@@ -377,11 +387,7 @@ object MovableChat {
                 } else {
                     val minYScaled = renderer.getMinYScaled()
                     val maxYScaled = renderer.getMaxYScaled()
-                    var y = Mth.clamp(newYRaw, minYScaled, maxYScaled)
-                    if (y == maxYScaled) {
-                        y = renderer.getDefaultY()
-                    }
-                    y
+                    Mth.clamp(newYRaw, minYScaled, maxYScaled)
                 }
                 renderer.y = newY
             }
@@ -515,12 +521,10 @@ object MovableChat {
             BOTTOM -> (mouseY - innerTabYOffset - CHAT_TAB_Y_OFFSET).roundToInt()
         }
         ChatPlus.debugLog("New window at $newX, $newY")
-        newRenderer.x = newRenderer.getUpdatedX(newX)
-        newRenderer.y = newRenderer.getUpdatedY(newY)
-        newRenderer.internalX = newRenderer.x
-        newRenderer.internalY = newRenderer.y
         newRenderer.width = oldRenderer.width
         newRenderer.height = oldRenderer.height
+        newRenderer.x = newRenderer.getUpdatedX(newX)
+        newRenderer.y = newRenderer.getUpdatedY(newY)
         newRenderer.updateCachedDimension()
 
         Config.values.chatWindows.add(newWindow)

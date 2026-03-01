@@ -1,5 +1,6 @@
 package com.ebicep.chatplus.features.chatwindows
 
+import com.ebicep.chatplus.config.AnchorPoint
 import com.ebicep.chatplus.config.MessageDirection
 import com.ebicep.chatplus.features.AlignMessage
 import com.ebicep.chatplus.hud.ChatManager
@@ -23,6 +24,7 @@ class GeneralSettings {
     var reduceUnfocusedTextOpacityWhenClosed: Boolean = false
     var unfocusedHeight: Float = .5f
     var lineSpacing: Float = 0f
+    var anchorPoint: AnchorPoint = AnchorPoint.BOTTOM_LEFT
     var messageAlignment: AlignMessage.Alignment = AlignMessage.Alignment.LEFT
     var messageDirection: MessageDirection = MessageDirection.BOTTOM_UP
     var topDownDirectionWrapInOrder: Boolean = true
@@ -44,6 +46,7 @@ class GeneralSettings {
             it.backgroundColor = backgroundColor
             it.unfocusedBackgroundColorOpacityMultiplier = unfocusedBackgroundColorOpacityMultiplier
             it.reduceUnfocusedBackgroundOpacityWhenClosed = reduceUnfocusedBackgroundOpacityWhenClosed
+            it.anchorPoint = anchorPoint
             it.scale = scale
             it.textOpacity = textOpacity
             it.unfocusedTextOpacityMultiplier = unfocusedTextOpacityMultiplier
