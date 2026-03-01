@@ -149,4 +149,10 @@ object ChatPlus {
         )
     }
 
+    fun debugLog(message: String) {
+        if (Config.values.debugLogging) {
+            LOGGER.info(message)
+        }
+    }
+
 }
