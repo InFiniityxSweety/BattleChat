@@ -41,6 +41,9 @@ class TabSettings {
     var tabTextColorUnselected: Int = Color(153, 153, 153, 255).rgb
     var unfocusedTabOpacityMultiplier: Float = .4f
 
+    @Transient
+    var tabPositionsInitialized: Boolean = false
+
     @Serializable(with = ChatTabSerializer::class)
     var tabs: MutableList<ChatTab> = mutableListOf()
         set(value) {
@@ -233,6 +236,9 @@ class TabSettings {
                         return@forEachIndexed
                     }
                     if (chatTab.unreadCount <= 0) {
+                        return@forEachIndexed
+                    }
+                    if (!chatTab.notificationSettings.disableNotifications) {
                         return@forEachIndexed
                     }
                     poseStack.createPose {
