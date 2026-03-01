@@ -26,7 +26,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.util.ArrayList;
 import java.util.List;
 
-@Mixin(value = ChatComponent.class, priority = Integer.MAX_VALUE)
+@Mixin(value = ChatComponent.class, priority = Integer.MAX_VALUE / 2)
 public class MixinChatComponent {
 
     @Final
