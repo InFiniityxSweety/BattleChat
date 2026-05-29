@@ -23,11 +23,12 @@ import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import net.minecraft.ChatFormatting
 import net.minecraft.client.ComponentCollector
-import net.minecraft.client.GuiMessage
-import net.minecraft.client.GuiMessageTag
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Font
 import net.minecraft.client.gui.screens.ChatScreen
+import net.minecraft.client.multiplayer.chat.GuiMessage
+import net.minecraft.client.multiplayer.chat.GuiMessageSource
+import net.minecraft.client.multiplayer.chat.GuiMessageTag
 import net.minecraft.locale.Language
 import net.minecraft.network.chat.*
 import net.minecraft.util.FormattedCharSequence
@@ -264,6 +265,7 @@ class ChatTab {
         val rawComponent = addNewMessageEvent.rawComponent
         val signature = addNewMessageEvent.signature
         val addedTime = addNewMessageEvent.addedTime
+        val source = addNewMessageEvent.source
         val tag = addNewMessageEvent.tag
         val chatPlusGuiMessage = ChatPlusGuiMessage(senderUUID = addNewMessageEvent.senderUUID)
         val chatTabAddNewMessageEvent = ChatTabAddNewMessageEvent(
@@ -275,12 +277,13 @@ class ChatTab {
             rawComponent,
             signature,
             addedTime,
+            source,
             tag,
         )
         if (EventBus.post(chatTabAddNewMessageEvent).returnFunction) {
             return NewMessageResult(chatTabAddNewMessageEvent, null, null)
         }
-        chatPlusGuiMessage.guiMessage = GuiMessage(addedTime, mutableComponent, signature, tag)
+        chatPlusGuiMessage.guiMessage = GuiMessage(addedTime, mutableComponent, signature, source, tag)
         this.messages.add(chatPlusGuiMessage)
         this.lastMessageTime = System.currentTimeMillis()
         val removedMessages = mutableListOf<ChatPlusGuiMessage>()
@@ -291,7 +294,7 @@ class ChatTab {
                 removedMessages.add(removed)
             }
         }
-        val newDisplayMessageResult = this.addNewDisplayMessage(mutableComponent, addedTime, tag, chatPlusGuiMessage)
+        val newDisplayMessageResult = this.addNewDisplayMessage(mutableComponent, addedTime, source, tag, chatPlusGuiMessage)
         if (chatWindow.tabSettings.selectedTab != this) {
             val notificationMatch = notificationSettings.notificationMatch
             if (notificationMatch.matches(rawComponent)) {
@@ -304,6 +307,7 @@ class ChatTab {
     private fun addNewDisplayMessage(
         component: MutableComponent,
         addedTime: Int,
+        source: GuiMessageSource,
         tag: GuiMessageTag?,
         linkedMessage: ChatPlusGuiMessage,
     ): NewDisplayMessageResult {
@@ -315,12 +319,13 @@ class ChatTab {
                 this,
                 component,
                 addedTime,
+                source,
                 tag,
                 linkedMessage,
                 maxWidth
             )
         )
-        val addedComponents: MutableList<ChatPlusGuiMessageLine> = addWrappedComponents(component, displayMessageEvent, addedTime, tag, linkedMessage, -1)
+        val addedComponents: MutableList<ChatPlusGuiMessageLine> = addWrappedComponents(component, displayMessageEvent, linkedMessage.guiMessage, linkedMessage, -1)
         val removedMessages: MutableList<ChatPlusGuiMessageLine> = mutableListOf()
         while (
             !displayMessageEvent.filtered &&
@@ -344,8 +349,7 @@ class ChatTab {
     fun addWrappedComponents(
         component: MutableComponent,
         displayMessageEvent: ChatTabAddDisplayMessageEvent,
-        addedTime: Int,
-        tag: GuiMessageTag?,
+        parent: GuiMessage,
         linkedMessage: ChatPlusGuiMessage,
         index: Int,
     ): MutableList<ChatPlusGuiMessageLine> {
@@ -370,7 +374,7 @@ class ChatTab {
             }
             val lastComponent = j == list.size - 1
             val line = ChatPlusGuiMessageLine(
-                GuiMessage.Line(addedTime, formattedCharSequence, tag, lastComponent),
+                GuiMessage.Line(parent, formattedCharSequence, lastComponent),
                 content,
                 null,
                 linkedMessage,
@@ -497,6 +501,7 @@ class ChatTab {
                 this.addNewDisplayMessage(
                     guiMessage.content() as MutableComponent,
                     guiMessage.addedTime(),
+                    guiMessage.source,
                     guiMessage.tag(),
                     chatPlusGuiMessage
                 )
@@ -653,6 +658,7 @@ data class SkipNewMessageEvent(
     var senderUUID: UUID?,
     val signature: MessageSignature?,
     val addedTime: Int,
+    val source: GuiMessageSource,
     val tag: GuiMessageTag?,
 ) : Event
 
@@ -662,6 +668,7 @@ data class AddNewMessageEvent(
     var senderUUID: UUID?,
     val signature: MessageSignature?,
     val addedTime: Int,
+    val source: GuiMessageSource,
     val tag: GuiMessageTag?,
     var returnFunction: Boolean = false,
 ) : Event
@@ -675,6 +682,7 @@ data class ChatTabAddNewMessageEvent(
     val rawComponent: Component,
     val signature: MessageSignature?,
     val addedTime: Int,
+    val source: GuiMessageSource,
     val tag: GuiMessageTag?,
     var returnFunction: Boolean = false,
 ) : Event
@@ -685,6 +693,7 @@ data class ChatTabAddDisplayMessageEvent(
     val chatTab: ChatTab,
     val component: MutableComponent,
     val addedTime: Int,
+    val source: GuiMessageSource,
     val tag: GuiMessageTag?,
     val linkedMessage: ChatTab.ChatPlusGuiMessage,
     var maxWidth: Int,

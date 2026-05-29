@@ -19,11 +19,11 @@ import com.ebicep.chatplus.util.GraphicsUtil.createPose
 import com.ebicep.chatplus.util.GraphicsUtil.drawString0
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
-import net.minecraft.client.GuiMessage
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.components.ChatComponent
 import net.minecraft.client.gui.components.ChatComponent.ChatGraphicsAccess
+import net.minecraft.client.multiplayer.chat.GuiMessage
 import net.minecraft.util.ARGB
 import kotlin.math.ceil
 import kotlin.math.max
@@ -35,7 +35,7 @@ data class ChatRenderContext(
 )
 
 abstract class ChatRenderLineEvent(
-    open val guiGraphics: GuiGraphics,
+    open val guiGraphics: GuiGraphicsExtractor,
     open val chatWindow: ChatWindow,
     open val chatPlusGuiMessageLine: ChatTab.ChatPlusGuiMessageLine,
     open val verticalChatOffset: Float,
@@ -46,7 +46,7 @@ abstract class ChatRenderLineEvent(
 }
 
 class ChatRenderLineTextEvent(
-    guiGraphics: GuiGraphics,
+    guiGraphics: GuiGraphicsExtractor,
     chatWindow: ChatWindow,
     chatPlusGuiMessageLine: ChatTab.ChatPlusGuiMessageLine,
     verticalChatOffset: Float,
@@ -61,7 +61,7 @@ class ChatRenderLineTextEvent(
 ) : ChatRenderLineEvent(guiGraphics, chatWindow, chatPlusGuiMessageLine, verticalChatOffset, verticalTextOffset)
 
 class ChatRenderPreLineAppearanceEvent(
-    guiGraphics: GuiGraphics,
+    guiGraphics: GuiGraphicsExtractor,
     chatWindow: ChatWindow,
     chatPlusGuiMessageLine: ChatTab.ChatPlusGuiMessageLine,
     verticalChatOffset: Float,
@@ -71,27 +71,27 @@ class ChatRenderPreLineAppearanceEvent(
 ) : ChatRenderLineEvent(guiGraphics, chatWindow, chatPlusGuiMessageLine, verticalChatOffset, verticalTextOffset)
 
 data class ChatRenderPreLinesEvent(
-    val guiGraphics: GuiGraphics,
+    val guiGraphics: GuiGraphicsExtractor,
     val chatWindow: ChatWindow,
-    var chatFocused: Boolean,
+    var displayMode: ChatComponent.DisplayMode,
     var returnFunction: Boolean = false,
 ) : Event
 
 data class ChatRenderPreLinesRenderEvent(
-    val guiGraphics: GuiGraphics,
+    val guiGraphics: GuiGraphicsExtractor,
     val chatWindow: ChatWindow,
     val guiTicks: Int,
 ) : Event
 
 data class ChatRenderPostLinesRenderEvent(
-    val guiGraphics: GuiGraphics,
+    val guiGraphics: GuiGraphicsExtractor,
     val chatWindow: ChatWindow,
     var displayMessageIndex: Int,
     var returnFunction: Boolean = false,
 ) : Event
 
 data class ChatRenderPostLinesEvent(
-    val guiGraphics: GuiGraphics,
+    val guiGraphics: GuiGraphicsExtractor,
     val chatWindow: ChatWindow,
 ) : Event
 
@@ -263,10 +263,10 @@ class ChatRenderer {
 
     fun render(
         chatWindow: ChatWindow,
-        guiGraphics: GuiGraphics,
+        guiGraphics: GuiGraphicsExtractor,
         chatGraphicsAccess: ChatGraphicsAccess,
         guiTicks: Int,
-        chatFocused: Boolean,
+        displayMode: ChatComponent.DisplayMode,
     ) {
         if (EventBus.post(RenderValidateYEvent(this, internalY)).internalY != computeAnchorInternalY()) {
             updateCachedDimension()
@@ -276,13 +276,13 @@ class ChatRenderer {
 //        var chatFocused = ChatManager.isChatFocused()
 
         val poseStack = guiGraphics.pose()
-        var chatFocused = chatFocused
+        var foreground = displayMode.foreground
 
-        val preLinesEvent = ChatRenderPreLinesEvent(guiGraphics, chatWindow, chatFocused)
+        val preLinesEvent = ChatRenderPreLinesEvent(guiGraphics, chatWindow, displayMode)
         if (EventBus.post(preLinesEvent).returnFunction) {
             return
         }
-        chatFocused = preLinesEvent.chatFocused
+        foreground = preLinesEvent.displayMode.foreground
 
         poseStack.pushMatrix()
         chatGraphicsAccess.updatePose { matrix ->
@@ -290,7 +290,7 @@ class ChatRenderer {
         }
 
         var linesPerPage = rescaledLinesPerPage
-        if (!chatFocused) {
+        if (!foreground) {
             linesPerPage = (linesPerPage * chatWindow.generalSettings.unfocusedHeight).roundToInt()
         }
 
@@ -299,13 +299,13 @@ class ChatRenderer {
 
         EventBus.post(ChatRenderPreLinesRenderEvent(guiGraphics, chatWindow, guiTicks))
 
-        val alphaCalculator = if (chatFocused) {
+        val alphaCalculator = if (foreground) {
             ChatComponent.AlphaCalculator.FULLY_VISIBLE
         } else {
             ChatComponent.AlphaCalculator.timeBased(guiTicks)
         }
 
-        forEachLine(alphaCalculator, linesPerPage, chatWindow, guiTicks, chatFocused) { line, displayIndex, fadeOpacity ->
+        forEachLine(alphaCalculator, linesPerPage, chatWindow, guiTicks, displayMode) { line, displayIndex, fadeOpacity ->
             val textOpacity = (255.0 * fadeOpacity * updatedTextOpacity).toInt()
             var backgroundColor = updatedBackgroundColor
             val verticalChatOffset = calculateVerticalOffset(displayIndex)
@@ -336,7 +336,7 @@ class ChatRenderer {
             }
         }
 
-        val displayMessageIndex = forEachLine(alphaCalculator, linesPerPage, chatWindow, guiTicks, chatFocused) { line, displayIndex, fadeOpacity ->
+        val displayMessageIndex = forEachLine(alphaCalculator, linesPerPage, chatWindow, guiTicks, displayMode) { line, displayIndex, fadeOpacity ->
             val textOpacity = (255.0 * fadeOpacity * updatedTextOpacity).toInt()
             if (textOpacity <= 3) {
                 return@forEachLine
@@ -381,7 +381,7 @@ class ChatRenderer {
         EventBus.post(ChatRenderPostLinesEvent(guiGraphics, chatWindow))
 
         // Debug rendering
-        if (chatFocused && Debug.debug && chatWindow == ChatManager.selectedWindow) {
+        if (displayMode.foreground && Debug.debug && chatWindow == ChatManager.selectedWindow) {
             guiGraphics.drawString0("$height", lastMouseX - 15, lastMouseY + 5, 0x3eeff)
             guiGraphics.drawString0("$rescaledHeight", lastMouseX - 15, lastMouseY + 15, 0x3eeff)
             guiGraphics.drawString0("$lineHeight", lastMouseX - 15, lastMouseY + 25, 0x3eeff)
@@ -452,7 +452,7 @@ class ChatRenderer {
         linesPerPage: Int,
         chatWindow: ChatWindow,
         guiTicks: Int,
-        chatFocused: Boolean,
+        displayMode: ChatComponent.DisplayMode,
         action: (ChatTab.ChatPlusGuiMessageLine, Int, Float) -> Unit,
     ): Int {
         val messagesToDisplay = chatWindow.tabSettings.selectedTab.displayedMessages.size
@@ -468,7 +468,7 @@ class ChatRenderer {
             }
             val line = chatPlusGuiMessageLine.line
             val ticksLived: Int = guiTicks - line.addedTime()
-            if (ticksLived >= 200 && !chatFocused) {
+            if (ticksLived >= 200 && !displayMode.foreground) {
                 ++displayMessageIndex
                 continue
             }

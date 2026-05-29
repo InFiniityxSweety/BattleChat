@@ -3,7 +3,7 @@ package com.ebicep.chatplus.features.textbarelements
 import com.ebicep.chatplus.events.Event
 import com.ebicep.chatplus.features.FindMessage
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.screens.ChatScreen
 
 class FindTextBarElement(private val chatPlusScreen: ChatScreen) : TextBarElement {
@@ -24,7 +24,7 @@ class FindTextBarElement(private val chatPlusScreen: ChatScreen) : TextBarElemen
         }
     }
 
-    override fun onHover(guiGraphics: GuiGraphics, pMouseX: Int, pMouseY: Int) {
+    override fun onHover(guiGraphics: GuiGraphicsExtractor, pMouseX: Int, pMouseY: Int) {
         guiGraphics.setTooltipForNextFrame(
             chatPlusScreen.font,
             tooltip("chatPlus.findMessage.highlightInputBox.tooltip"),
@@ -33,7 +33,7 @@ class FindTextBarElement(private val chatPlusScreen: ChatScreen) : TextBarElemen
         )
     }
 
-    override fun onRender(guiGraphics: GuiGraphics, currentX: Int, currentY: Int, mouseX: Int, mouseY: Int, partialTick: Float) {
+    override fun onRender(guiGraphics: GuiGraphicsExtractor, currentX: Int, currentY: Int, mouseX: Int, mouseY: Int, partialTick: Float) {
         fill(guiGraphics, currentX, currentY)
         drawCenteredString(guiGraphics, currentX, currentY, if (FindMessage.findEnabled) FindMessage.findMode!!.color else -1)
         if (FindMessage.findEnabled) {

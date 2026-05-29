@@ -14,7 +14,7 @@ import com.ebicep.chatplus.util.GraphicsUtil.PlayerHeadUtils.playerFaceRendererD
 import com.ebicep.chatplus.util.GraphicsUtil.createPose
 import com.ebicep.chatplus.util.GraphicsUtil.translate0
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.components.PlayerFaceRenderer
+import net.minecraft.client.gui.components.PlayerFaceExtractor
 import net.minecraft.client.multiplayer.PlayerInfo
 import net.minecraft.resources.Identifier
 import net.minecraft.world.entity.player.PlayerModelPart
@@ -24,7 +24,7 @@ object PlayerHeadChatDisplay {
 
     private const val CACHE_EXPIRATION = 1000 * 60 * 10
     private const val HEAD_RIGHT_PADDING = 2
-    private const val HEAD_WIDTH_PADDED = PlayerFaceRenderer.SKIN_HEAD_WIDTH + HEAD_RIGHT_PADDING
+    private const val HEAD_WIDTH_PADDED = PlayerFaceExtractor.SKIN_HEAD_WIDTH + HEAD_RIGHT_PADDING
     private const val HEAD_WIDTH_PADDED_HALF = HEAD_WIDTH_PADDED / 2
     private val NAME_REGEX = Regex("(§.)|\\W")
     private val playerNameUUIDs = mutableMapOf<String, TimedUUID>()
@@ -113,7 +113,7 @@ object PlayerHeadChatDisplay {
                     headData.texture.invoke(),
                     it.chatWindow.renderer.rescaledX,
                     it.verticalTextOffset,
-                    PlayerFaceRenderer.SKIN_HEAD_WIDTH.toFloat(),
+                    PlayerFaceExtractor.SKIN_HEAD_WIDTH.toFloat(),
                     headData.showHat,
                     false,
                     (it.textColor.coerceIn(0, 255) shl 24) or 0x00FFFFFF // alpha

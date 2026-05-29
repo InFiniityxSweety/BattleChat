@@ -8,7 +8,7 @@ import com.ebicep.chatplus.hud.ChatManager
 import com.mojang.brigadier.Command
 import com.mojang.brigadier.CommandDispatcher
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
-import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager
+import net.fabricmc.fabric.api.client.command.v2.ClientCommands
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
 import net.minecraft.ChatFormatting
@@ -27,25 +27,25 @@ object ClientCommandRegistration {
     }
 
     private fun createCommand(commandName: String): LiteralArgumentBuilder<FabricClientCommandSource?>? =
-        ClientCommandManager.literal(commandName)
+        ClientCommands.literal(commandName)
             .then(
-                ClientCommandManager.literal("clear")
+                ClientCommands.literal("clear")
                     .executes {
                         ChatManager.globalSelectedTab.clear()
                         Command.SINGLE_SUCCESS
                     }
             )
             .then(
-                ClientCommandManager.literal("hide")
+                ClientCommands.literal("hide")
                     .executes {
                         Config.values.hideChatEnabled = !Config.values.hideChatEnabled
                         Command.SINGLE_SUCCESS
                     }
             )
             .then(
-                ClientCommandManager.literal("tab")
+                ClientCommands.literal("tab")
                     .then(
-                        ClientCommandManager.literal("delete")
+                        ClientCommands.literal("delete")
                             .executes {
                                 val selectedWindow = ChatManager.selectedWindow
                                 val globalSelectedTab = ChatManager.globalSelectedTab
@@ -54,7 +54,7 @@ object ClientCommandRegistration {
                             }
                     )
                     .then(
-                        ClientCommandManager.literal("clone")
+                        ClientCommands.literal("clone")
                             .executes {
                                 val selectedWindow = ChatManager.selectedWindow
                                 val globalSelectedTab = ChatManager.globalSelectedTab
@@ -64,7 +64,7 @@ object ClientCommandRegistration {
                     )
             )
             .then(
-                ClientCommandManager.literal("debug")
+                ClientCommands.literal("debug")
                     .executes {
                         Debug.debug = !Debug.debug
                         ChatPlus.sendMessage(
@@ -75,7 +75,7 @@ object ClientCommandRegistration {
                     }
             )
             .then(
-                ClientCommandManager.literal("test")
+                ClientCommands.literal("test")
                     .executes {
 //                        ChatPlus.doTest()
                         Command.SINGLE_SUCCESS

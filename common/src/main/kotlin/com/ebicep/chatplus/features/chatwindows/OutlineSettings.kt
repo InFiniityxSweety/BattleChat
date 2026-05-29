@@ -10,7 +10,7 @@ import com.ebicep.chatplus.util.GraphicsUtil.drawHorizontalLine
 import com.ebicep.chatplus.util.GraphicsUtil.renderOutlineSetPos
 import com.ebicep.chatplus.util.KotlinUtil.reduceAlpha
 import kotlinx.serialization.Serializable
-import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.network.chat.Component
 import java.awt.Color
 import kotlin.math.roundToInt
@@ -52,7 +52,7 @@ class OutlineSettings {
 
         NONE("chatPlus.chatWindow.outlineSettings.outlineBoxType.none"),
         WHOLE_BOX("chatPlus.chatWindow.outlineSettings.outlineBoxType.wholeBox") {
-            override fun render(outlineTabType: OutlineTabType, guiGraphics: GuiGraphics, chatWindow: ChatWindow, selectedTab: ChatTab, renderer: ChatRenderer) {
+            override fun render(outlineTabType: OutlineTabType, guiGraphics: GuiGraphicsExtractor, chatWindow: ChatWindow, selectedTab: ChatTab, renderer: ChatRenderer) {
                 val position = chatWindow.tabSettings.position
                 val h = renderer.getTotalLineHeight(true)
                 guiGraphics.renderOutlineSetPos(
@@ -66,7 +66,7 @@ class OutlineSettings {
             }
         },
         TEXT_AND_TAB_BOX("chatPlus.chatWindow.outlineSettings.outlineBoxType.textAndTabBox") {
-            override fun render(outlineTabType: OutlineTabType, guiGraphics: GuiGraphics, chatWindow: ChatWindow, selectedTab: ChatTab, renderer: ChatRenderer) {
+            override fun render(outlineTabType: OutlineTabType, guiGraphics: GuiGraphicsExtractor, chatWindow: ChatWindow, selectedTab: ChatTab, renderer: ChatRenderer) {
                 WHOLE_BOX.render(outlineTabType, guiGraphics, chatWindow, selectedTab, renderer)
                 if (chatWindow.tabSettings.hideTabs) {
                     return
@@ -104,7 +104,7 @@ class OutlineSettings {
             }
         },
         TEXT_BOX("chatPlus.chatWindow.outlineSettings.outlineBoxType.textBox") {
-            override fun render(outlineTabType: OutlineTabType, guiGraphics: GuiGraphics, chatWindow: ChatWindow, selectedTab: ChatTab, renderer: ChatRenderer) {
+            override fun render(outlineTabType: OutlineTabType, guiGraphics: GuiGraphicsExtractor, chatWindow: ChatWindow, selectedTab: ChatTab, renderer: ChatRenderer) {
                 val position = chatWindow.tabSettings.position
                 val h = renderer.getTotalLineHeight(true)
                 val top = chatWindow.tabSettings.hideTabs || outlineTabType != OutlineTabType.SELECTED_TAB_OPEN_TOP || position != TabSettings.Position.TOP
@@ -146,7 +146,7 @@ class OutlineSettings {
             }
         },
         TAB_BOX("chatPlus.chatWindow.outlineSettings.outlineBoxType.tabBox") {
-            override fun render(outlineTabType: OutlineTabType, guiGraphics: GuiGraphics, chatWindow: ChatWindow, selectedTab: ChatTab, renderer: ChatRenderer) {
+            override fun render(outlineTabType: OutlineTabType, guiGraphics: GuiGraphicsExtractor, chatWindow: ChatWindow, selectedTab: ChatTab, renderer: ChatRenderer) {
                 if (chatWindow.tabSettings.hideTabs) {
                     return
                 }
@@ -197,7 +197,7 @@ class OutlineSettings {
 
         val translatable: Component = Component.translatable(key)
 
-        open fun render(outlineTabType: OutlineTabType, guiGraphics: GuiGraphics, chatWindow: ChatWindow, selectedTab: ChatTab, renderer: ChatRenderer) {
+        open fun render(outlineTabType: OutlineTabType, guiGraphics: GuiGraphicsExtractor, chatWindow: ChatWindow, selectedTab: ChatTab, renderer: ChatRenderer) {
 
         }
 
@@ -211,7 +211,7 @@ class OutlineSettings {
 
         NONE("chatPlus.chatWindow.outlineSettings.outlineTabType.none"),
         SELECTED_TAB("chatPlus.chatWindow.outlineSettings.outlineTabType.selectedTab") {
-            override fun render(outlineBoxType: OutlineBoxType, guiGraphics: GuiGraphics, chatWindow: ChatWindow, selectedTab: ChatTab, renderer: ChatRenderer) {
+            override fun render(outlineBoxType: OutlineBoxType, guiGraphics: GuiGraphicsExtractor, chatWindow: ChatWindow, selectedTab: ChatTab, renderer: ChatRenderer) {
                 guiGraphics.renderOutlineSetPos(
                     selectedTab.xStart - THICKNESS,
                     selectedTab.yStart - THICKNESS,
@@ -223,7 +223,7 @@ class OutlineSettings {
             }
         },
         SELECTED_TAB_OPEN_TOP("chatPlus.chatWindow.outlineSettings.outlineTabType.selectedTabOpenTop") {
-            override fun render(outlineBoxType: OutlineBoxType, guiGraphics: GuiGraphics, chatWindow: ChatWindow, selectedTab: ChatTab, renderer: ChatRenderer) {
+            override fun render(outlineBoxType: OutlineBoxType, guiGraphics: GuiGraphicsExtractor, chatWindow: ChatWindow, selectedTab: ChatTab, renderer: ChatRenderer) {
                 when (chatWindow.tabSettings.position) {
                     TabSettings.Position.TOP -> {
                         guiGraphics.renderOutlineSetPos(
@@ -252,7 +252,7 @@ class OutlineSettings {
             }
         },
         EVERY_TAB("chatPlus.chatWindow.outlineSettings.outlineTabType.everyTab") {
-            override fun render(outlineBoxType: OutlineBoxType, guiGraphics: GuiGraphics, chatWindow: ChatWindow, selectedTab: ChatTab, renderer: ChatRenderer) {
+            override fun render(outlineBoxType: OutlineBoxType, guiGraphics: GuiGraphicsExtractor, chatWindow: ChatWindow, selectedTab: ChatTab, renderer: ChatRenderer) {
                 chatWindow.tabSettings.tabs.forEach { SELECTED_TAB.render(outlineBoxType, guiGraphics, chatWindow, it, renderer) }
             }
         },
@@ -261,7 +261,7 @@ class OutlineSettings {
 
         val translatable: Component = Component.translatable(key)
 
-        open fun render(outlineBoxType: OutlineBoxType, guiGraphics: GuiGraphics, chatWindow: ChatWindow, selectedTab: ChatTab, renderer: ChatRenderer) {
+        open fun render(outlineBoxType: OutlineBoxType, guiGraphics: GuiGraphicsExtractor, chatWindow: ChatWindow, selectedTab: ChatTab, renderer: ChatRenderer) {
 
         }
 

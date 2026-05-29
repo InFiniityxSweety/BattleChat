@@ -1,0 +1,28 @@
+plugins {
+    id 'java-library'
+}
+
+configurations {
+    commonJava {
+        canBeResolved = false
+        canBeConsumed = true
+    }
+    commonResources {
+        canBeResolved = false
+        canBeConsumed = true
+    }
+}
+
+base {
+    archivesName = "$rootProject.archives_name-$project.name"
+}
+
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(java_version)
+}
+
+jar {
+    from(rootProject.file('LICENSE')) {
+        rename { "${it}_${mod_name}" }
+    }
+}

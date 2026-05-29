@@ -4,7 +4,7 @@ import com.ebicep.chatplus.config.Config
 import com.ebicep.chatplus.events.Event
 import com.ebicep.chatplus.features.BookmarkMessages
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.screens.ChatScreen
 
 class ShowBookmarksBarElement(private val chatPlusScreen: ChatScreen) : TextBarElement {
@@ -24,7 +24,7 @@ class ShowBookmarksBarElement(private val chatPlusScreen: ChatScreen) : TextBarE
         BookmarkMessages.toggle(chatPlusScreen)
     }
 
-    override fun onHover(guiGraphics: GuiGraphics, pMouseX: Int, pMouseY: Int) {
+    override fun onHover(guiGraphics: GuiGraphicsExtractor, pMouseX: Int, pMouseY: Int) {
         guiGraphics.setTooltipForNextFrame(
             chatPlusScreen.font,
             tooltip("chatPlus.bookmark.textBarElement"),
@@ -33,7 +33,7 @@ class ShowBookmarksBarElement(private val chatPlusScreen: ChatScreen) : TextBarE
         )
     }
 
-    override fun onRender(guiGraphics: GuiGraphics, currentX: Int, currentY: Int, mouseX: Int, mouseY: Int, partialTick: Float) {
+    override fun onRender(guiGraphics: GuiGraphicsExtractor, currentX: Int, currentY: Int, mouseX: Int, mouseY: Int, partialTick: Float) {
         fill(guiGraphics, currentX, currentY)
         drawCenteredString(guiGraphics, currentX, currentY, if (BookmarkMessages.showingBookmarks) Config.values.bookmarkColor else -1)
         if (BookmarkMessages.showingBookmarks) {

@@ -1,4 +1,5 @@
 import net.fabricmc.loom.api.LoomGradleExtensionAPI
+import org.gradle.jvm.tasks.Jar
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 
@@ -7,40 +8,38 @@ buildscript {
     repositories { mavenCentral() }
 
     dependencies {
-        classpath(kotlin("gradle-plugin", version = "2.2.0"))
-        classpath(kotlin("serialization", version = "2.2.0"))
+        classpath(kotlin("gradle-plugin", version = "2.3.+"))
+        classpath(kotlin("serialization", version = "2.3.+"))
     }
 }
 
 plugins {
     java
-    kotlin("jvm") version "2.2.0"
-    kotlin("plugin.serialization") version "2.2.0" apply false
-    id("architectury-plugin") version "3.4-SNAPSHOT"
-    id("dev.architectury.loom") version "1.13-SNAPSHOT" apply false
-    id("com.gradleup.shadow") version "8.3.6" apply false
+    kotlin("jvm") version "2.3.+"
+    kotlin("plugin.serialization") version "2.3.+" apply false
+    id("com.gradleup.shadow") version "9.4.2" apply false
+    id("net.fabricmc.fabric-loom") version(providers.gradleProperty("fabric_loom_version")) apply false
+    id("net.neoforged.moddev") version(providers.gradleProperty("moddevgradle_version")) apply false
+    id("multiloader-common") apply false
+    id("multiloader-loader") apply false
     id("me.shedaniel.unified-publishing") version "0.1.+" apply false
-}
-
-architectury {
-    minecraft = rootProject.property("minecraft_version").toString()
+    id("dev.isxander.mtk.accessx") version "0.1.1" apply false
 }
 
 subprojects {
-    apply(plugin = "dev.architectury.loom")
     apply(plugin = "me.shedaniel.unified-publishing")
 
-    val loom = project.extensions.getByName<LoomGradleExtensionAPI>("loom")
-    loom.silentMojangMappingsLicense()
-    loom.log4jConfigs.from(file("log4j-dev.xml"))
-
-    dependencies {
-        "minecraft"("com.mojang:minecraft:${project.property("minecraft_version")}")
-        "mappings"(loom.officialMojangMappings())
+    extensions.findByType(LoomGradleExtensionAPI::class.java)?.let { loom ->
+        loom.log4jConfigs.from(file("log4j-dev.xml"))
     }
 
     project.ext.set("releaseChangeLog", {
-        file("../docs/changelogs/${rootProject.version}.md").readText().trim()
+        val changelogFile = file("../docs/changelogs/${rootProject.version}.md")
+        if (changelogFile.exists()) {
+            changelogFile.readText().trim()
+        } else {
+            ""
+        }
     })
 }
 
@@ -48,10 +47,11 @@ allprojects {
     apply(plugin = "kotlin")
     apply(plugin = "org.jetbrains.kotlin.plugin.serialization")
     apply(plugin = "java")
-    apply(plugin = "architectury-plugin")
     apply(plugin = "maven-publish")
 
-    base.archivesName.set("${rootProject.property("archives_base_name").toString()}-${project.name}")
+    val archivesNameProp = rootProject.findProperty("archives_name")?.toString()
+        ?: rootProject.property("archives_base_name").toString()
+    base.archivesName.set("${archivesNameProp}-${project.name}")
     version = rootProject.property("mod_version").toString()
     group = rootProject.property("maven_group").toString()
 
@@ -63,25 +63,26 @@ allprojects {
         // for more information about repositories.
         maven { url = uri("https://maven.shedaniel.me/") }
         maven { url = uri("https://maven.terraformersmc.com") }
+        mavenCentral()
     }
 
     dependencies {
-        compileOnly("org.jetbrains.kotlin:kotlin-stdlib:2.2.0")
-        implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
-        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
+        compileOnly(kotlin("stdlib"))
+        implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0")
+        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0")
         implementation("net.java.dev.jna:jna:5.14.0")
         implementation("com.alphacephei:vosk:0.3.45")
-        compileOnly("io.github.llamalad7:mixinextras-common:0.3.6")
+        compileOnly("io.github.llamalad7:mixinextras-common:0.5.4")
     }
 
     tasks.withType<JavaCompile> {
         options.encoding = "UTF-8"
-        options.release.set(21)
+        options.release.set(25)
     }
 
     tasks.withType<KotlinJvmCompile>().configureEach {
         compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_21)
+            jvmTarget.set(JvmTarget.JVM_25)
         }
     }
 
@@ -103,4 +104,29 @@ allprojects {
     java {
         withSourcesJar()
     }
+}
+
+tasks.register<Jar>("mergeLoaderJars") {
+    group = "build"
+    description = "Merge Fabric and NeoForge shadow jars into a single multiloader jar."
+
+    val fabricJar = project(":fabric").tasks.named<Jar>("shadowJar")
+    val neoforgeJar = project(":neoforge").tasks.named<Jar>("shadowJar")
+
+    dependsOn(fabricJar)
+    dependsOn(neoforgeJar)
+
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    val archivesNameProp = rootProject.findProperty("archives_name")?.toString()
+        ?: rootProject.property("archives_base_name").toString()
+    archiveFileName.set("${archivesNameProp}-multiloader-${rootProject.version}.jar")
+    destinationDirectory.set(layout.buildDirectory.dir("libs"))
+
+    from({ zipTree(fabricJar.get().archiveFile) })
+    from({ zipTree(neoforgeJar.get().archiveFile) })
+}
+
+tasks.named("assemble") {
+    dependsOn("mergeLoaderJars")
 }

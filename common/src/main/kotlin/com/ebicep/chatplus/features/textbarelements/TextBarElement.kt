@@ -4,7 +4,7 @@ import com.ebicep.chatplus.hud.ChatPlusScreen.EDIT_BOX_DISPLAY_HEIGHT
 import com.ebicep.chatplus.hud.ChatScreenMouseClickedEvent
 import com.ebicep.chatplus.util.ComponentUtil
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.network.chat.Component
 import net.minecraft.util.FormattedCharSequence
 
@@ -28,12 +28,12 @@ interface TextBarElement {
 
     }
 
-    fun onHover(guiGraphics: GuiGraphics, pMouseX: Int, pMouseY: Int) {
+    fun onHover(guiGraphics: GuiGraphicsExtractor, pMouseX: Int, pMouseY: Int) {
 
     }
 
     fun onRender(
-        guiGraphics: GuiGraphics,
+        guiGraphics: GuiGraphicsExtractor,
         currentX: Int,
         currentY: Int,
         mouseX: Int,
@@ -41,7 +41,7 @@ interface TextBarElement {
         partialTick: Float,
     )
 
-    fun fill(guiGraphics: GuiGraphics, currentX: Int, currentY: Int, color: Int = Minecraft.getInstance().options.getBackgroundColor(Int.MIN_VALUE)) {
+    fun fill(guiGraphics: GuiGraphicsExtractor, currentX: Int, currentY: Int, color: Int = Minecraft.getInstance().options.getBackgroundColor(Int.MIN_VALUE)) {
         guiGraphics.fill(
             currentX,
             currentY,
@@ -51,9 +51,9 @@ interface TextBarElement {
         )
     }
 
-    fun drawCenteredString(guiGraphics: GuiGraphics, currentX: Int, currentY: Int, color: Int) {
+    fun drawCenteredString(guiGraphics: GuiGraphicsExtractor, currentX: Int, currentY: Int, color: Int) {
         getText()?.let {
-            guiGraphics.drawCenteredString(
+            guiGraphics.centeredText(
                 Minecraft.getInstance().font,
                 it,
                 currentX + getPaddedWidth() / 2,
@@ -63,8 +63,8 @@ interface TextBarElement {
         }
     }
 
-    fun renderOutline(guiGraphics: GuiGraphics, currentX: Int, currentY: Int, color: Int) {
-        guiGraphics.renderOutline(
+    fun renderOutline(guiGraphics: GuiGraphicsExtractor, currentX: Int, currentY: Int, color: Int) {
+        guiGraphics.outline(
             currentX,
             currentY,
             getPaddedWidth(),

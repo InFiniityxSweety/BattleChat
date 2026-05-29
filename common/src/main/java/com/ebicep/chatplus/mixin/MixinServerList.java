@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class MixinServerList {
 
     @Inject(
-            method = "method_68474",
+            method = "lambda$load$0",
             at = @At(
                     value = "INVOKE",
                     target = "Ljava/util/List;add(Ljava/lang/Object;)Z",

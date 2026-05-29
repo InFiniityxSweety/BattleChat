@@ -10,7 +10,7 @@ import com.ebicep.chatplus.hud.ChatScreenCloseEvent
 import com.ebicep.chatplus.hud.ChatScreenRenderEvent
 import com.ebicep.chatplus.util.KotlinUtil.brighter2
 import kotlinx.serialization.Serializable
-import net.minecraft.client.GuiMessage
+import net.minecraft.client.multiplayer.chat.GuiMessage
 import net.minecraft.network.chat.Component
 import net.minecraft.util.Mth
 import java.awt.Color

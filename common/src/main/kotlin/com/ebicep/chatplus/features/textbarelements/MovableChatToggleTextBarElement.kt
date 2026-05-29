@@ -3,7 +3,7 @@ package com.ebicep.chatplus.features.textbarelements
 import com.ebicep.chatplus.config.Config
 import com.ebicep.chatplus.features.MovableChat.MOVABLE_CHAT_COLOR
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.screens.ChatScreen
 
 class MovableChatToggleTextBarElement(private val chatPlusScreen: ChatScreen) : TextBarElement {
@@ -23,7 +23,7 @@ class MovableChatToggleTextBarElement(private val chatPlusScreen: ChatScreen) : 
         Config.values.movableChatEnabled = !Config.values.movableChatEnabled
     }
 
-    override fun onHover(guiGraphics: GuiGraphics, pMouseX: Int, pMouseY: Int) {
+    override fun onHover(guiGraphics: GuiGraphicsExtractor, pMouseX: Int, pMouseY: Int) {
         guiGraphics.setTooltipForNextFrame(
             chatPlusScreen.font,
             tooltip("chatPlus.movableChat.textBarElement.toggle.tooltip"),
@@ -32,7 +32,7 @@ class MovableChatToggleTextBarElement(private val chatPlusScreen: ChatScreen) : 
         )
     }
 
-    override fun onRender(guiGraphics: GuiGraphics, currentX: Int, currentY: Int, mouseX: Int, mouseY: Int, partialTick: Float) {
+    override fun onRender(guiGraphics: GuiGraphicsExtractor, currentX: Int, currentY: Int, mouseX: Int, mouseY: Int, partialTick: Float) {
         fill(guiGraphics, currentX, currentY)
         drawCenteredString(guiGraphics, currentX, currentY, if (Config.values.movableChatEnabled) MOVABLE_CHAT_COLOR else -1)
         if (Config.values.movableChatEnabled) {

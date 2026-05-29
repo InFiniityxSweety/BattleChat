@@ -1,6 +1,7 @@
 package com.ebicep.chatplus.neoforge
 
 
+import com.ebicep.chatplus.ChatPlusPlatformInit
 import com.ebicep.chatplus.MOD_ID
 import net.neoforged.fml.common.Mod
 
@@ -9,7 +10,7 @@ import net.neoforged.fml.common.Mod
 object ChatPlusForge {
 
     init {
-        ChatPlusPlatformInitImpl.platformInit()
+        ChatPlusPlatformInit.platformInit()
     }
 
 }

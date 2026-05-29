@@ -38,6 +38,7 @@ class AutoTabCreator {
                     it.senderUUID,
                     it.signature,
                     it.addedTime,
+                    it.source,
                     it.tag,
                 )
             )

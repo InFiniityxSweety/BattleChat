@@ -4,6 +4,7 @@
   "version": "${version}",
   "name": "${mod_name}",
   "description": "${mod_description}",
+  "accessWidener": "chatplus.accesswidener",
   "authors": [
     "${mod_authors}"
   ],
@@ -31,9 +32,8 @@
     "chatplus-common.mixins.json"
   ],
   "depends": {
-    "fabric": "*",
+    "fabric-api": "*",
     "minecraft": ">=${minecraft_version}",
-    "architectury": ">=${architectury_version}",
     "fabric-language-kotlin": ">=${fabric_kotlin_version}"
   }
 }

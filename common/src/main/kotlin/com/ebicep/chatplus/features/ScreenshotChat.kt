@@ -39,13 +39,12 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import net.minecraft.ChatFormatting
-import net.minecraft.client.GuiMessage
 import net.minecraft.client.Minecraft
 import net.minecraft.client.Screenshot
-import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.render.GuiRenderer
 import net.minecraft.client.gui.render.pip.PictureInPictureRenderer
-import net.minecraft.client.gui.render.state.GuiRenderState
+import net.minecraft.client.multiplayer.chat.GuiMessage
 import net.minecraft.client.renderer.MultiBufferSource
 import net.minecraft.client.renderer.RenderPipelines
 import net.minecraft.client.renderer.SubmitNodeStorage
@@ -53,6 +52,7 @@ import net.minecraft.client.renderer.fog.FogRenderer
 import net.minecraft.client.renderer.rendertype.OutputTarget
 import net.minecraft.client.renderer.rendertype.RenderSetup
 import net.minecraft.client.renderer.rendertype.RenderType
+import net.minecraft.client.renderer.state.gui.GuiRenderState
 import net.minecraft.network.chat.ClickEvent
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.HoverEvent
@@ -242,13 +242,13 @@ object ScreenshotChat {
             val commandEncoder: CommandEncoder = device.createCommandEncoder()
             val vertexProvider = ChatPlusBufferSource(ByteBufferBuilder(512), renderTarget!!)
             val guiRenderState = GuiRenderState()
-            val guiGraphics = GuiGraphics(minecraft, guiRenderState, ChatPlusScreen.lastMouseX, ChatPlusScreen.lastMouseY)
+            val guiGraphics = GuiGraphicsExtractor(minecraft, guiRenderState, ChatPlusScreen.lastMouseX, ChatPlusScreen.lastMouseY)
             val guiRenderer = GuiRenderer(
                 guiRenderState,
                 vertexProvider,
                 SubmitNodeStorage(),
                 minecraft.gameRenderer.featureRenderDispatcher,
-                emptyList<PictureInPictureRenderer<*>>()
+                emptyList()
             )
             val poseStack = guiGraphics.pose()
             commandEncoder.clearColorTexture(renderTarget!!.colorTexture!!, TRANSPARENCY_COLOR.rgb)
@@ -329,7 +329,7 @@ object ScreenshotChat {
 
     private fun renderLines(
         chatWindow: ChatWindow,
-        guiGraphics: GuiGraphics,
+        guiGraphics: GuiGraphicsExtractor,
         lines: MutableList<ChatTab.ChatPlusGuiMessageLine>,
         screenshotBackgroundMode: ScreenshotBackgroundMode,
     ) {
@@ -619,7 +619,7 @@ object ScreenshotChat {
 //
 ////            val vertexProvider = OverrideVertexProvider(ByteBufferBuilder(256))
 ////            val vertexConsumer = vertexProvider.getBuffer(RENDER_TYPE) as BufferBuilder
-////            val guiGraphics = GuiGraphics(minecraft, vertexProvider)
+////            val guiGraphics = GuiGraphicsExtractor(minecraft, vertexProvider)
 ////            val poseStack = guiGraphics.pose()
 //
 ////            poseStack.scale(10f, 10f, 1f)
@@ -643,7 +643,7 @@ object ScreenshotChat {
 ////            val drawEntries = mutableListOf<DrawEntry>()
 ////            val vertexProvider = OverrideVertexProvider(ByteBufferBuilder(256))
 ////            val bufferBuilder = vertexProvider.getBuffer(RENDER_TYPE) as BufferBuilder
-////            val guiGraphics = GuiGraphics(minecraft, vertexProvider)
+////            val guiGraphics = GuiGraphicsExtractor(minecraft, vertexProvider)
 ////            val poseStack = guiGraphics.pose()
 ////            poseStack.scale(.10f, .10f, 1f)
 ////            var index = 0

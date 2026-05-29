@@ -13,7 +13,7 @@ import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalBooleanRef;
 import net.minecraft.client.gui.ActiveTextCollector;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.ChatComponent;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.ChatScreen;
@@ -277,12 +277,12 @@ public abstract class MixinChatScreen extends Screen implements IMixinChatScreen
             method = "mouseClicked",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/client/gui/components/ChatComponent;captureClickableText(Lnet/minecraft/client/gui/ActiveTextCollector;IIZ)V"
+                    target = "Lnet/minecraft/client/gui/components/ChatComponent;captureClickableText(Lnet/minecraft/client/gui/ActiveTextCollector;IILnet/minecraft/client/gui/components/ChatComponent$DisplayMode;)V"
             )
     )
-    private void captureClickableText(ChatComponent instance, ActiveTextCollector activeTextCollector, int i, int j, boolean bl) {
+    private void captureClickableText(ChatComponent instance, ActiveTextCollector activeTextCollector, int screenHeight, int ticks, ChatComponent.DisplayMode displayMode) {
         if (!Config.INSTANCE.getValues().getEnabled()) {
-            this.minecraft.gui.getChat().captureClickableText(activeTextCollector, i, this.minecraft.gui.getGuiTicks(), true);
+            this.minecraft.gui.getChat().captureClickableText(activeTextCollector, screenHeight, ticks, displayMode);
         }
     }
 
@@ -310,15 +310,15 @@ public abstract class MixinChatScreen extends Screen implements IMixinChatScreen
         ci.cancel();
     }
 
-    @Inject(method = "render", at = @At("HEAD"))
-    private void renderHead(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick, CallbackInfo ci) {
+    @Inject(method = "extractRenderState", at = @At("HEAD"))
+    private void renderHead(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick, CallbackInfo ci) {
         if (!Config.INSTANCE.getValues().getEnabled()) {
             return;
         }
         ChatPlusScreenAdapter.INSTANCE.handleRenderHead(thisScreen(), guiGraphics, mouseX, mouseY, partialTick);
     }
 
-    @ModifyArg(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;fill(IIIII)V"), index = 0)
+    @ModifyArg(method = "extractRenderState", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;fill(IIIII)V"), index = 0)
     private int renderFillStartX(int x) {
         if (!Config.INSTANCE.getValues().getEnabled()) {
             return x;
@@ -337,7 +337,7 @@ public abstract class MixinChatScreen extends Screen implements IMixinChatScreen
         }
     }
 
-    @ModifyArg(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;fill(IIIII)V"), index = 1)
+    @ModifyArg(method = "extractRenderState", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;fill(IIIII)V"), index = 1)
     private int renderFillStartY(int y) {
         if (!Config.INSTANCE.getValues().getEnabled()) {
             return y;
@@ -348,7 +348,7 @@ public abstract class MixinChatScreen extends Screen implements IMixinChatScreen
         return Config.INSTANCE.getValues().getInputBoxSettings().getCalculatedStartY() - MovableChat.InputBoxSettings.INPUT_BOX_PADDING;
     }
 
-    @ModifyArg(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;fill(IIIII)V"), index = 2)
+    @ModifyArg(method = "extractRenderState", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;fill(IIIII)V"), index = 2)
     private int renderFillWidth(int x) {
         if (!Config.INSTANCE.getValues().getEnabled()) {
             return x;
@@ -359,7 +359,7 @@ public abstract class MixinChatScreen extends Screen implements IMixinChatScreen
         return Config.INSTANCE.getValues().getInputBoxSettings().getStartX() + chatPlus$w;
     }
 
-    @ModifyArg(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;fill(IIIII)V"), index = 3)
+    @ModifyArg(method = "extractRenderState", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;fill(IIIII)V"), index = 3)
     private int renderFillHeight(int y) {
         if (!Config.INSTANCE.getValues().getEnabled()) {
             return y;
@@ -370,8 +370,8 @@ public abstract class MixinChatScreen extends Screen implements IMixinChatScreen
         return Config.INSTANCE.getValues().getInputBoxSettings().getCalculatedStartY() + MovableChat.InputBoxSettings.PADDED_INPUT_BOX_HEIGHT;
     }
 
-    @Inject(method = "render", at = @At("TAIL"))
-    private void renderTail(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick, CallbackInfo ci) {
+    @Inject(method = "extractRenderState", at = @At("TAIL"))
+    private void renderTail(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick, CallbackInfo ci) {
         if (!Config.INSTANCE.getValues().getEnabled()) {
             return;
         }

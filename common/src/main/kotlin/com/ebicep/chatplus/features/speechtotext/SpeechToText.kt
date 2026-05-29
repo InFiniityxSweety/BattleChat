@@ -19,13 +19,13 @@ import com.ebicep.chatplus.util.GraphicsUtil.createPose
 import com.ebicep.chatplus.util.GraphicsUtil.translate0
 import com.ebicep.chatplus.util.KeyUtil.isDown
 import com.google.gson.JsonParser
-import dev.architectury.event.EventResult
-import dev.architectury.event.events.client.ClientGuiEvent
-import dev.architectury.event.events.client.ClientRawInputEvent
+import com.ebicep.chatplus.platform.events.EventResult
+import com.ebicep.chatplus.platform.events.client.ClientGuiEvent
+import com.ebicep.chatplus.platform.events.client.ClientRawInputEvent
 import kotlinx.serialization.Serializable
 import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.network.chat.Component
 import org.lwjgl.openal.ALC11
 import org.vosk.Model
@@ -54,7 +54,14 @@ object SpeechToText {
 
     var speechToTextLang: Language? = null
 
-    internal fun renderBoxAndText(guiGraphics: GuiGraphics, text: String, color: Int) {
+    internal fun renderBoxAndText(
+        guiGraphics: GuiGraphicsExtractor,
+        text: String,
+        color: Int,
+        mouseX: Int,
+        mouseY: Int,
+        partialTick: Float,
+    ) {
         val centerWidth = Minecraft.getInstance().window.guiScaledWidth / 2
         val width = Minecraft.getInstance().font.width(text)
         guiGraphics.fill(
@@ -64,7 +71,7 @@ object SpeechToText {
             52,
             2130706432
         )
-        guiGraphics.drawCenteredString(
+        guiGraphics.centeredText(
             Minecraft.getInstance().font,
             text,
             centerWidth,
@@ -72,14 +79,14 @@ object SpeechToText {
             color
         )
         if (Config.values.speechToTextTranslateEnabled) {
-            guiGraphics.renderOutline(
+            guiGraphics.outline(
                 centerWidth - width / 2 - 5,
                 35,
                 width + 10,
                 17,
                 (0xFF55FF55).toInt()
             )
-            guiGraphics.renderDeferredElements()
+            guiGraphics.extractDeferredElements(mouseX, mouseY, partialTick)
         }
     }
 
@@ -197,8 +204,10 @@ class MicrophoneThread : Thread("ChatPlusMicrophoneThread") {
             if (!Config.values.speechToTextEnabled) {
                 return@register
             }
+            val mouseX = ChatPlusScreen.lastMouseX
+            val mouseY = ChatPlusScreen.lastMouseY
             if (listening) {
-                SpeechToText.renderBoxAndText(guiGraphics, "Listening", SpeechToText.LISTENING_COLOR)
+                SpeechToText.renderBoxAndText(guiGraphics, "Listening", SpeechToText.LISTENING_COLOR, mouseX, mouseY, tickDelta)
             }
             if (canQuickSend) {
                 val failed = lastSpokenMessage.isNullOrEmpty()
@@ -206,9 +215,9 @@ class MicrophoneThread : Thread("ChatPlusMicrophoneThread") {
                 val poseStack = guiGraphics.pose()
                 poseStack.createPose {
                     if (failed) {
-                        SpeechToText.renderBoxAndText(guiGraphics, "Failed", SpeechToText.FAILED_COLOR)
+                        SpeechToText.renderBoxAndText(guiGraphics, "Failed", SpeechToText.FAILED_COLOR, mouseX, mouseY, tickDelta)
                     } else {
-                        SpeechToText.renderBoxAndText(guiGraphics, lastSpokenMessage!!, -1)
+                        SpeechToText.renderBoxAndText(guiGraphics, lastSpokenMessage!!, -1, mouseX, mouseY, tickDelta)
                     }
                 }
                 if (!failed) {
@@ -216,7 +225,7 @@ class MicrophoneThread : Thread("ChatPlusMicrophoneThread") {
                         val scale = .8f
                         poseStack.scale(scale, scale)
                         poseStack.translate0(x = centerWidth / scale, y = 55 / scale)
-                        guiGraphics.drawCenteredString(
+                        guiGraphics.centeredText(
                             Minecraft.getInstance().font,
                             Component.literal("Quick Send (")
                                 .append(Config.values.speechToTextQuickSendKey.displayName)

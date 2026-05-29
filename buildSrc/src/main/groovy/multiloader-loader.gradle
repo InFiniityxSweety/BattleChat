@@ -1,0 +1,24 @@
+plugins {
+    id 'multiloader-common'
+}
+
+dependencies {
+    compileOnly(project(':common')) {
+        def loaderAttribute = Attribute.of('io.github.mcgradleconventions.loader', String)
+        attributes {
+            attribute(loaderAttribute, 'common')
+        }
+    }
+}
+
+tasks.named('compileJava', JavaCompile) {
+    source(project(':common').fileTree('src/main/java'))
+}
+
+tasks.named('compileKotlin') {
+    source(project(':common').fileTree('src/main/kotlin'))
+}
+
+processResources {
+    from(project(':common').file('src/main/resources'))
+}
