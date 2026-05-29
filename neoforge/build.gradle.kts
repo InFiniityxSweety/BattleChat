@@ -86,8 +86,8 @@ dependencies {
     implementation("thedarkcolour:kotlinforforge-neoforge:${rootProject.property("kotlin_for_forge_version")}") {
         exclude(group = "net.neoforged.fancymodloader", module = "loader")
     }
-    shadowBundle("net.java.dev.jna:jna:5.14.0")
-    shadowBundle("com.alphacephei:vosk:0.3.45")
+    shadow("net.java.dev.jna:jna:5.14.0")
+    shadow("com.alphacephei:vosk:0.3.45")
 }
 //accessx {
 //    convert("neoforge") {
