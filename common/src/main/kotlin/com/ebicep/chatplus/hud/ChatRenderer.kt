@@ -273,16 +273,14 @@ class ChatRenderer {
         }
         handleScreenResize()
 
-//        var chatFocused = ChatManager.isChatFocused()
-
         val poseStack = guiGraphics.pose()
-        var foreground = displayMode.foreground
+        var displayMode = displayMode
 
         val preLinesEvent = ChatRenderPreLinesEvent(guiGraphics, chatWindow, displayMode)
         if (EventBus.post(preLinesEvent).returnFunction) {
             return
         }
-        foreground = preLinesEvent.displayMode.foreground
+        displayMode = preLinesEvent.displayMode
 
         poseStack.pushMatrix()
         chatGraphicsAccess.updatePose { matrix ->
@@ -290,7 +288,7 @@ class ChatRenderer {
         }
 
         var linesPerPage = rescaledLinesPerPage
-        if (!foreground) {
+        if (!displayMode.foreground) {
             linesPerPage = (linesPerPage * chatWindow.generalSettings.unfocusedHeight).roundToInt()
         }
 
@@ -299,7 +297,7 @@ class ChatRenderer {
 
         EventBus.post(ChatRenderPreLinesRenderEvent(guiGraphics, chatWindow, guiTicks))
 
-        val alphaCalculator = if (foreground) {
+        val alphaCalculator = if (displayMode.foreground) {
             ChatComponent.AlphaCalculator.FULLY_VISIBLE
         } else {
             ChatComponent.AlphaCalculator.timeBased(guiTicks)
