@@ -10,13 +10,12 @@ import com.ebicep.chatplus.platform.PlatformServicesProvider
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.screens.Screen
 import net.neoforged.fml.ModContainer
-import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent
-import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent
 import net.neoforged.neoforge.client.event.ClientTickEvent
 import net.neoforged.neoforge.client.event.RenderGuiEvent
+import net.neoforged.neoforge.client.event.lifecycle.ClientStartedEvent
+import net.neoforged.neoforge.client.event.lifecycle.ClientStoppingEvent
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory
 import net.neoforged.neoforge.common.NeoForge
-import net.neoforged.neoforge.event.GameShuttingDownEvent
 import net.neoforged.neoforge.event.level.LevelEvent
 
 class ChatPlusPlatformInitImpl : PlatformServicesProvider {
@@ -97,16 +96,11 @@ class ChatPlusPlatformInitImpl : PlatformServicesProvider {
             return
         }
         lifecycleHooked = true
-        NeoForgePlatformHooks.modEventBus.addListener(FMLClientSetupEvent::class.java) { event ->
-            event.enqueueWork {
-                startedListeners.forEach { it() }
-            }
+        NeoForge.EVENT_BUS.addListener<ClientStartedEvent> {
+            startedListeners.forEach { it() }
         }
-        NeoForge.EVENT_BUS.addListener<GameShuttingDownEvent> {
+        NeoForge.EVENT_BUS.addListener<ClientStoppingEvent> {
             stoppingListeners.forEach { it() }
-        }
-        NeoForge.EVENT_BUS.addListener<ClientPlayerNetworkEvent.LoggingIn> {
-            levelLoadListeners.forEach { it() }
         }
         NeoForge.EVENT_BUS.addListener<LevelEvent.Load> { event ->
             if (event.level.isClientSide) {
