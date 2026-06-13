@@ -19,6 +19,7 @@ import com.ebicep.chatplus.platform.events.EventResult
 import com.ebicep.chatplus.platform.events.client.ClientRawInputEvent
 import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.components.ChatComponent
 import net.minecraft.client.gui.components.EditBox
 import net.minecraft.client.multiplayer.chat.GuiMessageSource
 import net.minecraft.client.multiplayer.chat.GuiMessageTag
@@ -157,14 +158,18 @@ object TranslateMessage {
                 handleTranslate(it.rawComponent)
             }
         }
-        ClientRawInputEvent.KEY_PRESSED.register { _, _, keyEvent ->
+        ClientRawInputEvent.KEY_PRESSED.register { minecraft, _, keyEvent ->
             if (ChatManager.isChatFocused()) {
                 return@register EventResult.pass()
             }
             if (keyEvent.key() != values.translateKey.key.value || keyEvent.modifiers() != values.translateKey.modifier.toInt()) {
                 return@register EventResult.pass()
             }
+            if (minecraft.screen != null) {
+                return@register EventResult.pass()
+            }
             languageSpeakEnabled = true
+            minecraft.openChatScreen(ChatComponent.ChatMethod.MESSAGE)
             EventResult.interruptTrue()
         }
         EventBus.register<ChatScreenInputEvent> {
