@@ -108,7 +108,9 @@ allprojects {
 
 tasks.register<Jar>("mergeLoaderJars") {
     group = "build"
-    description = "Merge Fabric and NeoForge shadow jars into a single multiloader jar."
+    description =
+        "Dev-only: merges Fabric and NeoForge shadow JARs. Not for release (conflicting loader metadata). " +
+        "Use :fabric:shadowJar and :neoforge:shadowJar for publishing."
 
     val fabricJar = project(":fabric").tasks.named<Jar>("shadowJar")
     val neoforgeJar = project(":neoforge").tasks.named<Jar>("shadowJar")
@@ -125,8 +127,4 @@ tasks.register<Jar>("mergeLoaderJars") {
 
     from({ zipTree(fabricJar.get().archiveFile) })
     from({ zipTree(neoforgeJar.get().archiveFile) })
-}
-
-tasks.named("assemble") {
-    dependsOn("mergeLoaderJars")
 }
