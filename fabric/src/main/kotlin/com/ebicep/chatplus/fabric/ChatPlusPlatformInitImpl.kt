@@ -7,27 +7,26 @@ import com.ebicep.chatplus.events.fabric.ClientCommandRegistration
 import com.ebicep.chatplus.features.chattabs.ChatTab
 import com.ebicep.chatplus.features.chatwindows.ChatWindow
 import com.ebicep.chatplus.platform.PlatformServicesProvider
-import com.ebicep.chatplus.platform.events.EventResult
-import com.ebicep.chatplus.platform.events.PlatformKeyEvent
-import com.mojang.blaze3d.platform.InputConstants
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLevelEvents
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElement
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements
-import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.resources.Identifier
-import org.lwjgl.glfw.GLFW
 
 class ChatPlusPlatformInitImpl : PlatformServicesProvider {
 
     private val tickListeners = mutableListOf<() -> Unit>()
-    private val keyListeners = mutableListOf<(Minecraft, Int, PlatformKeyEvent) -> EventResult>()
     private val hudListeners = mutableListOf<(GuiGraphicsExtractor, Float) -> Unit>()
+    private val startedListeners = mutableListOf<() -> Unit>()
+    private val stoppingListeners = mutableListOf<() -> Unit>()
+    private val levelLoadListeners = mutableListOf<() -> Unit>()
     private var tickHooked = false
     private var hudHooked = false
-    private val keyStates = BooleanArray(GLFW.GLFW_KEY_LAST + 1)
+    private var lifecycleHooked = false
 
     override fun platformInit() {
         ChatPlus.init()
@@ -58,9 +57,19 @@ class ChatPlusPlatformInitImpl : PlatformServicesProvider {
         ensureHudHook()
     }
 
-    override fun registerKeyPressed(listener: (Minecraft, Int, PlatformKeyEvent) -> EventResult) {
-        keyListeners.add(listener)
-        ensureTickHook()
+    override fun registerClientStarted(listener: () -> Unit) {
+        startedListeners.add(listener)
+        ensureLifecycleHooks()
+    }
+
+    override fun registerClientStopping(listener: () -> Unit) {
+        stoppingListeners.add(listener)
+        ensureLifecycleHooks()
+    }
+
+    override fun registerClientLevelLoad(listener: () -> Unit) {
+        levelLoadListeners.add(listener)
+        ensureLifecycleHooks()
     }
 
     private fun ensureTickHook() {
@@ -68,11 +77,8 @@ class ChatPlusPlatformInitImpl : PlatformServicesProvider {
             return
         }
         tickHooked = true
-        ClientTickEvents.END_CLIENT_TICK.register { client ->
+        ClientTickEvents.END_CLIENT_TICK.register {
             tickListeners.forEach { it() }
-            if (keyListeners.isNotEmpty()) {
-                pollKeys(client)
-            }
         }
     }
 
@@ -93,47 +99,19 @@ class ChatPlusPlatformInitImpl : PlatformServicesProvider {
         )
     }
 
-    private fun pollKeys(client: Minecraft) {
-        val window = client.window
-        val handle = window.handle()
-        for (key in 0..GLFW.GLFW_KEY_LAST) {
-            val down = if (key in 0..7) {
-                GLFW.glfwGetMouseButton(handle, key) == GLFW.GLFW_PRESS
-            } else if (key < GLFW.GLFW_KEY_SPACE) {
-                // Skip invalid key codes that GLFW will reject.
-                continue
-            } else {
-                InputConstants.isKeyDown(window, key)
-            }
-            if (down == keyStates[key]) {
-                continue
-            }
-            keyStates[key] = down
-            val action = if (down) GLFW.GLFW_PRESS else GLFW.GLFW_RELEASE
-            val event = PlatformKeyEvent(key, getModifiers(client))
-            dispatchKeyEvent(client, action, event)
+    private fun ensureLifecycleHooks() {
+        if (lifecycleHooked) {
+            return
         }
-    }
-
-    private fun dispatchKeyEvent(client: Minecraft, action: Int, event: PlatformKeyEvent) {
-        for (listener in keyListeners) {
-            if (listener(client, action, event).interrupt) {
-                break
-            }
+        lifecycleHooked = true
+        ClientLifecycleEvents.CLIENT_STARTED.register {
+            startedListeners.forEach { it() }
         }
-    }
-
-    private fun getModifiers(client: Minecraft): Int {
-        var modifiers = 0
-        if (client.hasAltDown()) {
-            modifiers = modifiers or 1
+        ClientLifecycleEvents.CLIENT_STOPPING.register {
+            stoppingListeners.forEach { it() }
         }
-        if (client.hasControlDown()) {
-            modifiers = modifiers or 2
+        ClientLevelEvents.AFTER_CLIENT_LEVEL_CHANGE.register { _, _ ->
+            levelLoadListeners.forEach { it() }
         }
-        if (client.hasShiftDown()) {
-            modifiers = modifiers or 4
-        }
-        return modifiers
     }
 }

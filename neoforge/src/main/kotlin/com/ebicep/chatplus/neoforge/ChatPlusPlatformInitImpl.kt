@@ -7,31 +7,32 @@ import com.ebicep.chatplus.config.neoforge.ConfigScreenImpl
 import com.ebicep.chatplus.features.chattabs.ChatTab
 import com.ebicep.chatplus.features.chatwindows.ChatWindow
 import com.ebicep.chatplus.platform.PlatformServicesProvider
-import com.ebicep.chatplus.platform.events.EventResult
-import com.ebicep.chatplus.platform.events.PlatformKeyEvent
-import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.screens.Screen
 import net.neoforged.fml.ModContainer
-import net.neoforged.fml.ModLoadingContext
+import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent
+import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent
 import net.neoforged.neoforge.client.event.ClientTickEvent
-import net.neoforged.neoforge.client.event.InputEvent
 import net.neoforged.neoforge.client.event.RenderGuiEvent
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory
 import net.neoforged.neoforge.common.NeoForge
+import net.neoforged.neoforge.event.GameShuttingDownEvent
+import net.neoforged.neoforge.event.level.LevelEvent
 
 class ChatPlusPlatformInitImpl : PlatformServicesProvider {
 
     private val tickListeners = mutableListOf<() -> Unit>()
-    private val keyListeners = mutableListOf<(Minecraft, Int, PlatformKeyEvent) -> EventResult>()
     private val renderListeners = mutableListOf<(GuiGraphicsExtractor, Float) -> Unit>()
+    private val startedListeners = mutableListOf<() -> Unit>()
+    private val stoppingListeners = mutableListOf<() -> Unit>()
+    private val levelLoadListeners = mutableListOf<() -> Unit>()
     private var tickHooked = false
-    private var keyHooked = false
     private var renderHooked = false
+    private var lifecycleHooked = false
 
     override fun platformInit() {
         ChatPlus.init()
-        ModLoadingContext.get().registerExtensionPoint(IConfigScreenFactory::class.java) {
+        NeoForgePlatformHooks.modContainer.registerExtensionPoint(IConfigScreenFactory::class.java) {
             IConfigScreenFactory { _: ModContainer, screen: Screen ->
                 ConfigScreen.getConfigScreen(screen)
             }
@@ -58,7 +59,7 @@ class ChatPlusPlatformInitImpl : PlatformServicesProvider {
             return
         }
         tickHooked = true
-        NeoForge.EVENT_BUS.addListener<ClientTickEvent.Post> { event ->
+        NeoForge.EVENT_BUS.addListener<ClientTickEvent.Post> {
             tickListeners.forEach { it() }
         }
     }
@@ -76,28 +77,41 @@ class ChatPlusPlatformInitImpl : PlatformServicesProvider {
         }
     }
 
-    override fun registerKeyPressed(listener: (Minecraft, Int, PlatformKeyEvent) -> EventResult) {
-        keyListeners.add(listener)
-        if (keyHooked) {
-            return
-        }
-        keyHooked = true
-        NeoForge.EVENT_BUS.addListener<InputEvent.Key> { event ->
-            dispatchKeyEvent(event)
-        }
+    override fun registerClientStarted(listener: () -> Unit) {
+        startedListeners.add(listener)
+        ensureLifecycleHooks()
     }
 
-    private fun dispatchKeyEvent(event: InputEvent.Key): EventResult {
-        val client = Minecraft.getInstance()
-        val action = event.action
-        val keyEvent = PlatformKeyEvent(event.key, event.modifiers)
-        var finalResult = EventResult.pass()
-        for (listener in keyListeners) {
-            finalResult = listener(client, action, keyEvent)
-            if (finalResult.interrupt) {
-                break
+    override fun registerClientStopping(listener: () -> Unit) {
+        stoppingListeners.add(listener)
+        ensureLifecycleHooks()
+    }
+
+    override fun registerClientLevelLoad(listener: () -> Unit) {
+        levelLoadListeners.add(listener)
+        ensureLifecycleHooks()
+    }
+
+    private fun ensureLifecycleHooks() {
+        if (lifecycleHooked) {
+            return
+        }
+        lifecycleHooked = true
+        NeoForgePlatformHooks.modEventBus.addListener(FMLClientSetupEvent::class.java) { event ->
+            event.enqueueWork {
+                startedListeners.forEach { it() }
             }
         }
-        return finalResult
+        NeoForge.EVENT_BUS.addListener<GameShuttingDownEvent> {
+            stoppingListeners.forEach { it() }
+        }
+        NeoForge.EVENT_BUS.addListener<ClientPlayerNetworkEvent.LoggingIn> {
+            levelLoadListeners.forEach { it() }
+        }
+        NeoForge.EVENT_BUS.addListener<LevelEvent.Load> { event ->
+            if (event.level.isClientSide) {
+                levelLoadListeners.forEach { it() }
+            }
+        }
     }
 }

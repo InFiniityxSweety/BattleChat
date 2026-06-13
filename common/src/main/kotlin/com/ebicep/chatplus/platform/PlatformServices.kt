@@ -2,9 +2,6 @@ package com.ebicep.chatplus.platform
 
 import com.ebicep.chatplus.features.chattabs.ChatTab
 import com.ebicep.chatplus.features.chatwindows.ChatWindow
-import com.ebicep.chatplus.platform.events.EventResult
-import com.ebicep.chatplus.platform.events.PlatformKeyEvent
-import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.screens.Screen
 import java.nio.file.Path
@@ -18,7 +15,9 @@ interface PlatformServicesProvider {
     fun getWindowEditorScreen(previousScreen: Screen? = null, chatWindow: ChatWindow): Screen
     fun registerClientTickPost(listener: () -> Unit)
     fun registerRenderHud(listener: (GuiGraphicsExtractor, Float) -> Unit)
-    fun registerKeyPressed(listener: (Minecraft, Int, PlatformKeyEvent) -> EventResult)
+    fun registerClientStarted(listener: () -> Unit)
+    fun registerClientStopping(listener: () -> Unit)
+    fun registerClientLevelLoad(listener: () -> Unit)
 }
 
 object PlatformServices {
