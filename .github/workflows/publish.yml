@@ -37,20 +37,12 @@ jobs:
           PLATFORMS="${{ steps.platforms.outputs.value }}"
           TASKS=""
           [[ "$PLATFORMS" == *"fabric"* ]]   && TASKS="$TASKS :fabric:shadowJar"
-          [[ "$PLATFORMS" == *"forge"* ]]    && TASKS="$TASKS :forge:shadowJar"
           [[ "$PLATFORMS" == *"neoforge"* ]] && TASKS="$TASKS :neoforge:shadowJar"
           ./gradlew $TASKS
 
       - name: Publish Fabric
         if: contains(steps.platforms.outputs.value, 'fabric')
         run: ./gradlew :fabric:publishUnified
-        env:
-          CF_TOKEN: ${{ secrets.CF_TOKEN }}
-          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
-
-      - name: Publish Forge
-        if: contains(steps.platforms.outputs.value, 'forge')
-        run: ./gradlew :forge:publishUnified
         env:
           CF_TOKEN: ${{ secrets.CF_TOKEN }}
           MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}

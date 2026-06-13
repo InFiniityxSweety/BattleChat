@@ -46,10 +46,7 @@ dependencies {
 
     shadow("net.java.dev.jna:jna:5.14.0")
     shadow("com.alphacephei:vosk:0.3.45")
-
-//    annotationProcessor("io.github.llamalad7:mixinextras-fabric:0.3.6")
-//    implementation("io.github.llamalad7:mixinextras-fabric:0.3.6")
-//    include("io.github.llamalad7:mixinextras-fabric:0.3.6")
+    // MixinExtras: provided by Loom + mixinextras-common compileOnly in root project
 }
 
 tasks.processResources {
@@ -76,7 +73,6 @@ tasks.processResources {
 }
 
 tasks.shadowJar {
-    exclude("architectury.common.json")
     configurations = listOf(project.configurations.getByName("shadow"))
     archiveClassifier.set("dev-shadow")
     isZip64 = true
@@ -116,11 +112,6 @@ unifiedPublishing {
         mainPublication.set(tasks.shadowJar.get().archiveFile) // Declares the publicated jar
 
         relations {
-            depends { // Mark as a required dependency
-                // architectury
-                curseforge = "architectury-api"
-                modrinth = "lhGA9TYQ"
-            }
             depends { // Mark as a required dependency
                 // cloth config
                 curseforge = "cloth-config"
@@ -162,7 +153,7 @@ unifiedPublishing {
                 id = "cJlZ132G" // Required, must be a string, ID of Modrinth project
             }
         } else {
-            println("(${project.name}) CF_TOKEN not found, not publishing to CurseForge")
+            println("(${project.name}) MODRINTH_TOKEN not found, not publishing to Modrinth")
         }
     }
 }

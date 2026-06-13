@@ -193,7 +193,7 @@ unifiedPublishing {
                 id = "cJlZ132G" // Required, must be a string, ID of Modrinth project
             }
         } else {
-            println("(${project.name}) CF_TOKEN not found, not publishing to CurseForge")
+            println("(${project.name}) MODRINTH_TOKEN not found, not publishing to Modrinth")
         }
     }
 }
