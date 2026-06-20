@@ -60,7 +60,7 @@ tasks.processResources {
                 "version" to project.version,
 
                 "mod_id" to rootProject.property("mod_id"),
-                "minecraft_version" to rootProject.property("minecraft_version"),
+                "min_minecraft_version" to rootProject.property("min_minecraft_version"),
                 "fabric_kotlin_version" to rootProject.property("fabric_kotlin_version"),
                 "cloth_config_version" to rootProject.property("cloth_config_version"),
 
