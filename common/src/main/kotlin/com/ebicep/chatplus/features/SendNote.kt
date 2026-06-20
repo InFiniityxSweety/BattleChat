@@ -17,6 +17,7 @@ import com.ebicep.chatplus.translator.Translator
 import com.ebicep.chatplus.util.KeyUtil.isDown
 import kotlinx.serialization.Serializable
 import net.minecraft.client.Minecraft
+import net.minecraft.client.multiplayer.chat.GuiMessageSource
 import net.minecraft.network.chat.Component
 import java.awt.Color
 import java.util.*
@@ -109,6 +110,7 @@ object SendNote {
                     null,
                     null,
                     Minecraft.getInstance().gui.guiTicks,
+                    GuiMessageSource.PLAYER,
                     null,
                 )
             )

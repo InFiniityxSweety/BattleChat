@@ -11,7 +11,7 @@ import com.ebicep.chatplus.mixin.IMixinChatScreen
 import com.ebicep.chatplus.mixin.IMixinScreen
 import com.mojang.blaze3d.platform.InputConstants
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.screens.ChatScreen
 import net.minecraft.client.input.KeyEvent
 import net.minecraft.client.input.MouseButtonEvent
@@ -124,13 +124,13 @@ object ChatPlusScreenAdapter {
         }
     }
 
-    fun handleRenderHead(chatScreen: ChatScreen, guiGraphics: GuiGraphics, mouseX: Int, mouseY: Int, partialTick: Float) {
+    fun handleRenderHead(chatScreen: ChatScreen, guiGraphicsExtractor: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, partialTick: Float) {
         ChatPlusScreen.lastMouseX = mouseX
         ChatPlusScreen.lastMouseY = mouseY
     }
 
-    fun handleRenderTail(chatScreen: ChatScreen, guiGraphics: GuiGraphics, mouseX: Int, mouseY: Int, partialTick: Float) {
-        EventBus.post(ChatScreenRenderEvent(chatScreen, guiGraphics, mouseX, mouseY, partialTick))
+    fun handleRenderTail(chatScreen: ChatScreen, guiGraphicsExtractor: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, partialTick: Float) {
+        EventBus.post(ChatScreenRenderEvent(chatScreen, guiGraphicsExtractor, mouseX, mouseY, partialTick))
     }
 
     fun handleChatInput(chatScreen: ChatScreen, rawMessage: String): Boolean {

@@ -23,7 +23,7 @@ import com.ebicep.chatplus.util.Resources
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.network.chat.Component
 import net.minecraft.util.Mth
 import java.awt.Color
@@ -180,7 +180,7 @@ class TabSettings {
         return null
     }
 
-    fun renderTabs(guiGraphics: GuiGraphics) {
+    fun renderTabs(guiGraphics: GuiGraphicsExtractor) {
         val poseStack = guiGraphics.pose()
         var xStart: Int = chatWindow.renderer.internalX
         val yStart: Int = when (position) {
@@ -211,14 +211,14 @@ class TabSettings {
 
                     if (Debug.debug) {
                         poseStack.createPose {
-                            guiGraphics.drawString(
+                            guiGraphics.text(
                                 Minecraft.getInstance().font,
                                 "x:${it.xStart}",
                                 0,
                                 -20,
                                 0xFF5050
                             )
-                            guiGraphics.drawString(
+                            guiGraphics.text(
                                 Minecraft.getInstance().font,
                                 "y:${it.yStart}",
                                 0,
@@ -269,7 +269,7 @@ class TabSettings {
         }
     }
 
-    private fun renderTab(chatTab: ChatTab, guiGraphics: GuiGraphics) {
+    private fun renderTab(chatTab: ChatTab, guiGraphics: GuiGraphicsExtractor) {
         val poseStack = guiGraphics.pose()
         val isGlobalSelected = chatTab == ChatManager.globalSelectedTab
         val isWindowSelected = chatWindow == ChatManager.selectedWindow
@@ -374,7 +374,7 @@ data class ChatTabClickedEvent(
 )
 
 data class ChatTabRenderEvent(
-    val guiGraphics: GuiGraphics,
+    val guiGraphics: GuiGraphicsExtractor,
     val chatTab: ChatTab,
     val tabWidth: Int,
     var xStart: Int,

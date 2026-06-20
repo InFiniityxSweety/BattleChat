@@ -1,12 +1,23 @@
 package com.ebicep.chatplus
 
-import dev.architectury.injectables.annotations.ExpectPlatform
+import com.ebicep.chatplus.platform.PlatformServices
 
 object ChatPlusPlatformInit {
 
+    @Volatile
+    private var initialized = false
+
     @JvmStatic
-    @ExpectPlatform
     fun platformInit() {
-        throw AssertionError()
+        if (initialized) {
+            return
+        }
+        synchronized(this) {
+            if (initialized) {
+                return
+            }
+            PlatformServices.get().platformInit()
+            initialized = true
+        }
     }
 }

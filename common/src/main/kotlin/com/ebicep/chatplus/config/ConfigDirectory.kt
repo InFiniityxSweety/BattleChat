@@ -1,13 +1,12 @@
 package com.ebicep.chatplus.config
 
-import dev.architectury.injectables.annotations.ExpectPlatform
+import com.ebicep.chatplus.platform.PlatformServices
 import java.nio.file.Path
 
 object ConfigDirectory {
 
     @JvmStatic
-    @ExpectPlatform
     fun getConfigDirectory(): Path {
-        throw AssertionError()
+        return PlatformServices.get().getConfigDirectory()
     }
 }

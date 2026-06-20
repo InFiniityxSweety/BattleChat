@@ -35,7 +35,7 @@ import com.ebicep.chatplus.util.GraphicsUtil.translate0
 import kotlinx.serialization.Serializable
 import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.network.chat.Component
 import net.minecraft.util.Mth
 import org.joml.Matrix3x2fStack
@@ -586,7 +586,7 @@ object MovableChat {
     }
 
     private fun renderDebugTab(
-        guiGraphics: GuiGraphics,
+        guiGraphics: GuiGraphicsExtractor,
         chatTab: ChatTab,
         outsideTabBar: Boolean,
     ) {
@@ -625,7 +625,7 @@ object MovableChat {
     }
 
     private fun renderDebugMoving(
-        guiGraphics: GuiGraphics,
+        guiGraphics: GuiGraphicsExtractor,
         chatWindow: ChatWindow,
     ) {
         val poseStack = guiGraphics.pose()
@@ -648,7 +648,7 @@ object MovableChat {
             Config.values.chatWindows.forEach { window ->
                 val smallWidth = window === ChatManager.selectedWindow && isSingleTabWindow(window)
                 val width = if (smallWidth) window.tabSettings.getTabBarWidth() else window.renderer.backgroundWidthEndX - window.renderer.internalX
-                guiGraphics.renderOutline(
+                guiGraphics.outline(
                     window.renderer.internalX - MOVE_PADDING_X,
                     getTabStartY(window) - MOVE_PADDING_Y,
                     (width + MOVE_PADDING_X * 2),
@@ -660,7 +660,7 @@ object MovableChat {
             Config.values.chatWindows.forEach { window ->
                 val selected = window === ChatManager.selectedWindow && isSingleTabWindow(window)
                 val width = if (selected) window.tabSettings.getTabBarWidth() else window.renderer.backgroundWidthEndX - window.renderer.internalX
-                guiGraphics.renderOutline(
+                guiGraphics.outline(
                     window.renderer.internalX,
                     getTabStartY(window),
                     width,
@@ -700,7 +700,7 @@ object MovableChat {
 
     private fun renderMoving(
         poseStack: Matrix3x2fStack,
-        guiGraphics: GuiGraphics,
+        guiGraphics: GuiGraphicsExtractor,
         x: Int,
         y: Int,
         height: Int,

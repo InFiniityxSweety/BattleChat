@@ -9,12 +9,13 @@ import com.ebicep.chatplus.features.chattabs.SkipNewMessageEvent;
 import com.ebicep.chatplus.features.chatwindows.ChatWindowsManager;
 import com.ebicep.chatplus.hud.ChatManager;
 import com.llamalad7.mixinextras.sugar.Local;
-import net.minecraft.client.GuiMessage;
-import net.minecraft.client.GuiMessageTag;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.ChatComponent;
+import net.minecraft.client.multiplayer.chat.GuiMessage;
+import net.minecraft.client.multiplayer.chat.GuiMessageSource;
+import net.minecraft.client.multiplayer.chat.GuiMessageTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MessageSignature;
 import net.minecraft.util.profiling.Profiler;
@@ -36,32 +37,30 @@ public class MixinChatComponent {
     @Shadow
     Minecraft minecraft;
 
-    @Inject(method = "render(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/gui/Font;IIIZZ)V", at = @At("HEAD"), cancellable = true)
-    public void render(GuiGraphics guiGraphics, Font font, int i, int j, int k, boolean bl, boolean bl2, CallbackInfo ci) {
+    @Inject(method = "Lnet/minecraft/client/gui/components/ChatComponent;extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/gui/Font;IIILnet/minecraft/client/gui/components/ChatComponent$DisplayMode;Z)V", at = @At("HEAD"), cancellable = true)
+    public void render(GuiGraphicsExtractor graphics, Font font, int ticks, int mouseX, int mouseY, ChatComponent.DisplayMode displayMode, boolean changeCursorOnInsertions, CallbackInfo ci) {
         if (!ChatPlus.INSTANCE.isEnabled() || (Config.INSTANCE.getValues().getShowVanillaWhenUnfocused() && !ChatManager.INSTANCE.isChatFocused())) {
             return;
         }
-        guiGraphics.pose().pushMatrix();
+        graphics.pose().pushMatrix();
         ProfilerFiller profilerFiller = Profiler.get();
         profilerFiller.push("chatplus");
-        ChatWindowsManager.INSTANCE.renderAll(guiGraphics, font, i, j, k, bl, bl2);
+        ChatWindowsManager.INSTANCE.renderAll(graphics, font, ticks, mouseX, mouseY, displayMode, changeCursorOnInsertions);
         profilerFiller.pop();
-        guiGraphics.pose().popMatrix();
+        graphics.pose().popMatrix();
         ci.cancel();
     }
 
-    @Inject(method = "addMessage(Lnet/minecraft/network/chat/Component;Lnet/minecraft/network/chat/MessageSignature;Lnet/minecraft/client/GuiMessageTag;)V", at = @At("RETURN"))
+    @Inject(method = "Lnet/minecraft/client/gui/components/ChatComponent;addMessage(Lnet/minecraft/network/chat/Component;Lnet/minecraft/network/chat/MessageSignature;Lnet/minecraft/client/multiplayer/chat/GuiMessageSource;Lnet/minecraft/client/multiplayer/chat/GuiMessageTag;)V", at = @At("RETURN"))
     public void addMessage(
-            Component component, MessageSignature messageSignature, GuiMessageTag guiMessageTag,
-            CallbackInfo ci,
-            @Local GuiMessage guiMessage
+            Component contents, MessageSignature signature, GuiMessageSource source, GuiMessageTag tag, CallbackInfo ci, @Local(name = "message") GuiMessage message
     ) {
         if (!ChatPlus.INSTANCE.isEnabled() && !Config.INSTANCE.getValues().getAddMessagesIfDisabled()) {
             return;
         }
-        component = guiMessage.content();
-        messageSignature = guiMessage.signature();
-        guiMessageTag = guiMessage.tag();
+        contents = message.content();
+        signature = message.signature();
+        tag = message.tag();
         List<ChatTab> addMessagesTo = new ArrayList<>();
 
         Integer lastPriority = null;
@@ -71,7 +70,7 @@ public class MixinChatComponent {
             if (lastPriority != null && lastPriority > priority && !alwaysAdd) {
                 continue;
             }
-            if (chatTab.matches(component)) {
+            if (chatTab.matches(contents)) {
                 addMessagesTo.add(chatTab);
                 if (chatTab.getSkipOthers()) {
                     break;
@@ -83,12 +82,13 @@ public class MixinChatComponent {
         }
         if (!addMessagesTo.isEmpty()) {
             AddNewMessageEvent messageEvent = new AddNewMessageEvent(
-                    component.copy(),
-                    component,
+                    contents.copy(),
+                    contents,
                     null,
-                    messageSignature,
+                    signature,
                     this.minecraft.gui.getGuiTicks(),
-                    guiMessageTag,
+                    source,
+                    tag,
                     false
             );
             EventBus.INSTANCE.post(AddNewMessageEvent.class, messageEvent);
@@ -100,12 +100,13 @@ public class MixinChatComponent {
             }
         } else {
             SkipNewMessageEvent messageEvent = new SkipNewMessageEvent(
-                    component.copy(),
-                    component,
+                    contents.copy(),
+                    contents,
                     null,
-                    messageSignature,
+                    signature,
                     this.minecraft.gui.getGuiTicks(),
-                    guiMessageTag
+                    source,
+                    tag
             );
             EventBus.INSTANCE.post(SkipNewMessageEvent.class, messageEvent);
         }

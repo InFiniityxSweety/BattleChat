@@ -7,7 +7,7 @@ import com.ebicep.chatplus.features.chattabs.CHAT_TAB_Y_OFFSET
 import com.ebicep.chatplus.hud.*
 import com.ebicep.chatplus.util.GraphicsUtil.createPose
 import net.minecraft.client.gui.Font
-import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.components.ChatComponent
 
 object ChatWindowsManager {
@@ -123,10 +123,10 @@ object ChatWindowsManager {
         EventBus.post(WindowSwitchEvent(oldWindow, newWindow))
     }
 
-    fun renderAll(guiGraphics: GuiGraphics, font: Font, guiTicks: Int, mouseX: Int, mouseY: Int, chatFocused: Boolean, bl2: Boolean) {
+    fun renderAll(guiGraphics: GuiGraphicsExtractor, font: Font, guiTicks: Int, mouseX: Int, mouseY: Int, displayMode: ChatComponent.DisplayMode, changeCursorOnInsertions: Boolean) {
         EventBus.post(RenderWindowsPreEvent(guiGraphics))
-        val chatGraphicsAccess = if (chatFocused) {
-            ChatComponent.DrawingFocusedGraphicsAccess(guiGraphics, font, mouseX, mouseY, bl2)
+        val chatGraphicsAccess = if (displayMode.foreground) {
+            ChatComponent.DrawingFocusedGraphicsAccess(guiGraphics, font, mouseX, mouseY, changeCursorOnInsertions)
         } else {
             ChatComponent.DrawingBackgroundGraphicsAccess(guiGraphics)
         }
@@ -136,7 +136,7 @@ object ChatWindowsManager {
             }
             val poseStack = guiGraphics.pose()
             poseStack.createPose {
-                it.renderer.render(it, guiGraphics, chatGraphicsAccess, guiTicks, chatFocused)
+                it.renderer.render(it, guiGraphics, chatGraphicsAccess, guiTicks, displayMode)
             }
         }
         EventBus.post(RenderWindowsPostEvent(guiGraphics))
@@ -149,6 +149,6 @@ data class WindowSwitchEvent(
     val newWindow: ChatWindow,
 )
 
-data class RenderWindowsPreEvent(val guiGraphics: GuiGraphics)
+data class RenderWindowsPreEvent(val guiGraphics: GuiGraphicsExtractor)
 
-data class RenderWindowsPostEvent(val guiGraphics: GuiGraphics)
+data class RenderWindowsPostEvent(val guiGraphics: GuiGraphicsExtractor)

@@ -17,7 +17,7 @@ import com.ebicep.chatplus.translator.LanguageManager
 import com.ebicep.chatplus.translator.LanguageManager.languages
 import com.ebicep.chatplus.util.GraphicsUtil.createPose
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.components.EditBox
 import net.minecraft.client.gui.screens.ChatScreen
 import net.minecraft.network.chat.Component
@@ -142,7 +142,7 @@ class TranslateSpeakTextBarElement(private val chatPlusScreen: ChatScreen) : Tex
         event.returnFunction = selectorLanguageSearch.isFocused && selectorLanguageSearch.mouseClicked(event.mouseButtonEvent, false)
     }
 
-    override fun onHover(guiGraphics: GuiGraphics, pMouseX: Int, pMouseY: Int) {
+    override fun onHover(guiGraphics: GuiGraphicsExtractor, pMouseX: Int, pMouseY: Int) {
         chatPlusScreen as IMixinScreen
         guiGraphics.setTooltipForNextFrame(
             chatPlusScreen.font,
@@ -152,7 +152,7 @@ class TranslateSpeakTextBarElement(private val chatPlusScreen: ChatScreen) : Tex
         )
     }
 
-    override fun onRender(guiGraphics: GuiGraphics, currentX: Int, currentY: Int, mouseX: Int, mouseY: Int, partialTick: Float) {
+    override fun onRender(guiGraphics: GuiGraphicsExtractor, currentX: Int, currentY: Int, mouseX: Int, mouseY: Int, partialTick: Float) {
         fill(guiGraphics, currentX, currentY)
         drawCenteredString(guiGraphics, currentX, currentY, if (languageSpeakEnabled) TRANSLATE_COLOR else -1)
         if (languageSpeakEnabled) {
@@ -162,7 +162,7 @@ class TranslateSpeakTextBarElement(private val chatPlusScreen: ChatScreen) : Tex
             return
         }
         selectorLanguageSearch.y = selectorStartY
-        selectorLanguageSearch.render(guiGraphics, currentX, currentY, partialTick)
+        selectorLanguageSearch.extractRenderState(guiGraphics, currentX, currentY, partialTick)
         val poseStack = guiGraphics.pose()
         val bottom = selectorRenderBottom
         var y = if (bottom) selectorStartY - 10 else selectorStartY + EDIT_BOX_HEIGHT
@@ -184,7 +184,7 @@ class TranslateSpeakTextBarElement(private val chatPlusScreen: ChatScreen) : Tex
                     y + 10,
                     0x55000000
                 )
-                guiGraphics.drawString(
+                guiGraphics.text(
                     Minecraft.getInstance().font,
                     it.name,
                     guiScaledWidth - languageWidth - 2,

@@ -133,12 +133,11 @@ object ChatPlus {
 
     fun sendMessage(component: Component) {
         // rgb(18, 227, 219)
-        Minecraft.getInstance().player?.displayClientMessage(
+        Minecraft.getInstance().player?.sendSystemMessage(
             Component.empty()
                 .append(Component.literal("ChatPlus").withColor(MOD_COLOR))
                 .append(Component.literal(" > ").withStyle(ChatFormatting.DARK_GRAY))
-                .append(component),
-            false
+                .append(component)
         )
     }
 

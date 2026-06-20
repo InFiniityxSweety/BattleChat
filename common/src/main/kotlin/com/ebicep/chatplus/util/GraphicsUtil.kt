@@ -4,7 +4,7 @@ import com.ebicep.chatplus.mixin.IMixinGuiGraphics
 import com.mojang.blaze3d.pipeline.RenderPipeline
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Font
-import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.renderer.RenderPipelines
 import net.minecraft.locale.Language
 import net.minecraft.network.chat.FormattedText
@@ -72,11 +72,11 @@ object GraphicsUtil {
         translate(x.toFloat(), y.toFloat())
     }
 
-    fun GuiGraphics.fill0(i: Float, j: Float, k: Float, l: Float, m: Int) {
+    fun GuiGraphicsExtractor.fill0(i: Float, j: Float, k: Float, l: Float, m: Int) {
         this.fill(RenderPipelines.GUI, i.toInt(), j.toInt(), k.toInt(), l.toInt(), m)
     }
 
-//    fun GuiGraphics.fill0(renderPipeline: RenderPipeline, i: Float, j: Float, k: Float, l: Float, m: Int, n: Int) {
+//    fun GuiGraphicsExtractor.fill0(renderPipeline: RenderPipeline, i: Float, j: Float, k: Float, l: Float, m: Int, n: Int) {
 //        var o: Float
 //        var i = i
 //        var j = j
@@ -116,7 +116,7 @@ object GraphicsUtil {
 //        vertexConsumer.addVertex(matrix4f, k, j, m.toFloat()).setColor(n).setUv(0f, 0f)
 //    }
 
-    fun GuiGraphics.renderOutline(
+    fun GuiGraphicsExtractor.renderOutline(
         startX: Float,
         startY: Float,
         width: Float,
@@ -131,7 +131,7 @@ object GraphicsUtil {
         renderOutlineSetPos(startX, startY, startX + width, startY + height, color, thickness, top, bottom, left, right)
     }
 
-    fun GuiGraphics.renderOutlineSetPos(
+    fun GuiGraphicsExtractor.renderOutlineSetPos(
         startX: Float,
         startY: Float,
         endX: Float,
@@ -157,7 +157,7 @@ object GraphicsUtil {
         }
     }
 
-    fun GuiGraphics.renderOutline(
+    fun GuiGraphicsExtractor.renderOutline(
         startX: Int,
         startY: Int,
         width: Int,
@@ -172,7 +172,7 @@ object GraphicsUtil {
         renderOutlineSetPos(startX, startY, startX + width, startY + height, color, thickness, top, bottom, left, right)
     }
 
-    fun GuiGraphics.renderOutlineSetPos(
+    fun GuiGraphicsExtractor.renderOutlineSetPos(
         startX: Int,
         startY: Int,
         endX: Int,
@@ -199,43 +199,43 @@ object GraphicsUtil {
     }
 
 
-    fun GuiGraphics.drawHorizontalLine(x1: Int, x2: Int, y: Int, color: Int) {
+    fun GuiGraphicsExtractor.drawHorizontalLine(x1: Int, x2: Int, y: Int, color: Int) {
         this.fill(x1, y, x2, y + 1, color)
     }
 
-    fun GuiGraphics.drawHorizontalLine(x1: Float, x2: Float, y: Float, color: Int, thickness: Float = 1f) {
+    fun GuiGraphicsExtractor.drawHorizontalLine(x1: Float, x2: Float, y: Float, color: Int, thickness: Float = 1f) {
         this.fill0(x1, y, x2, y + thickness, color)
     }
 
-    fun GuiGraphics.drawHorizontalLine(x1: Int, x2: Int, y: Int, color: Int, thickness: Int = 1) {
+    fun GuiGraphicsExtractor.drawHorizontalLine(x1: Int, x2: Int, y: Int, color: Int, thickness: Int = 1) {
         this.fill(x1, y, x2, y + thickness, color)
     }
 
-    fun GuiGraphics.drawVerticalLine(x: Int, y1: Int, y2: Int, color: Int, thickness: Int = 1) {
+    fun GuiGraphicsExtractor.drawVerticalLine(x: Int, y1: Int, y2: Int, color: Int, thickness: Int = 1) {
         this.fill(x, y1, x + thickness, y2, color)
     }
 
-    fun GuiGraphics.drawString0(string: String, i: Int, j: Int, k: Int) {
-        this.drawString(Minecraft.getInstance().font, string, i, j, k, true)
+    fun GuiGraphicsExtractor.drawString0(string: String, i: Int, j: Int, k: Int) {
+        this.text(Minecraft.getInstance().font, string, i, j, k, true)
     }
 
-    fun GuiGraphics.drawString0(string: String, x: Float, y: Float, color: Int) {
+    fun GuiGraphicsExtractor.drawString0(string: String, x: Float, y: Float, color: Int) {
         this.drawString0(Minecraft.getInstance().font, string, x, y, color, true)
     }
 
-    private fun GuiGraphics.drawString0(font: Font, string: String, x: Float, y: Float, color: Int, bl: Boolean) {
-        this.drawString(font, Language.getInstance().getVisualOrder(FormattedText.of(string)), x.toInt(), y.toInt(), color, bl)
+    private fun GuiGraphicsExtractor.drawString0(font: Font, string: String, x: Float, y: Float, color: Int, bl: Boolean) {
+        this.text(font, Language.getInstance().getVisualOrder(FormattedText.of(string)), x.toInt(), y.toInt(), color, bl)
     }
 
-    fun GuiGraphics.drawString0(formattedCharSequence: FormattedCharSequence, x: Float, y: Float, color: Int) {
+    fun GuiGraphicsExtractor.drawString0(formattedCharSequence: FormattedCharSequence, x: Float, y: Float, color: Int) {
         this.drawString0(formattedCharSequence, x, y, color, true)
     }
 
-    fun GuiGraphics.drawString0(formattedCharSequence: FormattedCharSequence, x: Float, y: Float, color: Int, bl: Boolean) {
-        this.drawString(Minecraft.getInstance().font, formattedCharSequence, x.toInt(), y.toInt(), color, bl)
+    fun GuiGraphicsExtractor.drawString0(formattedCharSequence: FormattedCharSequence, x: Float, y: Float, color: Int, bl: Boolean) {
+        this.text(Minecraft.getInstance().font, formattedCharSequence, x.toInt(), y.toInt(), color, bl)
     }
 
-    fun GuiGraphics.blit0(
+    fun GuiGraphicsExtractor.blit0(
         renderPipeline: RenderPipeline,
         resourceLocation: Identifier,
         i: Float, // starting x-coordinate for the blit.
@@ -265,7 +265,7 @@ object GraphicsUtil {
         )
     }
 
-    private fun GuiGraphics.innerBlit0(
+    private fun GuiGraphicsExtractor.innerBlit0(
         renderPipeline: RenderPipeline,
         resourceLocation: Identifier,
         i: Float, // starting x-coordinate for the blit.
@@ -282,15 +282,15 @@ object GraphicsUtil {
         this.callInnerBlit(renderPipeline, resourceLocation, i.toInt(), j.toInt(), k.toInt(), l.toInt(), f, g, h, m, n)
     }
 
-    fun GuiGraphics.drawImage(resources: Resources) {
+    fun GuiGraphicsExtractor.drawImage(resources: Resources) {
         this.drawImage(resources.resourceLocation, resources.width, resources.height)
     }
 
-    fun GuiGraphics.drawImage(resourceLocation: Identifier, width: Int, height: Int) {
+    fun GuiGraphicsExtractor.drawImage(resourceLocation: Identifier, width: Int, height: Int) {
         this.drawImage(resourceLocation, width.toFloat(), height.toFloat())
     }
 
-    fun GuiGraphics.drawImage(resourceLocation: Identifier, width: Float, height: Float) {
+    fun GuiGraphicsExtractor.drawImage(resourceLocation: Identifier, width: Float, height: Float) {
         this.innerBlit0(
             RenderPipelines.GUI_TEXTURED,
             resourceLocation,
@@ -308,12 +308,12 @@ object GraphicsUtil {
 
     object PlayerHeadUtils {
 
-        fun playerFaceRendererDraw(guiGraphics: GuiGraphics, resourceLocation: Identifier, i: Float, j: Float, k: Float) {
+        fun playerFaceRendererDraw(guiGraphics: GuiGraphicsExtractor, resourceLocation: Identifier, i: Float, j: Float, k: Float) {
             this.playerFaceRendererDraw(guiGraphics, resourceLocation, i, j, k, renderHat = true, renderUpsideDown = false, l = -1)
         }
 
         fun playerFaceRendererDraw(
-            guiGraphics: GuiGraphics,
+            guiGraphics: GuiGraphicsExtractor,
             resourceLocation: Identifier,
             i: Float,
             j: Float,
@@ -344,7 +344,7 @@ object GraphicsUtil {
             }
         }
 
-        private fun playerFaceRendererDrawHat(guiGraphics: GuiGraphics, resourceLocation: Identifier, i: Float, j: Float, k: Float, bl: Boolean, l: Int) {
+        private fun playerFaceRendererDrawHat(guiGraphics: GuiGraphicsExtractor, resourceLocation: Identifier, i: Float, j: Float, k: Float, bl: Boolean, l: Int) {
             val m = 8 + (if (bl) 8 else 0)
             val n = 8 * (if (bl) -1 else 1)
             guiGraphics.blit0(

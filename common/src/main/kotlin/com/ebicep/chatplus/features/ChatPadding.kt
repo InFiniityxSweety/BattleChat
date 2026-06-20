@@ -9,8 +9,8 @@ import com.ebicep.chatplus.hud.*
 import com.ebicep.chatplus.util.GraphicsUtil.fill0
 import com.ebicep.chatplus.util.GraphicsUtil.translate0
 import com.ebicep.chatplus.util.KotlinUtil.reduceAlpha
-import net.minecraft.client.GuiMessage
 import net.minecraft.client.gui.components.ChatComponent
+import net.minecraft.client.multiplayer.chat.GuiMessage
 import kotlin.math.max
 import kotlin.math.roundToInt
 

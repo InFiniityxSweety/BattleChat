@@ -9,7 +9,7 @@ import com.ebicep.chatplus.util.GraphicsUtil.createPose
 import com.ebicep.chatplus.util.GraphicsUtil.drawString0
 import com.ebicep.chatplus.util.GraphicsUtil.translate0
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.components.AbstractWidget
 import net.minecraft.client.gui.components.Button
 import net.minecraft.client.gui.layouts.FrameLayout
@@ -139,8 +139,8 @@ class Editor(
         gridlayout.visitWidgets(Consumer { guiEventListener: AbstractWidget -> this.addRenderableWidget(guiEventListener) })
     }
 
-    override fun render(guiGraphics: GuiGraphics, i: Int, j: Int, f: Float) {
-        super.render(guiGraphics, i, j, f)
+    override fun extractRenderState(guiGraphics: GuiGraphicsExtractor, i: Int, j: Int, f: Float) {
+        super.extractRenderState(guiGraphics, i, j, f)
         guiGraphics.nextStratum()
         val poseStack = guiGraphics.pose()
         poseStack.createPose {
@@ -157,7 +157,7 @@ class Editor(
     private fun drawText(
         poseStack: Matrix3x2fStack,
         scale: Float,
-        guiGraphics: GuiGraphics,
+        guiGraphics: GuiGraphicsExtractor,
         text: FormattedCharSequence,
     ) {
         poseStack.scale(scale, scale)

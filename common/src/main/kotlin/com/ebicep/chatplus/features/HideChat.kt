@@ -6,9 +6,10 @@ import com.ebicep.chatplus.events.EventBus
 import com.ebicep.chatplus.features.internal.OnScreenDisplayEvent
 import com.ebicep.chatplus.hud.ChatManager
 import com.ebicep.chatplus.hud.ChatRenderPreLinesEvent
-import dev.architectury.event.EventResult
-import dev.architectury.event.events.client.ClientRawInputEvent
+import com.ebicep.chatplus.platform.events.EventResult
+import com.ebicep.chatplus.platform.events.client.ClientRawInputEvent
 import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.components.ChatComponent
 import net.minecraft.network.chat.Component
 
 object HideChat {
@@ -20,7 +21,7 @@ object HideChat {
         EventBus.register<ChatRenderPreLinesEvent>({ 200 }, { hidden }) {
             hidden = false
             if (Config.values.alwaysShowChat) {
-                it.chatFocused = true
+                it.displayMode = ChatComponent.DisplayMode.FOREGROUND
                 return@register
             }
             if (Config.values.hideChatHideWhenDebugScreen && Minecraft.getInstance().debugOverlay.showDebugScreen()) {
@@ -45,7 +46,7 @@ object HideChat {
             if (ChatManager.isChatFocused()) {
                 return@register EventResult.pass()
             }
-            val modifiers = keyEvent.modifiers
+            val modifiers = keyEvent.modifiers()
             val hideKeyDown = Config.values.hideChatToggleKey.isDown(keyEvent.key(), modifiers)
             val alwaysShowChatDown = Config.values.alwaysShowChatToggleKey.isDown(keyEvent.key(), modifiers)
             if (!hideKeyDown && !alwaysShowChatDown) {

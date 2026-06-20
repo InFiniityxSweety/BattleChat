@@ -9,7 +9,7 @@ import com.ebicep.chatplus.util.KeyUtil
 import com.ebicep.chatplus.util.KeyUtil.isDown
 import com.mojang.blaze3d.platform.InputConstants
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.screens.ChatScreen
 import net.minecraft.client.input.KeyEvent
 import net.minecraft.client.input.MouseButtonEvent
@@ -254,7 +254,7 @@ data class ChatScreenMouseReleasedEvent(
 
 data class ChatScreenRenderEvent(
     val screen: ChatScreen,
-    val guiGraphics: GuiGraphics,
+    val guiGraphics: GuiGraphicsExtractor,
     val mouseX: Int,
     val mouseY: Int,
     val partialTick: Float,

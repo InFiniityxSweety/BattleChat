@@ -1,7 +1,10 @@
 import org.gradle.kotlin.dsl.support.uppercaseFirstChar
+import org.gradle.api.attributes.Attribute
 
 plugins {
     id("com.gradleup.shadow")
+    id("multiloader-loader")
+    id("net.fabricmc.fabric-loom")
 }
 
 repositories {
@@ -14,47 +17,36 @@ repositories {
     }
 }
 
-architectury {
-    platformSetupLoomIde()
-    fabric()
-}
-
 loom {
-    accessWidenerPath.set(project(":common").loom.accessWidenerPath)
+    val aw = project(":common").file("src/main/resources/${rootProject.property("mod_id")}.accesswidener")
+    if (aw.exists()) {
+        accessWidenerPath.set(aw)
+    }
 }
-
-val common: Configuration by configurations.creating
-val shadowCommon: Configuration by configurations.creating
-val developmentFabric: Configuration by configurations.getting
 
 configurations {
-    compileOnly.configure { extendsFrom(common) }
-    runtimeOnly.configure { extendsFrom(common) }
-    developmentFabric.extendsFrom(common)
+    runtimeClasspath {
+        extendsFrom(configurations.getByName("shadow"))
+    }
 }
 
 dependencies {
-    modImplementation("net.fabricmc:fabric-loader:${rootProject.property("fabric_loader_version")}")
-    modApi("net.fabricmc.fabric-api:fabric-api:${rootProject.property("fabric_api_version")}")
-    // Remove the next line if you don't want to depend on the API
-    modApi("dev.architectury:architectury-fabric:${rootProject.property("architectury_version")}")
-    modApi("me.shedaniel.cloth:cloth-config-fabric:${rootProject.property("cloth_config_version")}") {
+    minecraft("com.mojang:minecraft:${project.property("minecraft_version")}")
+
+    implementation("net.fabricmc:fabric-loader:${rootProject.property("fabric_loader_version")}")
+    api("net.fabricmc.fabric-api:fabric-api:${rootProject.property("fabric_api_version")}")
+    api("me.shedaniel.cloth:cloth-config-fabric:${rootProject.property("cloth_config_version")}") {
         exclude(group = "net.fabricmc.fabric-api")
     }
 
-    common(project(":common", "namedElements")) { isTransitive = false }
-    shadowCommon(project(":common", "transformProductionFabric")) { isTransitive = false }
-
     // Fabric Kotlin
-    modImplementation("net.fabricmc:fabric-language-kotlin:${rootProject.property("fabric_kotlin_version")}")
+    implementation("net.fabricmc:fabric-language-kotlin:${rootProject.property("fabric_kotlin_version")}")
     // Mod Menu
-    modImplementation("com.terraformersmc:modmenu:${project.property("modmenu_version")}")
+    implementation("com.terraformersmc:modmenu:${project.property("modmenu_version")}")
 
-    include("com.alphacephei:vosk:0.3.45")
-
-//    annotationProcessor("io.github.llamalad7:mixinextras-fabric:0.3.6")
-//    implementation("io.github.llamalad7:mixinextras-fabric:0.3.6")
-//    include("io.github.llamalad7:mixinextras-fabric:0.3.6")
+    shadow("net.java.dev.jna:jna:5.14.0")
+    shadow("com.alphacephei:vosk:0.3.45")
+    // MixinExtras: provided by Loom + mixinextras-common compileOnly in root project
 }
 
 tasks.processResources {
@@ -68,8 +60,7 @@ tasks.processResources {
                 "version" to project.version,
 
                 "mod_id" to rootProject.property("mod_id"),
-                "minecraft_version" to rootProject.property("minecraft_version"),
-                "architectury_version" to rootProject.property("architectury_version"),
+                "min_minecraft_version" to rootProject.property("min_minecraft_version"),
                 "fabric_kotlin_version" to rootProject.property("fabric_kotlin_version"),
                 "cloth_config_version" to rootProject.property("cloth_config_version"),
 
@@ -82,16 +73,13 @@ tasks.processResources {
 }
 
 tasks.shadowJar {
-    exclude("architectury.common.json")
-    configurations = listOf(shadowCommon)
+    configurations = listOf(project.configurations.getByName("shadow"))
     archiveClassifier.set("dev-shadow")
+    isZip64 = true
 }
 
-tasks.remapJar {
-    injectAccessWidener.set(true)
-    inputFile.set(tasks.shadowJar.get().archiveFile)
-    dependsOn(tasks.shadowJar)
-    archiveClassifier.set(null as String?)
+tasks.named("build") {
+    dependsOn("shadowJar")
 }
 
 tasks.jar {
@@ -115,19 +103,15 @@ unifiedPublishing {
     project {
         println("(${project.name}) Publishing | ${rootProject.property("minecraft_version")} | ${project.name}")
         displayName.set("${rootProject.property("mod_name")} ${project.name.uppercaseFirstChar()} v${project.version}")
-        changelog.set((project.ext.get("releaseChangeLog") as () -> String)())
+        val releaseChangeLog = project.ext.get("releaseChangeLog") as? () -> String
+        changelog.set(releaseChangeLog?.invoke() ?: "")
         gameVersions.set("${rootProject.property("supported_minecraft_version")}".split(","))
         gameLoaders.set(listOf(project.name))
         releaseType.set("release")
 
-        mainPublication.set(tasks.remapJar.get().archiveFile) // Declares the publicated jar
+        mainPublication.set(tasks.shadowJar.get().archiveFile) // Declares the publicated jar
 
         relations {
-            depends { // Mark as a required dependency
-                // architectury
-                curseforge = "architectury-api"
-                modrinth = "lhGA9TYQ"
-            }
             depends { // Mark as a required dependency
                 // cloth config
                 curseforge = "cloth-config"
@@ -169,7 +153,36 @@ unifiedPublishing {
                 id = "cJlZ132G" // Required, must be a string, ID of Modrinth project
             }
         } else {
-            println("(${project.name}) CF_TOKEN not found, not publishing to CurseForge")
+            println("(${project.name}) MODRINTH_TOKEN not found, not publishing to Modrinth")
+        }
+    }
+}
+
+// Implement mcgradleconventions loader attribute
+val loaderAttribute: Attribute<String> =
+    Attribute.of("io.github.mcgradleconventions.loader", String::class.java)
+
+listOf("apiElements", "runtimeElements").forEach { variant ->
+    configurations.named(variant) {
+        attributes {
+            attribute(loaderAttribute, "fabric")
+        }
+    }
+}
+
+sourceSets.configureEach {
+    val compileCp = configurations.named(compileClasspathConfigurationName)
+    val runtimeCp = configurations.named(runtimeClasspathConfigurationName)
+
+    compileCp.configure {
+        attributes {
+            attribute(loaderAttribute, "fabric")
+        }
+    }
+
+    runtimeCp.configure {
+        attributes {
+            attribute(loaderAttribute, "fabric")
         }
     }
 }

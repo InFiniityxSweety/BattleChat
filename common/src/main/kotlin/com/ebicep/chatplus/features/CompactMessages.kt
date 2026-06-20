@@ -15,6 +15,7 @@ import com.ebicep.chatplus.util.KotlinUtil
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import net.minecraft.ChatFormatting
+import net.minecraft.client.multiplayer.chat.GuiMessage
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.HoverEvent
 import net.minecraft.network.chat.Style
@@ -137,7 +138,19 @@ object CompactMessages {
                     break
                 }
                 val addedTime =
-                    if (Config.values.compactMessagesRefreshAddedTime) event.addedTime else oldDisplayMessage.line.addedTime
+                    if (Config.values.compactMessagesRefreshAddedTime) event.addedTime else oldDisplayMessage.line.addedTime()
+                val parent = oldDisplayMessage.line.parent()
+                val lineParent = if (Config.values.compactMessagesRefreshAddedTime) {
+                    GuiMessage(
+                        addedTime,
+                        event.mutableComponent,
+                        parent.signature(),
+                        parent.source,
+                        parent.tag()
+                    )
+                } else {
+                    parent
+                }
                 val displayMessageEvent = EventBus.post(
                     ChatTabAddDisplayMessageEvent(
                         AddDisplayMessageType.COMPACT,
@@ -145,7 +158,8 @@ object CompactMessages {
                         chatTab,
                         event.mutableComponent,
                         addedTime,
-                        oldDisplayMessage.line.tag,
+                        lineParent.source,
+                        lineParent.tag(),
                         message,
                         Mth.floor(event.chatWindow.renderer.getBackgroundWidth())
                     )
@@ -153,8 +167,7 @@ object CompactMessages {
                 chatTab.addWrappedComponents(
                     event.mutableComponent,
                     displayMessageEvent,
-                    addedTime,
-                    oldDisplayMessage.line.tag,
+                    lineParent,
                     message,
                     addIndex
                 )

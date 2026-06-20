@@ -4,7 +4,7 @@ import com.ebicep.chatplus.events.Event
 import com.ebicep.chatplus.events.EventBus
 import com.ebicep.chatplus.util.GraphicsUtil.createPose
 import com.ebicep.chatplus.util.GraphicsUtil.translate0
-import dev.architectury.event.events.client.ClientGuiEvent
+import com.ebicep.chatplus.platform.events.client.ClientGuiEvent
 import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.Component
 
@@ -22,7 +22,7 @@ object OnScreenDisplay {
             components.forEachIndexed { index, it ->
                 poseStack.createPose {
                     poseStack.translate0(y = index * 10.0)
-                    guiGraphics.drawCenteredString(
+                    guiGraphics.centeredText(
                         Minecraft.getInstance().font,
                         it,
                         Minecraft.getInstance().window.guiScaledWidth / 2,

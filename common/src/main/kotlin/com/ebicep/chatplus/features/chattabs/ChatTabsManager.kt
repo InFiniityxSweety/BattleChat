@@ -12,8 +12,8 @@ import com.ebicep.chatplus.hud.*
 import com.ebicep.chatplus.hud.ChatManager.isChatFocused
 import com.ebicep.chatplus.hud.ChatManager.selectedWindow
 import com.ebicep.chatplus.mixin.IMixinChatScreen
-import dev.architectury.event.EventResult
-import dev.architectury.event.events.client.ClientRawInputEvent
+import com.ebicep.chatplus.platform.events.EventResult
+import com.ebicep.chatplus.platform.events.client.ClientRawInputEvent
 import net.minecraft.client.Minecraft
 import net.minecraft.util.Mth
 
@@ -65,7 +65,7 @@ object ChatTabs {
             if (isChatFocused() || keyCode != 1) {
                 return@register EventResult.pass()
             }
-            val modifiers = keyEvent.modifiers
+            val modifiers = keyEvent.modifiers()
             when {
                 Config.values.keyCycleTabLeftChatClosed.isDown(keyEvent.key(), modifiers) -> {
                     selectedWindow.tabSettings.scrollTab(-1)

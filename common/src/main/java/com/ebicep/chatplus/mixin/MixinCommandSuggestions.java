@@ -58,7 +58,7 @@ public class MixinCommandSuggestions {
     }
 
     @ModifyVariable(
-            method = "renderUsage",
+            method = "extractUsage",
             at = @At(value = "STORE"),
             ordinal = 1
     )

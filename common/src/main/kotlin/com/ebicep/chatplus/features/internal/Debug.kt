@@ -38,7 +38,7 @@ object Debug {
             val mouseX = ChatPlusScreen.lastMouseX
             val mouseY = ChatPlusScreen.lastMouseY
             pose.createPose {
-                guiGraphics.drawString(
+                guiGraphics.text(
                     Minecraft.getInstance().font,
                     "$mouseX,$mouseY",
                     mouseX + 5,
@@ -46,7 +46,7 @@ object Debug {
                     -1
                 )
                 val globalSelectedTab = ChatManager.globalSelectedTab
-                guiGraphics.drawString(
+                guiGraphics.text(
                     Minecraft.getInstance().font,
                     "${globalSelectedTab.chatScrollbarPos}",
                     mouseX + 5,
@@ -58,7 +58,7 @@ object Debug {
                 messageAtEvent.calculateFinalPositions(mouseX.toDouble(), mouseY.toDouble())
                 val finalMouse = messageAtEvent.finalMouse
                 val finalChat = messageAtEvent.finalChat
-                guiGraphics.drawString(
+                guiGraphics.text(
                     Minecraft.getInstance().font,
                     "${messageAtEvent.finalMouse.x.roundToInt()},${messageAtEvent.finalMouse.y.roundToInt()} | ${messageAtEvent.finalChat.x.roundToInt()},${messageAtEvent.finalChat.y.roundToInt()}",
                     mouseX + 5,
@@ -83,7 +83,7 @@ object Debug {
             val guiGraphics = it.guiGraphics
             val pose = guiGraphics.pose()
             pose.createPose {
-                guiGraphics.drawString(
+                guiGraphics.text(
                     Minecraft.getInstance().font,
                     "${renderer.x},${renderer.y}",
                     renderer.x,

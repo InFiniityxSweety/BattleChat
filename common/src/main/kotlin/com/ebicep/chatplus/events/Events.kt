@@ -3,10 +3,8 @@ package com.ebicep.chatplus.events
 import com.ebicep.chatplus.config.Config
 import com.ebicep.chatplus.config.ConfigScreen
 import com.ebicep.chatplus.config.queueUpdateConfig
-import dev.architectury.event.CompoundEventResult
-import dev.architectury.event.events.client.ClientGuiEvent
-import dev.architectury.event.events.client.ClientLifecycleEvent
-import dev.architectury.event.events.client.ClientTickEvent
+import com.ebicep.chatplus.platform.events.client.ClientLifecycleEvent
+import com.ebicep.chatplus.platform.events.client.ClientTickEvent
 
 data class ChatPlusTickEvent(
     val tick: Long
@@ -53,9 +51,6 @@ object Events {
         }
         ClientLifecycleEvent.CLIENT_STOPPING.register {
             Config.save()
-        }
-        ClientGuiEvent.SET_SCREEN.register {
-            return@register CompoundEventResult.pass()
         }
     }
 }

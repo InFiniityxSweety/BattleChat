@@ -4,6 +4,7 @@ import com.ebicep.chatplus.config.Config
 import com.ebicep.chatplus.events.EventBus
 import com.ebicep.chatplus.hud.ChatRenderPreLinesEvent
 import com.ebicep.chatplus.util.KeyUtil.isDown
+import net.minecraft.client.gui.components.ChatComponent
 
 object PeekChat {
 
@@ -15,7 +16,7 @@ object PeekChat {
         EventBus.register<ChatRenderPreLinesEvent> {
             if (peeking) {
                 wasPeeking = true
-                it.chatFocused = true
+                it.displayMode = ChatComponent.DisplayMode.FOREGROUND
             } else if (wasPeeking) {
                 wasPeeking = false
                 it.chatWindow.tabSettings.selectedTab.resetChatScroll()

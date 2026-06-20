@@ -126,7 +126,7 @@ object FindMessage {
                 it.screen as IMixinChatScreen
                 it.screen as IChatScreen
                 val editBox = it.screen.input ?: return@register
-                it.guiGraphics.renderOutline(
+                it.guiGraphics.outline(
                     editBox.x - 2,
                     editBox.y - (if (Config.values.vanillaInputBox) 2 else 4),
                     it.screen.chatPlusWidth - (if (Config.values.vanillaInputBox) 2 else -2),

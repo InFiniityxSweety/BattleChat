@@ -2,7 +2,7 @@ package com.ebicep.chatplus.config
 
 import com.ebicep.chatplus.features.chattabs.ChatTab
 import com.ebicep.chatplus.features.chatwindows.ChatWindow
-import dev.architectury.injectables.annotations.ExpectPlatform
+import com.ebicep.chatplus.platform.PlatformServices
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.Screen
 
@@ -23,21 +23,18 @@ object ConfigScreen {
     }
 
     @JvmStatic
-    @ExpectPlatform
     fun getConfigScreen(previousScreen: Screen? = null): Screen {
-        throw AssertionError()
+        return PlatformServices.get().getConfigScreen(previousScreen)
     }
 
     @JvmStatic
-    @ExpectPlatform
     fun getTabEditorScreen(previousScreen: Screen? = null, chatTab: ChatTab): Screen {
-        throw AssertionError()
+        return PlatformServices.get().getTabEditorScreen(previousScreen, chatTab)
     }
 
     @JvmStatic
-    @ExpectPlatform
     fun getWindowEditorScreen(previousScreen: Screen? = null, chatWindow: ChatWindow): Screen {
-        throw AssertionError()
+        return PlatformServices.get().getWindowEditorScreen(previousScreen, chatWindow)
     }
 
 }

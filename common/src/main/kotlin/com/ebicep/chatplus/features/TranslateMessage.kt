@@ -15,12 +15,14 @@ import com.ebicep.chatplus.mixin.IMixinChatScreen
 import com.ebicep.chatplus.mixin.IMixinScreen
 import com.ebicep.chatplus.translator.*
 import com.ebicep.chatplus.util.ComponentUtil
-import dev.architectury.event.EventResult
-import dev.architectury.event.events.client.ClientRawInputEvent
+import com.ebicep.chatplus.platform.events.EventResult
+import com.ebicep.chatplus.platform.events.client.ClientRawInputEvent
 import net.minecraft.ChatFormatting
-import net.minecraft.client.GuiMessageTag
 import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.components.ChatComponent
 import net.minecraft.client.gui.components.EditBox
+import net.minecraft.client.multiplayer.chat.GuiMessageSource
+import net.minecraft.client.multiplayer.chat.GuiMessageTag
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.HoverEvent
 
@@ -119,7 +121,7 @@ object TranslateMessage {
                 if (values.vanillaInputBox) height - 2 else inputBoxSettings.getCalculatedStartY() + MovableChat.InputBoxSettings.PADDED_INPUT_BOX_HEIGHT,
                 minecraft.options.getBackgroundColor(Int.MIN_VALUE)
             )
-            guiGraphics.renderOutline(
+            guiGraphics.outline(
                 startX,
                 startY,
                 TRANSLATE_PREFIX_INPUT_WIDTH,
@@ -128,7 +130,7 @@ object TranslateMessage {
             )
             val mouseX = it.mouseX
             val mouseY = it.mouseY
-            inputTranslatePrefix!!.render(guiGraphics, mouseX, mouseY, it.partialTick)
+            inputTranslatePrefix!!.extractRenderState(guiGraphics, mouseX, mouseY, it.partialTick)
             if (
                 mouseX in startX until startX + TRANSLATE_PREFIX_INPUT_WIDTH &&
                 mouseY in startY until startY + EDIT_BOX_HEIGHT
@@ -156,14 +158,18 @@ object TranslateMessage {
                 handleTranslate(it.rawComponent)
             }
         }
-        ClientRawInputEvent.KEY_PRESSED.register { _, _, keyEvent ->
+        ClientRawInputEvent.KEY_PRESSED.register { minecraft, _, keyEvent ->
             if (ChatManager.isChatFocused()) {
                 return@register EventResult.pass()
             }
             if (keyEvent.key() != values.translateKey.key.value || keyEvent.modifiers() != values.translateKey.modifier.toInt()) {
                 return@register EventResult.pass()
             }
+            if (minecraft.screen != null) {
+                return@register EventResult.pass()
+            }
             languageSpeakEnabled = true
+            minecraft.openChatScreen(ChatComponent.ChatMethod.MESSAGE)
             EventResult.interruptTrue()
         }
         EventBus.register<ChatScreenInputEvent> {
@@ -253,6 +259,7 @@ object TranslateMessage {
                         null,
                         null,
                         Minecraft.getInstance().gui.guiTicks,
+                        GuiMessageSource.PLAYER,
                         GuiMessageTag.system(),
                         false
                     )
