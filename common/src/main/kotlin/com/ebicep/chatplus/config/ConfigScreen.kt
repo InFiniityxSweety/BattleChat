@@ -19,7 +19,7 @@ object ConfigScreen {
 
     private fun openConfigScreen() {
         val screen = getConfigScreen()
-        Minecraft.getInstance().setScreen(screen)
+        Minecraft.getInstance().setScreenAndShow(screen)
     }
 
     @JvmStatic

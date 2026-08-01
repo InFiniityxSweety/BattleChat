@@ -105,7 +105,7 @@ object FindMessage {
             }
         }
         EventBus.register<ChatTabAddDisplayMessageEvent> {
-            val screen = Minecraft.getInstance().screen
+            val screen = Minecraft.getInstance().gui.screen()
             if (findEnabled && screen is IMixinChatScreen) {
                 it.filtered = true
                 val filter = screen.input?.value

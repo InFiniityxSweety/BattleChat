@@ -101,9 +101,9 @@ object ChatTabs {
             } else if (it.button == 1 && Config.values.tabEditorScreen) {
                 val clickedTab = selectedWindow.tabSettings.getClickedTab(mouseX, mouseY) ?: return@register
                 if (Config.values.windowEditorScreen && Minecraft.getInstance().hasShiftDown()) {
-                    Minecraft.getInstance().setScreen(Editor.windowEditor(it.screen, selectedWindow))
+                    Minecraft.getInstance().setScreenAndShow(Editor.windowEditor(it.screen, selectedWindow))
                 } else {
-                    Minecraft.getInstance().setScreen(Editor.tabEditor(it.screen, clickedTab))
+                    Minecraft.getInstance().setScreenAndShow(Editor.tabEditor(it.screen, clickedTab))
                 }
             }
         }

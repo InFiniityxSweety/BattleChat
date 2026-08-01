@@ -342,7 +342,7 @@ class MicrophoneThread : Thread("ChatPlusMicrophoneThread") {
                     if (Config.values.speechToTextAutoReplacePlayers) {
                         lastSpokenMessage = replacePlayer(lastSpokenMessage!!)
                     }
-                    val screen = Minecraft.getInstance().screen
+                    val screen = Minecraft.getInstance().gui.screen()
                     if (ChatManager.isChatFocused()) {
                         doWithMessage { message, translated ->
                             if (

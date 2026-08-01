@@ -138,7 +138,7 @@ object ChatPlusScreenAdapter {
         val sendMessageEvent = EventBus.post(ChatScreenSendMessagePreEvent(chatScreen, rawMessage))
         val minecraft = chatScreen.minecraft!!
         if (sendMessageEvent.returnFunction) {
-            return minecraft.screen === chatScreen
+            return minecraft.gui.screen() === chatScreen
         }
         val newMessage = sendMessageEvent.message
         val normalizeChatMessage = ChatPlusScreen.normalizeChatMessage(newMessage)
@@ -147,7 +147,7 @@ object ChatPlusScreenAdapter {
         }
         val messages = splitChatMessage(normalizeChatMessage)
         if (messages.isEmpty()) {
-            return minecraft.screen === chatScreen
+            return minecraft.gui.screen() === chatScreen
         }
         var sentMessage = messages[0]
         if (rawMessage != newMessage) {
@@ -166,7 +166,7 @@ object ChatPlusScreenAdapter {
                 )
             ).dontSendMessage
         ) {
-            return minecraft.screen === chatScreen
+            return minecraft.gui.screen() === chatScreen
         }
 
         ChatManager.addSentMessage(sentMessage)
@@ -178,7 +178,7 @@ object ChatPlusScreenAdapter {
                 InputOverFlowAutoFill.addToQueue(messages.subList(1, messages.size))
             }
         }
-        return minecraft.screen === chatScreen
+        return minecraft.gui.screen() === chatScreen
     }
 
 }

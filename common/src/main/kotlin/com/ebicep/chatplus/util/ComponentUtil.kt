@@ -252,8 +252,9 @@ object ComponentUtil {
         return COLOR_REGEX.replace(input) { matchResult ->
             val code = matchResult.groupValues[1]
             val chatFormatting = ChatFormatting.getByCode(code[0])
-            if (chatFormatting != null && chatFormatting.color != null) {
-                String.format("#%06X", chatFormatting.color) // hex color in #RRGGBB format
+            val color = chatFormatting?.let { TextColor.fromLegacyFormat(it)?.value }
+            if (color != null) {
+                String.format("#%06X", color) // hex color in #RRGGBB format
             } else if (code.equals("r", ignoreCase = true)) {
                 defaultColor
             } else {

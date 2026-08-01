@@ -22,7 +22,7 @@ import org.joml.Matrix3x2fStack
 import java.util.function.Consumer
 
 class Editor(
-    val previousScreen: Screen?,
+    val previousScreen: Screen,
     titleComponent: () -> String,
     val subTitleComponent: () -> String?,
     val pressClone: (Button) -> Unit,
@@ -32,25 +32,25 @@ class Editor(
 ) : Screen(Component.translatable(titleComponent())) {
 
     companion object {
-        fun tabEditor(previousScreen: Screen?, chatTab: ChatTab): Editor {
+        fun tabEditor(previousScreen: Screen, chatTab: ChatTab): Editor {
             return Editor(
                 previousScreen,
                 { "chatPlus.gui.tabEditor" },
                 { "( ${chatTab.name} ) " },
                 { button ->
                     chatTab.chatWindow.tabSettings.cloneTab(chatTab)
-                    Minecraft.getInstance().setScreen(previousScreen)
+                    Minecraft.getInstance().setScreenAndShow(previousScreen)
                 },
-                { button -> Minecraft.getInstance().setScreen(getTabEditorScreen(previousScreen, chatTab)) },
+                { button -> Minecraft.getInstance().setScreenAndShow(getTabEditorScreen(previousScreen, chatTab)) },
                 { button ->
                     chatTab.chatWindow.tabSettings.removeTab(chatTab)
-                    Minecraft.getInstance().setScreen(previousScreen)
+                    Minecraft.getInstance().setScreenAndShow(previousScreen)
                 },
                 { chatTab.chatWindow.tabSettings.tabs.size > 1 }
             )
         }
 
-        fun windowEditor(previousScreen: Screen?, chatWindow: ChatWindow): Editor {
+        fun windowEditor(previousScreen: Screen, chatWindow: ChatWindow): Editor {
             return Editor(
                 previousScreen,
                 { "chatPlus.gui.windowEditor" },
@@ -74,14 +74,14 @@ class Editor(
                     windows.add(newWindow)
                     Config.values.chatWindows = windows
                     resetGlobalSortedTabs()
-                    Minecraft.getInstance().setScreen(previousScreen)
+                    Minecraft.getInstance().setScreenAndShow(previousScreen)
                 },
-                { button -> Minecraft.getInstance().setScreen(getWindowEditorScreen(previousScreen, chatWindow)) },
+                { button -> Minecraft.getInstance().setScreenAndShow(getWindowEditorScreen(previousScreen, chatWindow)) },
                 { button ->
                     val windows = Config.values.chatWindows.toMutableList()
                     windows.remove(chatWindow)
                     Config.values.chatWindows = windows
-                    Minecraft.getInstance().setScreen(previousScreen)
+                    Minecraft.getInstance().setScreenAndShow(previousScreen)
                 },
                 { Config.values.chatWindows.size > 1 }
             )
@@ -128,7 +128,7 @@ class Editor(
         rowHelper.addChild(
             Button.builder(
                 CommonComponents.GUI_DONE,
-                Button.OnPress { this.minecraft!!.setScreen(previousScreen) }
+                Button.OnPress { this.minecraft!!.setScreenAndShow(previousScreen) }
             ).width(200).build(),
             1,
             gridlayout.newCellSettings().paddingTop(90)

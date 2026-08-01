@@ -165,11 +165,11 @@ object TranslateMessage {
             if (keyEvent.key() != values.translateKey.key.value || keyEvent.modifiers() != values.translateKey.modifier.toInt()) {
                 return@register EventResult.pass()
             }
-            if (minecraft.screen != null) {
+            if (minecraft.gui.screen() != null) {
                 return@register EventResult.pass()
             }
             languageSpeakEnabled = true
-            minecraft.openChatScreen(ChatComponent.ChatMethod.MESSAGE)
+            minecraft.gui.openChatScreen(ChatComponent.ChatMethod.MESSAGE)
             EventResult.interruptTrue()
         }
         EventBus.register<ChatScreenInputEvent> {
@@ -258,7 +258,7 @@ object TranslateMessage {
                         component,
                         null,
                         null,
-                        Minecraft.getInstance().gui.guiTicks,
+                        Minecraft.getInstance().gui.hud.guiTicks,
                         GuiMessageSource.PLAYER,
                         GuiMessageTag.system(),
                         false

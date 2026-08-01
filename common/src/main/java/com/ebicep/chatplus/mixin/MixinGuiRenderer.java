@@ -16,7 +16,7 @@ public class MixinGuiRenderer {
             method = "draw",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/client/Minecraft;getMainRenderTarget()Lcom/mojang/blaze3d/pipeline/RenderTarget;"
+                    target = "Lnet/minecraft/client/renderer/GameRenderer;mainRenderTarget()Lcom/mojang/blaze3d/pipeline/RenderTarget;"
             )
     )
     private RenderTarget getMainRenderTarget(RenderTarget original) {

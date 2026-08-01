@@ -35,9 +35,9 @@ public class MixinChatComponent {
 
     @Final
     @Shadow
-    Minecraft minecraft;
+    private Minecraft minecraft;
 
-    @Inject(method = "Lnet/minecraft/client/gui/components/ChatComponent;extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/gui/Font;IIILnet/minecraft/client/gui/components/ChatComponent$DisplayMode;Z)V", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/gui/Font;IIILnet/minecraft/client/gui/components/ChatComponent$DisplayMode;Z)V", at = @At("HEAD"), cancellable = true)
     public void render(GuiGraphicsExtractor graphics, Font font, int ticks, int mouseX, int mouseY, ChatComponent.DisplayMode displayMode, boolean changeCursorOnInsertions, CallbackInfo ci) {
         if (!ChatPlus.INSTANCE.isEnabled() || (Config.INSTANCE.getValues().getShowVanillaWhenUnfocused() && !ChatManager.INSTANCE.isChatFocused())) {
             return;
@@ -51,7 +51,7 @@ public class MixinChatComponent {
         ci.cancel();
     }
 
-    @Inject(method = "Lnet/minecraft/client/gui/components/ChatComponent;addMessage(Lnet/minecraft/network/chat/Component;Lnet/minecraft/network/chat/MessageSignature;Lnet/minecraft/client/multiplayer/chat/GuiMessageSource;Lnet/minecraft/client/multiplayer/chat/GuiMessageTag;)V", at = @At("RETURN"))
+    @Inject(method = "addMessage(Lnet/minecraft/network/chat/Component;Lnet/minecraft/network/chat/MessageSignature;Lnet/minecraft/client/multiplayer/chat/GuiMessageSource;Lnet/minecraft/client/multiplayer/chat/GuiMessageTag;)V", at = @At("RETURN"))
     public void addMessage(
             Component contents, MessageSignature signature, GuiMessageSource source, GuiMessageTag tag, CallbackInfo ci, @Local(name = "message") GuiMessage message
     ) {
@@ -86,7 +86,7 @@ public class MixinChatComponent {
                     contents,
                     null,
                     signature,
-                    this.minecraft.gui.getGuiTicks(),
+                    this.minecraft.gui.hud.getGuiTicks(),
                     source,
                     tag,
                     false
@@ -104,7 +104,7 @@ public class MixinChatComponent {
                     contents,
                     null,
                     signature,
-                    this.minecraft.gui.getGuiTicks(),
+                    this.minecraft.gui.hud.getGuiTicks(),
                     source,
                     tag
             );

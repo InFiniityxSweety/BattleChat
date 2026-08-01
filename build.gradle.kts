@@ -22,13 +22,11 @@ plugins {
     id("net.neoforged.moddev") version(providers.gradleProperty("moddevgradle_version")) apply false
     id("multiloader-common") apply false
     id("multiloader-loader") apply false
-    id("me.shedaniel.unified-publishing") version "0.1.+" apply false
+    id("me.modmuss50.mod-publish-plugin") version "2.2.0" apply false
     id("dev.isxander.mtk.accessx") version "0.1.1" apply false
 }
 
 subprojects {
-    apply(plugin = "me.shedaniel.unified-publishing")
-
     extensions.findByType(LoomGradleExtensionAPI::class.java)?.let { loom ->
         loom.log4jConfigs.from(file("log4j-dev.xml"))
     }

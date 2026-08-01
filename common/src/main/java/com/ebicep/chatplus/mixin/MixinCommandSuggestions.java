@@ -23,7 +23,7 @@ public class MixinCommandSuggestions {
 
     @Shadow
     @Final
-    EditBox input;
+    private EditBox input;
 
     @Inject(
             method = "showSuggestions",
@@ -32,7 +32,7 @@ public class MixinCommandSuggestions {
                     target = "Lcom/mojang/brigadier/suggestion/Suggestions;isEmpty()Z"
             )
     )
-    private void showSuggestions(boolean bl, CallbackInfo ci, @Local @NotNull Suggestions suggestions) {
+    private void showSuggestions(boolean bl, CallbackInfo ci, @Local(name = "suggestions") @NotNull Suggestions suggestions) {
         ConfigVariables values = Config.INSTANCE.getValues();
         if (!values.getEnabled()) {
             return;
@@ -44,7 +44,7 @@ public class MixinCommandSuggestions {
     @ModifyVariable(
             method = "showSuggestions",
             at = @At(value = "STORE"),
-            ordinal = 2
+            name = "y"
     )
     private int modifySuggestionY(int i) {
         ConfigVariables values = Config.INSTANCE.getValues();
@@ -60,9 +60,9 @@ public class MixinCommandSuggestions {
     @ModifyVariable(
             method = "extractUsage",
             at = @At(value = "STORE"),
-            ordinal = 1
+            name = "lineY"
     )
-    private int modifyRenderUsageY(int j, @Local(ordinal = 0) int i) {
+    private int modifyRenderUsageY(int j, @Local(name = "y") int i) {
         ConfigVariables values = Config.INSTANCE.getValues();
         if (!values.getEnabled() || values.getVanillaInputBox()) {
             return j;

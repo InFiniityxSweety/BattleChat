@@ -5,6 +5,7 @@ plugins {
     id("multiloader-loader")
     id("net.neoforged.moddev")
     id("dev.isxander.mtk.accessx") version "0.1.1"
+    id("me.modmuss50.mod-publish-plugin")
 }
 
 repositories {
@@ -149,51 +150,42 @@ components.getByName("java") {
     }
 }
 
-unifiedPublishing {
-    project {
-        println("(${project.name}) Publishing | ${rootProject.property("minecraft_version")} | ${project.name}")
-        displayName.set("${rootProject.property("mod_name")} ${project.name.uppercaseFirstChar()} v${project.version}")
-        val releaseChangeLog = project.ext.get("releaseChangeLog") as? () -> String
-        changelog.set(releaseChangeLog?.invoke() ?: "")
-        gameVersions.set("${rootProject.property("supported_minecraft_version")}".split(","))
-        gameLoaders.set(listOf(project.name))
-        releaseType.set("release")
+publishMods {
+    println("(${project.name}) Publishing | ${rootProject.property("minecraft_version")} | ${project.name}")
+    file.set(tasks.shadowJar.flatMap { it.archiveFile })
+    displayName.set("${rootProject.property("mod_name")} ${project.name.uppercaseFirstChar()} v${project.version}")
+    val releaseChangeLog = project.ext.get("releaseChangeLog") as? () -> String
+    changelog.set(releaseChangeLog?.invoke() ?: "")
+    type.set(STABLE)
+    modLoaders.add(project.name)
 
-        mainPublication.set(tasks.shadowJar.get().archiveFile) // Declares the publicated jar
+    val mcVersions = "${rootProject.property("supported_minecraft_version")}".split(",")
 
-        relations {
-            depends { // Mark as a required dependency
-                // cloth config
-                curseforge = "cloth-config"
-                modrinth = "9s6osm5g"
-            }
-            depends { // Mark as a required dependency
-                // kotlin for forge
-                curseforge = "kotlin-for-forge"
-                modrinth = "ordsPcFz"
-            }
+    val cfToken = System.getenv("CF_TOKEN")
+    if (cfToken != null) {
+        println("(${project.name}) CF_TOKEN found, publishing to CurseForge")
+        curseforge {
+            accessToken.set(cfToken)
+            projectId.set("1023333")
+            minecraftVersions.addAll(mcVersions)
+            client.set(true)
+            requires("cloth-config", "kotlin-for-forge")
         }
+    } else {
+        println("(${project.name}) CF_TOKEN not found, not publishing to CurseForge")
+    }
 
-        val cfToken = System.getenv("CF_TOKEN")
-        if (cfToken != null) {
-            println("(${project.name}) CF_TOKEN found, publishing to CurseForge")
-            curseforge {
-                token = cfToken
-                id = "1023333" // Required, must be a string, ID of CurseForge project
-            }
-        } else {
-            println("(${project.name}) CF_TOKEN not found, not publishing to CurseForge")
+    val mrToken = System.getenv("MODRINTH_TOKEN")
+    if (mrToken != null) {
+        println("(${project.name}) MODRINTH_TOKEN found, publishing to Modrinth")
+        modrinth {
+            accessToken.set(mrToken)
+            projectId.set("cJlZ132G")
+            minecraftVersions.addAll(mcVersions)
+            environment.set(CLIENT_ONLY)
+            requires("9s6osm5g", "ordsPcFz")
         }
-
-        val mrToken = System.getenv("MODRINTH_TOKEN")
-        if (mrToken != null) {
-            println("(${project.name}) MODRINTH_TOKEN found, publishing to Modrinth")
-            modrinth {
-                token = mrToken
-                id = "cJlZ132G" // Required, must be a string, ID of Modrinth project
-            }
-        } else {
-            println("(${project.name}) MODRINTH_TOKEN not found, not publishing to Modrinth")
-        }
+    } else {
+        println("(${project.name}) MODRINTH_TOKEN not found, not publishing to Modrinth")
     }
 }

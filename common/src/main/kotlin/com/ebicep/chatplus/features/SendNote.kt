@@ -109,7 +109,7 @@ object SendNote {
                     component,
                     null,
                     null,
-                    Minecraft.getInstance().gui.guiTicks,
+                    Minecraft.getInstance().gui.hud.guiTicks,
                     GuiMessageSource.PLAYER,
                     null,
                 )

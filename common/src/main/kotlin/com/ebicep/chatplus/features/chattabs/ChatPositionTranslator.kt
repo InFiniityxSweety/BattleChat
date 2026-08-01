@@ -101,7 +101,7 @@ object ChatPositionTranslator {
 
     private fun getMessageLineIndexAtRelative(chatTab: ChatTab, relativeX: Double, relativeY: Double): Int {
         val chatWindow = chatTab.chatWindow
-        if (!ChatManager.isChatFocused() || Minecraft.getInstance().options.hideGui) {
+        if (!ChatManager.isChatFocused() || Minecraft.getInstance().gui.hud.isHidden) {
             return -1
         }
         if (!(0.0 <= relativeX && relativeX <= Mth.floor(chatWindow.renderer.rescaledWidth.toDouble()))) {

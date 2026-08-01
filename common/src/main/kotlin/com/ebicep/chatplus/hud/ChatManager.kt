@@ -33,7 +33,7 @@ object ChatManager {
     var globalSortedTabs: List<ChatTab> = ArrayList()
 
     init {
-        sentMessages.addAll(Minecraft.getInstance().commandHistory().history())
+        sentMessages.addAll(Minecraft.getInstance().gui.hud.chat.commandHistory.history())
         resetGlobalSortedTabs()
     }
 
@@ -62,12 +62,12 @@ object ChatManager {
             this.sentMessages.add(pMessage)
         }
         if (pMessage.startsWith("/")) {
-            Minecraft.getInstance().commandHistory().addCommand(pMessage)
+            Minecraft.getInstance().gui.hud.chat.commandHistory.addCommand(pMessage)
         }
     }
 
     fun isChatFocused(): Boolean {
-        return Minecraft.getInstance().screen is ChatScreen
+        return Minecraft.getInstance().gui.screen() is ChatScreen
     }
 
     fun rescaleAll() {

@@ -282,7 +282,7 @@ public abstract class MixinChatScreen extends Screen implements IMixinChatScreen
     )
     private void captureClickableText(ChatComponent instance, ActiveTextCollector activeTextCollector, int screenHeight, int ticks, ChatComponent.DisplayMode displayMode) {
         if (!Config.INSTANCE.getValues().getEnabled()) {
-            this.minecraft.gui.getChat().captureClickableText(activeTextCollector, screenHeight, ticks, displayMode);
+            this.minecraft.gui.hud.getChat().captureClickableText(activeTextCollector, screenHeight, ticks, displayMode);
         }
     }
 

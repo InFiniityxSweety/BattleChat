@@ -3,7 +3,6 @@
 package com.ebicep.chatplus.features
 
 import com.ebicep.chatplus.ChatPlus
-import com.ebicep.chatplus.MOD_ID
 import com.ebicep.chatplus.config.Config
 import com.ebicep.chatplus.config.EnumTranslatableName
 import com.ebicep.chatplus.config.MessageDirection
@@ -23,16 +22,13 @@ import com.ebicep.chatplus.util.GraphicsUtil.drawString0
 import com.ebicep.chatplus.util.GraphicsUtil.fill0
 import com.ebicep.chatplus.util.GraphicsUtil.translate0
 import com.google.gson.JsonParser
+import com.mojang.blaze3d.GpuFormat
 import com.mojang.blaze3d.pipeline.RenderTarget
 import com.mojang.blaze3d.pipeline.TextureTarget
 import com.mojang.blaze3d.platform.NativeImage
 import com.mojang.blaze3d.systems.CommandEncoder
 import com.mojang.blaze3d.systems.GpuDevice
 import com.mojang.blaze3d.systems.RenderSystem
-import com.mojang.blaze3d.vertex.BufferBuilder
-import com.mojang.blaze3d.vertex.ByteBufferBuilder
-import com.mojang.blaze3d.vertex.VertexConsumer
-import it.unimi.dsi.fastutil.objects.Object2ObjectSortedMaps
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -43,15 +39,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.Screenshot
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.render.GuiRenderer
-import net.minecraft.client.gui.render.pip.PictureInPictureRenderer
 import net.minecraft.client.multiplayer.chat.GuiMessage
-import net.minecraft.client.renderer.MultiBufferSource
-import net.minecraft.client.renderer.RenderPipelines
-import net.minecraft.client.renderer.SubmitNodeStorage
-import net.minecraft.client.renderer.fog.FogRenderer
-import net.minecraft.client.renderer.rendertype.OutputTarget
-import net.minecraft.client.renderer.rendertype.RenderSetup
-import net.minecraft.client.renderer.rendertype.RenderType
 import net.minecraft.client.renderer.state.gui.GuiRenderState
 import net.minecraft.network.chat.ClickEvent
 import net.minecraft.network.chat.Component
@@ -59,6 +47,7 @@ import net.minecraft.network.chat.HoverEvent
 import net.minecraft.network.chat.HoverEvent.ShowText
 import net.minecraft.network.chat.Style
 import net.minecraft.util.Util
+import org.joml.Vector4f
 import org.lwjgl.stb.STBImage
 import java.awt.Color
 import java.awt.Image
@@ -79,38 +68,14 @@ import javax.imageio.ImageIO
 
 object ScreenshotChat {
 
-    private fun createRenderType(renderTarget: RenderTarget): RenderType {
-        return RenderType.create(
-            "$MOD_ID:screenshot",
-            RenderSetup.builder(RenderPipelines.TEXT)
-                .bufferSize(786432)
-                .useLightmap()
-                .setOutputTarget(OutputTarget("${MOD_ID}_target") {
-                    renderTarget
-                })
-                .createRenderSetup()
-        )
-    }
-
-    class ChatPlusBufferSource(bufferAllocator: ByteBufferBuilder, renderTarget: RenderTarget) :
-        MultiBufferSource.BufferSource(bufferAllocator, Object2ObjectSortedMaps.emptyMap()) {
-
-        private val renderType = createRenderType(renderTarget)
-        private var bufferBuilder: BufferBuilder = BufferBuilder(this.sharedBuffer, renderType.mode(), renderType.format())
-
-        override fun getBuffer(renderType: RenderType): VertexConsumer {
-            return this.bufferBuilder
-        }
-
-        fun endDraw() {
-            this.startedBuilders[renderType] = this.bufferBuilder
-            endBatch(renderType)
-        }
-
-    }
-
     const val SCREENSHOT_COLOR = -1
     private val TRANSPARENCY_COLOR = Color(54, 57, 63, 255)
+    private val TRANSPARENCY_CLEAR_COLOR = Vector4f(
+        TRANSPARENCY_COLOR.red / 255f,
+        TRANSPARENCY_COLOR.green / 255f,
+        TRANSPARENCY_COLOR.blue / 255f,
+        TRANSPARENCY_COLOR.alpha / 255f,
+    )
 
     var renderTarget: RenderTarget? = null
     private var takeScreenshot = false
@@ -237,21 +202,18 @@ object ScreenshotChat {
         ChatPlus.LOGGER.info("screenshotting = width: $width, height: $height")
         val minecraft = Minecraft.getInstance()
         try {
-            renderTarget = TextureTarget("ChatPlusScreenshot", width.toInt(), height.toInt(), true)
+            renderTarget = TextureTarget("ChatPlusScreenshot", width.toInt(), height.toInt(), true, GpuFormat.RGBA8_UNORM)
             val device: GpuDevice = RenderSystem.getDevice()
             val commandEncoder: CommandEncoder = device.createCommandEncoder()
-            val vertexProvider = ChatPlusBufferSource(ByteBufferBuilder(512), renderTarget!!)
             val guiRenderState = GuiRenderState()
             val guiGraphics = GuiGraphicsExtractor(minecraft, guiRenderState, ChatPlusScreen.lastMouseX, ChatPlusScreen.lastMouseY)
             val guiRenderer = GuiRenderer(
                 guiRenderState,
-                vertexProvider,
-                SubmitNodeStorage(),
-                minecraft.gameRenderer.featureRenderDispatcher,
+                minecraft.gameRenderer.featureRenderDispatcher(),
                 emptyList()
             )
             val poseStack = guiGraphics.pose()
-            commandEncoder.clearColorTexture(renderTarget!!.colorTexture!!, TRANSPARENCY_COLOR.rgb)
+            commandEncoder.clearColorTexture(renderTarget!!.getColorTexture()!!, TRANSPARENCY_CLEAR_COLOR)
             poseStack.scale((minecraft.window.guiScaledWidth / width).toFloat() * scale, (minecraft.window.guiScaledHeight / height).toFloat() * scale)
             when (screenshotWindowsMode) {
                 ScreenshotWindowsMode.STACK -> {
@@ -278,8 +240,8 @@ object ScreenshotChat {
                     }
                 }
             }
-            guiRenderer.render(minecraft.gameRenderer.fogRenderer.getBuffer(FogRenderer.FogMode.NONE))
-            vertexProvider.endDraw()
+            guiRenderer.render()
+            guiRenderer.endFrame()
             try {
                 Screenshot.takeScreenshot(renderTarget!!) { nativeImage ->
                     val image: Image = getImage(nativeImage)
