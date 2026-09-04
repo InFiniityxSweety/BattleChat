@@ -6,6 +6,7 @@ import com.ebicep.chatplus.util.ComponentUtil
 import kotlinx.serialization.Serializable
 import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
+import net.minecraft.network.chat.Component
 import java.util.regex.Pattern
 
 open class Translator(val message: String, val from: Language?, val to: Language, val filtered: Boolean = true) : Thread() {
@@ -20,6 +21,7 @@ open class Translator(val message: String, val from: Language?, val to: Language
         }
         val translatedMessage = translate(textToTranslate) ?: run {
             ChatPlus.LOGGER.debug("Translation failed for: $textToTranslate")
+            onTranslateFailed(textToTranslate)
             return
         }
         if (translatedMessage.translatedText.trim().equals(textToTranslate, ignoreCase = true)) {
@@ -42,6 +44,13 @@ open class Translator(val message: String, val from: Language?, val to: Language
             }
         }
         return null to text
+    }
+
+    open fun onTranslateFailed(textToTranslate: String) {
+        ChatPlus.sendMessage(
+            Component.literal("Translation failed. Please try again in a moment.")
+                .withStyle(ChatFormatting.RED)
+        )
     }
 
     open fun onTranslateSameMessage() {
