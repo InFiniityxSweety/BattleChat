@@ -4,18 +4,15 @@ import com.ebicep.chatplus.ChatPlus
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonArray
-import java.io.IOException
-import java.net.MalformedURLException
-import java.net.URL
+import java.net.HttpURLConnection
+import java.net.URI
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
-import javax.net.ssl.HttpsURLConnection
 
 class GoogleRequester {
 
     companion object {
         const val BASE_URL = "https://translate.googleapis.com/translate_a/single"
-        var accessDenied = false
     }
 
     fun translateAuto(message: String, to: Language?): RequestResult {
@@ -23,116 +20,76 @@ class GoogleRequester {
     }
 
     fun performTranslationRequest(message: String, from: Language, to: Language): RequestResult {
-        val encodedMessage = encodeMessage(message) ?: return RequestResult(2, "Failed to encode message", null, null)
-        val queryParams = mutableMapOf(
-            "client" to "gtx",
-            "sl" to from.googleCode,
-            "tl" to to.googleCode,
-            "dt" to "t",
-            "q" to encodedMessage
-        )
+        val encodedMessage = encodeMessage(message)
+            ?: return RequestResult(2, "Failed to encode message", null, null)
+
+        val requestUrl = buildString {
+            append(BASE_URL)
+            append("?client=gtx")
+            append("&sl=").append(from.googleCode)
+            append("&tl=").append(to.googleCode)
+            append("&dt=t")
+            append("&q=").append(encodedMessage)
+        }
+
+        val connection = try {
+            URI.create(requestUrl).toURL().openConnection() as HttpURLConnection
+        } catch (exception: Exception) {
+            return RequestResult(2, "Invalid Google translation URL: ${exception.message}", null, to)
+        }
 
         return try {
-            val response = sendRequest("GET", queryParams, "application/json")
-                ?: return RequestResult(1, "Connection error", null, null)
+            connection.requestMethod = "GET"
+            connection.connectTimeout = 4_000
+            connection.readTimeout = 8_000
+            connection.setRequestProperty("Accept", "application/json")
+            connection.setRequestProperty("User-Agent", "BattleChat/0.1")
 
-            when (response.responseCode) {
-                200 -> processSuccessfulResponse(response, to)
-                429 -> handleAccessDenied()
-                else -> handleApiError(response)
+            val status = connection.responseCode
+            val stream = if (status in 200..299) connection.inputStream else connection.errorStream
+            val body = stream?.bufferedReader(StandardCharsets.UTF_8)?.use { it.readText() }.orEmpty()
+
+            when (status) {
+                200 -> processSuccessfulResponse(body, to)
+                429 -> RequestResult(429, "Access to Google Translate denied / rate limited", null, to)
+                else -> {
+                    ChatPlus.LOGGER.debug("Google translation endpoint returned {}: {}", status, body.take(250))
+                    RequestResult(status, body.ifBlank { "Google translation API error" }, null, to)
+                }
             }
-        } catch (e: Exception) {
-            e.printStackTrace()
-            RequestResult(1, "Connection error", null, null)
+        } catch (exception: Exception) {
+            ChatPlus.LOGGER.debug("Google translation request failed", exception)
+            RequestResult(1, "Connection error: ${exception.message ?: exception.javaClass.simpleName}", null, to)
+        } finally {
+            connection.disconnect()
         }
     }
 
     private fun encodeMessage(message: String): String? {
         return try {
-            URLEncoder.encode(message, StandardCharsets.UTF_8.name())
-        } catch (e: Exception) {
+            URLEncoder.encode(message, StandardCharsets.UTF_8)
+        } catch (_: Exception) {
             null
         }
     }
 
-    private fun processSuccessfulResponse(response: Response, targetLanguage: Language): RequestResult {
-        val gson: Gson = GsonBuilder().setLenient().create()
-        val json: JsonArray = gson.fromJson(response.entity, JsonArray::class.java)
-
-        val detectedSource = LanguageManager.findLanguageFromGoogle(json[2].asString)
-        val translatedText = json[0].asJsonArray
-            .joinToString(" ") { it.asJsonArray[0].asString }
-
-        return RequestResult(200, translatedText, detectedSource, targetLanguage)
-    }
-
-    private fun handleAccessDenied(): RequestResult {
-        accessDenied = true
-        Timeout().start()
-        return RequestResult(429, "Access to Google Translate denied", null, null)
-    }
-
-    private fun handleApiError(response: Response): RequestResult {
-        accessDenied = true
-        ChatPlus.LOGGER.error(response.entity)
-        return RequestResult(411, "API call error", null, null)
-    }
-
-    private fun sendRequest(method: String, queryParams: Map<String, String>, contentType: String): Response? {
-        val requestUrl = buildRequestUrl(queryParams)
-
+    private fun processSuccessfulResponse(body: String, targetLanguage: Language): RequestResult {
         return try {
-            val connection = createConnection(requestUrl, method, contentType)
-            val responseBody = readResponseBody(connection)
-            Response(connection.responseCode, responseBody)
-        } catch (e: Exception) {
-            when (e) {
-                is MalformedURLException -> null
-                is IOException -> Response(1, "Failed to connect to server")
-                else -> {
-                    ChatPlus.LOGGER.error(e)
-                    Response(1, "Unexpected error: ${e.message}")
-                }
+            val gson: Gson = GsonBuilder().setLenient().create()
+            val json: JsonArray = gson.fromJson(body, JsonArray::class.java)
+            val detectedSource = LanguageManager.findLanguageFromGoogle(json[2].asString)
+            val translatedText = json[0].asJsonArray
+                .joinToString("") { it.asJsonArray[0].asString }
+
+            if (detectedSource == null) {
+                RequestResult(500, "Failed to determine source language", null, targetLanguage)
+            } else {
+                RequestResult(200, translatedText, detectedSource, targetLanguage)
             }
+        } catch (exception: Exception) {
+            RequestResult(500, "Failed to parse Google response: ${exception.message}", null, targetLanguage)
         }
-    }
-
-    private fun buildRequestUrl(queryParams: Map<String, String>): String {
-        return queryParams.entries.joinToString("&", "$BASE_URL?") { (key, value) ->
-            "$key=$value"
-        }
-    }
-
-    private fun createConnection(requestUrl: String, method: String, contentType: String): HttpsURLConnection {
-        return (URL(requestUrl).openConnection() as HttpsURLConnection).apply {
-            setRequestProperty("Content-Type", contentType)
-            doOutput = true
-            requestMethod = method
-            connectTimeout = 5000
-            connect()
-        }
-    }
-
-    private fun readResponseBody(connection: HttpsURLConnection): String {
-        val inputStream = if (connection.responseCode == HttpsURLConnection.HTTP_OK)
-            connection.inputStream
-        else
-            connection.errorStream
-
-        return inputStream.bufferedReader(StandardCharsets.UTF_8).use { it.readText() }
     }
 }
 
 data class RequestResult(val code: Int, val message: String, val from: Language?, val to: Language?)
-
-data class Response(val responseCode: Int, val entity: String)
-
-class Timeout : Thread() {
-    override fun run() {
-        try {
-            sleep(300000)
-            GoogleRequester.accessDenied = false
-        } catch (ignored: InterruptedException) {
-        }
-    }
-}
