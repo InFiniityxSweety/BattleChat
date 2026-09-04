@@ -45,7 +45,6 @@ open class Translator(val message: String, val from: Language?, val to: Language
     }
 
     open fun onTranslateSameMessage() {
-
     }
 
     open fun onTranslate(matchedRegex: String?, translatedMessage: TranslateResult, fromLanguage: String?) {
@@ -64,35 +63,9 @@ open class Translator(val message: String, val from: Language?, val to: Language
         if (text.trim().isEmpty()) {
             return null
         }
-        if (GoogleRequester.accessDenied) {
-            return null
-        }
-        //Use free ones later
-        val google = GoogleRequester()
-        val transRequest: RequestResult = if (from == null) google.translateAuto(text, to) else google.performTranslationRequest(text, from, to)
-        if (transRequest.code != 200) {
-            logException(transRequest)
-            return null
-        }
-        if (transRequest.from == null) {
-            return null
-        }
-        return TranslateResult(transRequest.message.trim(), transRequest.from)
-    }
 
-    private fun logException(transRequest: RequestResult) {
-        when (transRequest.code) {
-            1 -> ChatPlus.LOGGER.error("Cannot connect to translation server. Is player offline?")
-            2 -> ChatPlus.LOGGER.error(transRequest.message)
-            411 -> ChatPlus.LOGGER.error("Google API >> API call error")
-            429 -> ChatPlus.LOGGER.warn("Google denied access to translation API. Pausing translation for 5 minutes")
-            403 -> ChatPlus.LOGGER.error("Google API >> Exceeded API quota / User rate limit reached")
-            400 -> ChatPlus.LOGGER.error("Google API >> API key invalid")
-            500 -> ChatPlus.LOGGER.error("Google API >> Failed to determine source language: " + transRequest.message)
-            else -> ChatPlus.LOGGER.error("Unknown error/Server side failure: " + transRequest.message)
-        }
+        return TranslationManager.translate(text, from, to)
     }
-
 }
 
 
