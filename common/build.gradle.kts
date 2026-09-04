@@ -6,7 +6,9 @@ plugins {
 }
 
 loom {
-    accessWidenerPath.set(file(project(":common").file("src/main/resources/${rootProject.property("mod_id")}.accesswidener")))
+    // Keep the upstream filename for now. The access widener is an internal
+    // resource and does not need to follow the public BattleChat mod id.
+    accessWidenerPath.set(file(project(":common").file("src/main/resources/chatplus.accesswidener")))
 }
 
 dependencies {
