@@ -6,7 +6,9 @@ import com.ebicep.chatplus.features.internal.MessageFilterFormatted
 import com.mojang.brigadier.suggestion.Suggestion
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
+import net.minecraft.client.multiplayer.chat.GuiMessageSource
 import net.minecraft.network.chat.Component
+import net.minecraft.network.chat.MessageSignature
 
 @Serializable
 open class ServerChatTabSettings : MessageFilterFormatted {
@@ -22,6 +24,10 @@ open class ServerChatTabSettings : MessageFilterFormatted {
 
     var autoSend: String = ""
     var autoPrefix: String = ""
+
+    // BattleChat: optional semantic source filter applied before regex matching.
+    // ANY preserves upstream ChatPlus behaviour and existing configs.
+    var messageSourceMode: MessageSourceMode = MessageSourceMode.ANY
 
     // priority of tab, when adding messages, tabs are sorted by priority first
     // if a message got added to a tab then any other tab with a lower priority will not get the message
@@ -45,6 +51,28 @@ open class ServerChatTabSettings : MessageFilterFormatted {
 
     constructor(pattern: String, formatted: Boolean) : super(pattern, formatted)
 
+    fun matchesSource(component: Component, source: GuiMessageSource, signature: MessageSignature?): Boolean {
+        if (messageSourceMode == MessageSourceMode.ANY) {
+            return true
+        }
+        val classification = MessageClassifier.classify(component, source, signature)
+        return when (messageSourceMode) {
+            MessageSourceMode.ANY -> true
+            MessageSourceMode.PLAYER -> classification.kind == MessageClassifier.Kind.PLAYER
+            MessageSourceMode.SERVER -> classification.kind == MessageClassifier.Kind.SERVER
+        }
+    }
+
+    fun applyBattleChatNameDefault() {
+        if (messageSourceMode != MessageSourceMode.ANY) {
+            return
+        }
+        when (name.trim().lowercase()) {
+            "chat", "player", "players", "spieler" -> messageSourceMode = MessageSourceMode.PLAYER
+            "server", "system" -> messageSourceMode = MessageSourceMode.SERVER
+        }
+    }
+
     fun clone(): ServerChatTabSettings {
         return ServerChatTabSettings(
             pattern, formatted
@@ -53,6 +81,7 @@ open class ServerChatTabSettings : MessageFilterFormatted {
             it.name = this.name
             it.autoSend = this.autoSend
             it.autoPrefix = this.autoPrefix
+            it.messageSourceMode = this.messageSourceMode
             it.priority = this.priority
             it.alwaysAdd = this.alwaysAdd
             it.skipOthers = this.skipOthers
@@ -84,6 +113,13 @@ open class ServerChatTabSettings : MessageFilterFormatted {
         }
     }
 
+}
+
+@Serializable
+enum class MessageSourceMode {
+    ANY,
+    PLAYER,
+    SERVER,
 }
 
 @Serializable
