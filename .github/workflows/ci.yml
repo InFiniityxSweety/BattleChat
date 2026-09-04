@@ -13,10 +13,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up JDK 25
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '25'
@@ -29,3 +29,12 @@ jobs:
 
       - name: Build Fabric artifact
         run: ./gradlew :fabric:shadowJar
+
+      - name: Upload Fabric build
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: battlechat-fabric-${{ github.sha }}
+          path: fabric/build/libs/*.jar
+          if-no-files-found: error
+          retention-days: 14
