@@ -19,7 +19,7 @@ repositories {
 }
 
 loom {
-    val aw = project(":common").file("src/main/resources/${rootProject.property("mod_id")}.accesswidener")
+    val aw = project(":common").file("src/main/resources/chatplus.accesswidener")
     if (aw.exists()) {
         accessWidenerPath.set(aw)
     }
