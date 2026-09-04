@@ -60,6 +60,7 @@ public class MixinChatComponent {
         }
         contents = message.content();
         signature = message.signature();
+        source = message.source();
         tag = message.tag();
         List<ChatTab> addMessagesTo = new ArrayList<>();
 
@@ -70,6 +71,15 @@ public class MixinChatComponent {
             if (lastPriority != null && lastPriority > priority && !alwaysAdd) {
                 continue;
             }
+
+            // BattleChat source classification runs before the existing regex filter.
+            // Existing tabs remain ANY by default. Tabs named Chat/Server are upgraded
+            // automatically so imported ChatPlus configs immediately gain semantic routing.
+            chatTab.getCurrentSettings().applyBattleChatNameDefault();
+            if (!chatTab.getCurrentSettings().matchesSource(contents, source, signature)) {
+                continue;
+            }
+
             if (chatTab.matches(contents)) {
                 addMessagesTo.add(chatTab);
                 if (chatTab.getSkipOthers()) {
