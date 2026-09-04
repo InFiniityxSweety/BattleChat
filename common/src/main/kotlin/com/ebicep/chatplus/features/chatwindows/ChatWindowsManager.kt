@@ -4,6 +4,9 @@ import com.ebicep.chatplus.config.Config
 import com.ebicep.chatplus.events.EventBus
 import com.ebicep.chatplus.features.chattabs.CHAT_TAB_HEIGHT
 import com.ebicep.chatplus.features.chattabs.CHAT_TAB_Y_OFFSET
+import com.ebicep.chatplus.features.chattabs.ChatTab
+import com.ebicep.chatplus.features.chattabs.MessageSourceMode
+import com.ebicep.chatplus.features.chattabs.ServerChatTabSettings
 import com.ebicep.chatplus.hud.*
 import com.ebicep.chatplus.util.GraphicsUtil.createPose
 import net.minecraft.client.gui.Font
@@ -13,8 +16,24 @@ import net.minecraft.client.gui.components.ChatComponent
 object ChatWindowsManager {
 
     fun createDefaultWindow(): ChatWindow {
-        return ChatWindow().also {
-            it.tabSettings.hideTabs = true
+        return ChatWindow().also { window ->
+            val playerSettings = ServerChatTabSettings("(?s).*").also {
+                it.name = "Chat"
+                it.messageSourceMode = MessageSourceMode.PLAYER
+                it.priority = 100
+                it.skipOthers = true
+            }
+            val serverSettings = ServerChatTabSettings("(?s).*").also {
+                it.name = "Server"
+                it.messageSourceMode = MessageSourceMode.SERVER
+                it.priority = 0
+            }
+
+            window.tabSettings.hideTabs = false
+            window.tabSettings.tabs = mutableListOf(
+                ChatTab(mutableListOf(playerSettings)),
+                ChatTab(mutableListOf(serverSettings)),
+            )
         }
     }
 
