@@ -67,7 +67,7 @@ object TranslateMessage {
                     Component.translatable("chatPlus.editBox")
                 )
                 val editBox = inputTranslatePrefix as EditBox
-                editBox.setMaxLength(inputBoxSettings.maxInputBoxInputLength) // default 256
+                editBox.setMaxLength(inputBoxSettings.maxInputBoxInputLength)
                 editBox.isBordered = false
                 editBox.setCanLoseFocus(true)
                 screen as IMixinScreen
@@ -179,34 +179,41 @@ object TranslateMessage {
             TranslateSpeakTextBarElement.toggleTranslateSpeak(it.screen)
         }
         var translateClickCooldown = 0L
-        EventBus.register<ChatScreenMouseClickedEvent>({ 100 }) {
+        EventBus.register<ChatScreenMouseClickedEvent>({ 100 }) { event ->
             if (!values.translatorEnabled || !values.translateClickEnabled) {
                 return@register
             }
-            if (it.button != 0 || !Minecraft.getInstance().hasControlDown()) {
+            if (event.button != 0 || !Minecraft.getInstance().hasControlDown()) {
                 return@register
             }
-            if (System.currentTimeMillis() - translateClickCooldown < 2_000) {
+            if (System.currentTimeMillis() - translateClickCooldown < 1_000) {
                 return@register
             }
-            ChatManager.globalSelectedTab.getHoveredOverMessageLine(it.mouseX, it.mouseY)?.let { message ->
-                translateClickCooldown = System.currentTimeMillis()
-                // selected message compatibility, sends one translate request with all selected messages split by § then sends the
-                // translated messages unsplit
+            ChatManager.globalSelectedTab.getHoveredOverMessageLine(event.mouseX, event.mouseY)?.let { message ->
                 val selectedMessages = SelectChat.getAllSelectedMessages()
                 val messages: List<ChatTab.ChatPlusGuiMessage> = if (selectedMessages.contains(message)) {
                     SelectChat.getSelectedMessagesOrdered().map { it.linkedMessage }
                 } else {
                     listOf(message.linkedMessage)
                 }
-                LanguageManager.languageTo?.let { to ->
-                    it.returnFunction = true
-                    ClickTranslator(
-                        messages,
-                        messages.joinToString("§") { ChatFormatting.stripFormatting(it.guiMessage.content.string)!! },
-                        to
-                    ).start()
+
+                // Incoming translation is always source=auto. Auto Detect is not a
+                // meaningful target language, so fall back to German for BattleChat.
+                val target = LanguageManager.languageTo
+                    ?.takeUnless { language -> language.googleCode == "auto" }
+                    ?: LanguageManager.findLanguageFromName("German")
+
+                if (target == null) {
+                    ChatPlus.sendMessage(
+                        Component.literal("No valid target language is configured for incoming translation.")
+                            .withStyle(ChatFormatting.RED)
+                    )
+                    return@let
                 }
+
+                translateClickCooldown = System.currentTimeMillis()
+                event.returnFunction = true
+                ClickTranslator(messages, target).start()
             }
         }
     }
@@ -225,48 +232,83 @@ object TranslateMessage {
         }
     }
 
-    class ClickTranslator(val line: List<ChatTab.ChatPlusGuiMessage>, message: String, to: Language) :
-        Translator(message, LanguageManager.translateFrom, to, false) {
+    /**
+     * Manual Ctrl+click translation.
+     *
+     * Each selected message is translated independently. The old ChatPlus implementation
+     * concatenated selected lines with a section-sign delimiter and expected the provider
+     * to preserve that delimiter, which is fragile and can make otherwise valid requests fail.
+     */
+    class ClickTranslator(
+        private val lines: List<ChatTab.ChatPlusGuiMessage>,
+        private val to: Language,
+    ) : Thread() {
 
-        override fun onTranslateSameMessage() {
-            val component = Component.literal("")
-            line.forEachIndexed { index, it ->
-                component.append(it.guiMessage.content)
-                if (index != line.size - 1) {
-                    component.append(Component.literal("\n"))
+        override fun run() {
+            var failures = 0
+
+            lines.forEach { line ->
+                val original = ChatFormatting.stripFormatting(line.guiMessage.content.string)?.trim().orEmpty()
+                if (original.isBlank()) {
+                    return@forEach
+                }
+
+                val translated = TranslationManager.translate(original, null, to)
+                if (translated == null) {
+                    failures++
+                    return@forEach
+                }
+
+                if (translated.translatedText.trim().equals(original, ignoreCase = true)) {
+                    Minecraft.getInstance().execute {
+                        ChatPlus.sendMessage(
+                            ComponentUtil.translatable(
+                                "chatPlus.translator.sameMessage",
+                                ChatFormatting.RED,
+                                HoverEvent.ShowText(line.guiMessage.content.copy())
+                            )
+                        )
+                    }
+                    return@forEach
+                }
+
+                val fromLanguage = translated.from?.name ?: "Auto Detect"
+                val component = ComponentUtil.literal(
+                    translated.translatedText.trim() + " (" + fromLanguage + ")",
+                    ChatFormatting.GREEN,
+                    HoverEvent.ShowText(line.guiMessage.content.copy())
+                )
+
+                Minecraft.getInstance().execute {
+                    ChatManager.globalSelectedTab.addNewMessage(
+                        AddNewMessageEvent(
+                            component.copy(),
+                            component,
+                            null,
+                            null,
+                            Minecraft.getInstance().gui.hud.guiTicks,
+                            GuiMessageSource.PLAYER,
+                            GuiMessageTag.system(),
+                            false
+                        )
+                    )
                 }
             }
-            ChatPlus.sendMessage(
-                ComponentUtil.translatable(
-                    "chatPlus.translator.sameMessage",
-                    ChatFormatting.RED,
-                    HoverEvent.ShowText(component)
-                )
-            )
-        }
 
-        override fun onTranslate(matchedRegex: String?, translatedMessage: TranslateResult, fromLanguage: String?) {
-            translatedMessage.translatedText.split("§").forEachIndexed { index, it ->
-                val component = ComponentUtil.literal(
-                    (matchedRegex ?: "") + it.trim() + " (" + (fromLanguage ?: "Unknown") + ")",
-                    ChatFormatting.GREEN,
-                    HoverEvent.ShowText(line[index].guiMessage.content.copy())
-                )
-                ChatManager.globalSelectedTab.addNewMessage(
-                    AddNewMessageEvent(
-                        component.copy(),
-                        component,
-                        null,
-                        null,
-                        Minecraft.getInstance().gui.hud.guiTicks,
-                        GuiMessageSource.PLAYER,
-                        GuiMessageTag.system(),
-                        false
+            if (failures > 0) {
+                Minecraft.getInstance().execute {
+                    ChatPlus.sendMessage(
+                        Component.literal(
+                            if (failures == 1) {
+                                "Translation failed. Please try again in a moment."
+                            } else {
+                                "$failures translations failed. Please try again in a moment."
+                            }
+                        ).withStyle(ChatFormatting.RED)
                     )
-                )
+                }
             }
         }
-
     }
 
 }
