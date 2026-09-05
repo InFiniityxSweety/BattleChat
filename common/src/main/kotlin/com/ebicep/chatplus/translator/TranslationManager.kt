@@ -6,9 +6,8 @@ import java.util.concurrent.ConcurrentHashMap
 /**
  * BattleChat translation dispatcher.
  *
- * Providers are tried in order. A failure only cools down the provider that failed,
- * instead of disabling translation globally. This keeps Ctrl+Click and outgoing
- * translation usable when one public endpoint is rate limited or unavailable.
+ * Providers are isolated from each other, transient failures are retried once,
+ * cooldowns are deliberately short, and successful translations are cached.
  */
 object TranslationManager {
 
@@ -17,12 +16,25 @@ object TranslationManager {
         val request: (String, Language?, Language) -> RequestResult
     )
 
+    private data class CacheKey(val text: String, val from: String, val to: String)
+    private data class CacheEntry(val result: TranslateResult, val expiresAt: Long)
+
     private val cooldownUntil = ConcurrentHashMap<String, Long>()
+    private val cache = ConcurrentHashMap<CacheKey, CacheEntry>()
+
+    @Volatile
+    var lastFailureSummary: String = ""
+        private set
 
     private val providers: List<Provider> by lazy {
         listOf(
-            Provider("google") { text, from, to ->
-                val requester = GoogleRequester()
+            Provider("google-api") { text, from, to ->
+                val requester = GoogleRequester(GoogleRequester.DEFAULT_BASE_URL)
+                if (from == null || from.googleCode == "auto") requester.translateAuto(text, to)
+                else requester.performTranslationRequest(text, from, to)
+            },
+            Provider("google-web") { text, from, to ->
+                val requester = GoogleRequester(GoogleRequester.FALLBACK_BASE_URL)
                 if (from == null || from.googleCode == "auto") requester.translateAuto(text, to)
                 else requester.performTranslationRequest(text, from, to)
             },
@@ -37,38 +49,59 @@ object TranslationManager {
 
     fun translate(text: String, from: Language?, to: Language): TranslateResult? {
         if (to.googleCode == "auto") {
+            lastFailureSummary = "invalid target: auto"
             ChatPlus.LOGGER.warn("Refusing translation request with Auto Detect as target language")
             return null
         }
 
+        val normalizedText = text.trim()
+        if (normalizedText.isEmpty()) {
+            lastFailureSummary = "empty input"
+            return null
+        }
+
+        val key = CacheKey(normalizedText, from?.googleCode ?: "auto", to.googleCode)
         val now = System.currentTimeMillis()
+        cache[key]?.let { cached ->
+            if (cached.expiresAt > now) {
+                lastFailureSummary = ""
+                return cached.result
+            }
+            cache.remove(key)
+        }
+
         val failures = mutableListOf<String>()
+        var attempted = 0
 
         for (provider in providers) {
             val cooldown = cooldownUntil[provider.id] ?: 0L
             if (cooldown > now) {
-                ChatPlus.LOGGER.debug(
-                    "Skipping translation provider {} for another {} ms",
-                    provider.id,
-                    cooldown - now
-                )
+                failures += "${provider.id}:cooldown"
                 continue
             }
 
-            val result = try {
-                provider.request(text, from, to)
-            } catch (throwable: Throwable) {
-                ChatPlus.LOGGER.warn("Translation provider {} failed unexpectedly", provider.id, throwable)
-                RequestResult(1, throwable.message ?: "Unexpected provider error", null, to)
+            attempted++
+            var result = safeRequest(provider, normalizedText, from, to)
+            if (shouldRetry(result.code)) {
+                try {
+                    Thread.sleep(150)
+                } catch (_: InterruptedException) {
+                    Thread.currentThread().interrupt()
+                }
+                result = safeRequest(provider, normalizedText, from, to)
             }
 
-            // The translated text is the important part. Some free providers return
-            // valid translations but omit/rename the detected source language. Do not
-            // throw away a good translation just because source-language metadata is missing.
             if (result.code == 200 && result.message.isNotBlank()) {
                 cooldownUntil.remove(provider.id)
+                lastFailureSummary = ""
+                val translated = TranslateResult(result.message.trim(), result.from)
+                if (cache.size >= 256) {
+                    cache.entries.removeIf { it.value.expiresAt <= now }
+                    if (cache.size >= 256) cache.clear()
+                }
+                cache[key] = CacheEntry(translated, now + 15 * 60_000L)
                 ChatPlus.LOGGER.debug("Translation succeeded through provider {}", provider.id)
-                return TranslateResult(result.message.trim(), result.from)
+                return translated
             }
 
             failures += "${provider.id}:${result.code}"
@@ -76,7 +109,6 @@ object TranslationManager {
             if (cooldownMillis > 0) {
                 cooldownUntil[provider.id] = System.currentTimeMillis() + cooldownMillis
             }
-
             ChatPlus.LOGGER.warn(
                 "Translation provider {} failed with code {}: {}",
                 provider.id,
@@ -85,14 +117,34 @@ object TranslationManager {
             )
         }
 
-        ChatPlus.LOGGER.error("All translation providers failed: {}", failures.joinToString(", "))
+        // If every provider happened to be cooling down, clear transient cooldowns
+        // for the next manual attempt instead of recreating ChatPlus' old multi-minute lockout.
+        if (attempted == 0) {
+            cooldownUntil.clear()
+            failures += "all providers were cooling down; reset for next attempt"
+        }
+
+        lastFailureSummary = failures.joinToString(", ")
+        ChatPlus.LOGGER.error("All translation providers failed: {}", lastFailureSummary)
         return null
     }
 
+    private fun safeRequest(provider: Provider, text: String, from: Language?, to: Language): RequestResult {
+        return try {
+            provider.request(text, from, to)
+        } catch (throwable: Throwable) {
+            ChatPlus.LOGGER.warn("Translation provider {} failed unexpectedly", provider.id, throwable)
+            RequestResult(1, throwable.message ?: "Unexpected provider error", null, to)
+        }
+    }
+
+    private fun shouldRetry(code: Int): Boolean = code == 1 || code in 500..599
+
     private fun cooldownFor(code: Int): Long = when (code) {
-        429, 403 -> 5 * 60_000L
-        in 500..599 -> 30_000L
-        1 -> 15_000L
-        else -> 10_000L
+        429 -> 20_000L
+        403 -> 45_000L
+        in 500..599 -> 5_000L
+        1 -> 3_000L
+        else -> 5_000L
     }
 }
