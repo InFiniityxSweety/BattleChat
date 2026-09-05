@@ -10,23 +10,25 @@ import net.minecraft.network.chat.Component
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 
+// Keep the upstream internal namespace for resource/package compatibility during the fork transition.
 const val MOD_ID = "chatplus"
+const val MOD_NAME = "BattleChat"
 const val MOD_COLOR = 0xFF12e3DB.toInt()
 
 object ChatPlus {
 
-    val LOGGER: Logger = LogManager.getLogger(MOD_ID)
+    val LOGGER: Logger = LogManager.getLogger(MOD_NAME)
     var initialized: Boolean = false
 
     fun init() {
         initialized = true
-        LOGGER.info("Initializing ChatPlus")
+        LOGGER.info("Initializing $MOD_NAME")
         LanguageManager
         Config.load()
 
         Events
         FeatureManager
-        LOGGER.info("Done Initializing ChatPlus")
+        LOGGER.info("Done Initializing $MOD_NAME")
     }
 
     fun doTest() {
@@ -132,10 +134,9 @@ object ChatPlus {
     }
 
     fun sendMessage(component: Component) {
-        // rgb(18, 227, 219)
         Minecraft.getInstance().player?.sendSystemMessage(
             Component.empty()
-                .append(Component.literal("ChatPlus").withColor(MOD_COLOR))
+                .append(Component.literal(MOD_NAME).withColor(MOD_COLOR))
                 .append(Component.literal(" > ").withStyle(ChatFormatting.DARK_GRAY))
                 .append(component)
         )
