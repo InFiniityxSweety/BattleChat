@@ -48,6 +48,10 @@ object TranslationManager {
     }
 
     fun translate(text: String, from: Language?, to: Language): TranslateResult? {
+        return translateInternal(text, from, to, allowCooldownReset = true)
+    }
+
+    private fun translateInternal(text: String, from: Language?, to: Language, allowCooldownReset: Boolean): TranslateResult? {
         if (to.googleCode == "auto") {
             lastFailureSummary = "invalid target: auto"
             ChatPlus.LOGGER.warn("Refusing translation request with Auto Detect as target language")
@@ -70,6 +74,7 @@ object TranslationManager {
             cache.remove(key)
         }
 
+        cooldownUntil.entries.removeIf { it.value <= now }
         val failures = mutableListOf<String>()
         var attempted = 0
 
@@ -117,11 +122,10 @@ object TranslationManager {
             )
         }
 
-        // If every provider happened to be cooling down, clear transient cooldowns
-        // for the next manual attempt instead of recreating ChatPlus' old multi-minute lockout.
-        if (attempted == 0) {
+        if (attempted == 0 && allowCooldownReset) {
+            ChatPlus.LOGGER.info("All translation providers were cooling down; resetting transient cooldowns and retrying now")
             cooldownUntil.clear()
-            failures += "all providers were cooling down; reset for next attempt"
+            return translateInternal(normalizedText, from, to, allowCooldownReset = false)
         }
 
         lastFailureSummary = failures.joinToString(", ")
