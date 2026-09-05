@@ -6,7 +6,6 @@ package com.ebicep.chatplus.config
 
 import com.ebicep.chatplus.ChatPlus
 import com.ebicep.chatplus.ChatPlusPlatformInit
-import com.ebicep.chatplus.MOD_ID
 import com.ebicep.chatplus.config.migration.MigrationManager
 import com.ebicep.chatplus.config.serializers.KeySerializer
 import com.ebicep.chatplus.config.serializers.KeyWithModifier
@@ -32,14 +31,15 @@ import java.io.File
 import kotlin.math.max
 
 const val CONFIG_VERSION = "2.7.0"
-const val CONFIG_NAME = "${MOD_ID}-v$CONFIG_VERSION.json"
+const val CONFIG_NAME = "battlechat-v$CONFIG_VERSION.json"
+const val CONFIG_DIRECTORY_NAME = "battlechat"
 val json = Json {
     encodeDefaults = true
     ignoreUnknownKeys = true
     prettyPrint = true
 }
 val configDirectoryPath: String
-    get() = ConfigDirectory.getConfigDirectory().toString() + "/chatplus"
+    get() = ConfigDirectory.getConfigDirectory().resolve(CONFIG_DIRECTORY_NAME).toString()
 var queueUpdateConfig = false
 
 
@@ -56,27 +56,30 @@ object Config {
     fun save() {
         val configDirectory = File(configDirectoryPath)
         if (!configDirectory.exists()) {
-            configDirectory.mkdir()
+            configDirectory.mkdirs()
         }
         val configFile = File(configDirectory, CONFIG_NAME)
         configFile.writeText(json.encodeToString(ConfigVariables.serializer(), values))
     }
 
     fun load() {
-        ChatPlus.LOGGER.info("Config Directory: ${ConfigDirectory.getConfigDirectory().toAbsolutePath().normalize()}/chatplus")
+        val configRoot = ConfigDirectory.getConfigDirectory().toAbsolutePath().normalize()
+        ChatPlus.LOGGER.info("BattleChat Config Directory: ${configRoot.resolve(CONFIG_DIRECTORY_NAME)}")
         val configDirectory = File(configDirectoryPath)
         if (!configDirectory.exists()) {
-            configDirectory.mkdir()
+            configDirectory.mkdirs()
         }
         val configFile = File(configDirectory, CONFIG_NAME)
         if (!configFile.exists()) {
-            ChatPlus.LOGGER.info("No config file found, checking migration")
-            if (!MigrationManager.tryMigration(configDirectory, configFile)) {
-                ChatPlus.LOGGER.info("No migration found, creating new config")
+            ChatPlus.LOGGER.info("No BattleChat config file found, checking ChatPlus import/migration")
+            val migrated = MigrationManager.tryLegacyChatPlusMigration(configRoot.toFile(), configFile) ||
+                    MigrationManager.tryMigration(configDirectory, configFile)
+            if (!migrated) {
+                ChatPlus.LOGGER.info("No migration found, creating new BattleChat config")
                 configFile.createNewFile()
                 configFile.writeText(json.encodeToString(ConfigVariables.serializer(), values))
             } else {
-                ChatPlus.LOGGER.info("Reading migrated config")
+                ChatPlus.LOGGER.info("Reading migrated BattleChat config")
                 values = json.decodeFromString(ConfigVariables.serializer(), configFile.readText())
             }
         } else {
@@ -85,7 +88,7 @@ object Config {
         correctValues()
         loadValues()
         loaded = true
-        ChatPlus.LOGGER.info("Config Loaded")
+        ChatPlus.LOGGER.info("BattleChat Config Loaded")
     }
 
     private fun loadValues() {
