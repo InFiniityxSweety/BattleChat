@@ -6,6 +6,7 @@ import com.ebicep.chatplus.util.ComponentUtil
 import kotlinx.serialization.Serializable
 import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
+import net.minecraft.network.chat.Component
 import java.util.regex.Pattern
 
 open class Translator(val message: String, val from: Language?, val to: Language, val filtered: Boolean = true) : Thread() {
@@ -20,6 +21,7 @@ open class Translator(val message: String, val from: Language?, val to: Language
         }
         val translatedMessage = translate(textToTranslate) ?: run {
             ChatPlus.LOGGER.debug("Translation failed for: $textToTranslate")
+            onTranslateFailed(textToTranslate)
             return
         }
         if (translatedMessage.translatedText.trim().equals(textToTranslate, ignoreCase = true)) {
@@ -44,8 +46,14 @@ open class Translator(val message: String, val from: Language?, val to: Language
         return null to text
     }
 
-    open fun onTranslateSameMessage() {
+    open fun onTranslateFailed(textToTranslate: String) {
+        ChatPlus.sendMessage(
+            Component.literal("Translation failed. Please try again in a moment.")
+                .withStyle(ChatFormatting.RED)
+        )
+    }
 
+    open fun onTranslateSameMessage() {
     }
 
     open fun onTranslate(matchedRegex: String?, translatedMessage: TranslateResult, fromLanguage: String?) {
@@ -64,35 +72,9 @@ open class Translator(val message: String, val from: Language?, val to: Language
         if (text.trim().isEmpty()) {
             return null
         }
-        if (GoogleRequester.accessDenied) {
-            return null
-        }
-        //Use free ones later
-        val google = GoogleRequester()
-        val transRequest: RequestResult = if (from == null) google.translateAuto(text, to) else google.performTranslationRequest(text, from, to)
-        if (transRequest.code != 200) {
-            logException(transRequest)
-            return null
-        }
-        if (transRequest.from == null) {
-            return null
-        }
-        return TranslateResult(transRequest.message.trim(), transRequest.from)
-    }
 
-    private fun logException(transRequest: RequestResult) {
-        when (transRequest.code) {
-            1 -> ChatPlus.LOGGER.error("Cannot connect to translation server. Is player offline?")
-            2 -> ChatPlus.LOGGER.error(transRequest.message)
-            411 -> ChatPlus.LOGGER.error("Google API >> API call error")
-            429 -> ChatPlus.LOGGER.warn("Google denied access to translation API. Pausing translation for 5 minutes")
-            403 -> ChatPlus.LOGGER.error("Google API >> Exceeded API quota / User rate limit reached")
-            400 -> ChatPlus.LOGGER.error("Google API >> API key invalid")
-            500 -> ChatPlus.LOGGER.error("Google API >> Failed to determine source language: " + transRequest.message)
-            else -> ChatPlus.LOGGER.error("Unknown error/Server side failure: " + transRequest.message)
-        }
+        return TranslationManager.translate(text, from, to)
     }
-
 }
 
 

@@ -5,6 +5,7 @@ import com.ebicep.chatplus.config.Config;
 import com.ebicep.chatplus.events.EventBus;
 import com.ebicep.chatplus.features.chattabs.AddNewMessageEvent;
 import com.ebicep.chatplus.features.chattabs.ChatTab;
+import com.ebicep.chatplus.features.chattabs.MessageClassifier;
 import com.ebicep.chatplus.features.chattabs.SkipNewMessageEvent;
 import com.ebicep.chatplus.features.chatwindows.ChatWindowsManager;
 import com.ebicep.chatplus.hud.ChatManager;
@@ -60,8 +61,19 @@ public class MixinChatComponent {
         }
         contents = message.content();
         signature = message.signature();
+        source = message.source();
         tag = message.tag();
         List<ChatTab> addMessagesTo = new ArrayList<>();
+
+        MessageClassifier.Classification classification = MessageClassifier.INSTANCE.classify(contents, source, signature);
+        ChatPlus.INSTANCE.debugLog(
+                "BattleChat classification: " + classification.getKind()
+                        + " (" + classification.getConfidence() + "%)"
+                        + " | " + classification.getReason()
+                        + " | source=" + source
+                        + " | signed=" + (signature != null)
+                        + " | text=" + contents.getString()
+        );
 
         Integer lastPriority = null;
         for (ChatTab chatTab : ChatManager.INSTANCE.getGlobalSortedTabs()) {
@@ -70,6 +82,15 @@ public class MixinChatComponent {
             if (lastPriority != null && lastPriority > priority && !alwaysAdd) {
                 continue;
             }
+
+            // BattleChat source classification runs before the existing regex filter.
+            // Existing tabs remain ANY by default. Tabs named Chat/Server are upgraded
+            // automatically so imported ChatPlus configs immediately gain semantic routing.
+            chatTab.getCurrentSettings().applyBattleChatNameDefault();
+            if (!chatTab.getCurrentSettings().matchesSource(classification)) {
+                continue;
+            }
+
             if (chatTab.matches(contents)) {
                 addMessagesTo.add(chatTab);
                 if (chatTab.getSkipOthers()) {

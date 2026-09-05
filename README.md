@@ -1,59 +1,58 @@
-Adds more customization to the chat.
-- /chatplus
-- [Wiki](https://github.com/ebicep/ChatPlus/wiki)
-- <video src="https://github.com/user-attachments/assets/1c48a7cc-09bc-4cef-9389-035d8b6e52a0" controls></video>
+# BattleChat
 
-# Vanilla Changes
-- Increases the maximum messages Minecraft can store.
-- Increases the maximum number of command suggestions shown.
-- Resize/Relocate the chat box.
-- Scroll through the chat faster/slower.
-- Made the tiny scrollbar larger and actually functional.
-- Removed the "Server message. Cannot be reported" sidebar.
-- And more!
+BattleChat is a client-side Minecraft chat enhancement mod based on ChatPlus, targeting Fabric 26.2 first.
 
-# Custom Features
+## BattleChat 0.1.0-alpha
 
-### General
-- Create chat windows with chat tabs.
-- Customize the chat window.
-  - Resize
-  - Relocate
-  - Background Color
-  - Scale
-  - Text Opacity
-  - Unfocused Opacities
-  - Unfocused Height
-  - Line Spacing
-  - Outline
-  - Padding
-  - Message alignment (left/middle/right)
-  - Message direction (top down/bottom up)
-- Automatically create tabs.
-- Tab notifications.
-- Highlight lines automatically*.
-- Bookmark messages manually or automatically* and jump to them.
-- Highlight the current hovered over line.
-- Find messages in chat and jump to them.
-- Take screenshots of the whole chat or specific messages and auto upload them to imgur.
-- Select groups of messages by right clicking them, and then perform many of the custom options on them (Screenshot/Copy/Bookmark/etc).
-- Adds timestamps to messages.
-- Adds player heads next to messages.
-- Peek chat.
-- Compact messages.
-- And more!
+### Chat routing
+- Default `Chat` and `Server` tabs.
+- Modern player-chat metadata is used where available.
+- Legacy/ViaVersion servers use a conservative fallback classifier.
+- Each tab can explicitly use `Any`, `Player`, or `Server` as its message source.
+- `Ctrl + right click` a chat line to show classifier diagnostics (`Message Info`).
 
-### Language Related
-- Automatically* translate incoming messages.
-- Send messages in different languages.
-- Control click messages to translate them.
-- Send messages using speech to text (can be auto translated) using [VOSK](https://alphacephei.com/vosk/models), download your desired model and place in config/chatplus/models. (NOTE: This uses push to talk and larger models are slower!)
+### Translation
+- Incoming messages are never translated automatically.
+- `Ctrl + left click` translates the selected/hovered incoming message on demand.
+- Incoming source language is auto-detected and the default target is German.
+- Outgoing translation is controlled by the visible language selector in the chat bar; active mode is highlighted green.
+- Slash commands bypass translation completely.
+- Multiple independent translation backends are used with provider-local cooldowns, retries and a short result cache.
 
+### Text styles
+The `✨` selector supports:
+- Normal
+- Enchantment / Standard Galactic Alphabet style
+- Small Caps
+- Fullwidth
+- Bold
+- Italic
+- Bold Italic
+- Monospace
+- Fraktur
+- Double Struck
+- Script
+- Circled
+- Upside Down
 
-*Based on user defined regexes.
+When translation and a text style are both enabled, BattleChat translates readable text first and applies the selected style afterwards. Supported stylized incoming text is normalized back to readable text before manual translation.
 
+### Emoji picker
+The `😀` chat-bar picker includes categories, search, recent emojis and favorites. Left click inserts at the current cursor position; right click toggles a favorite.
 
-# Compatibility
+### Config
+BattleChat stores its configuration under:
 
-This mod overrides the vanilla chat renderer. Any mod that uses mixin on it will probably not work.
+`config/battlechat/`
 
+On first startup it can import a compatible ChatPlus configuration from `config/chatplus` without deleting or modifying the original files.
+
+## Translation privacy
+Manual incoming messages and outgoing messages that you choose to translate are sent to external translation services. BattleChat does not automatically translate incoming chat. Do not translate text you do not want sent to a third-party translation provider.
+
+## Upstream and license
+BattleChat is based on ChatPlus by ebicep and remains licensed under GPL-3.0. Upstream attribution and licensing are preserved.
+
+## Status
+
+`0.1.0-alpha` is still a test build. Fabric / Minecraft 26.2 is the initial supported target.

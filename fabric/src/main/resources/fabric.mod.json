@@ -9,9 +9,9 @@
     "${mod_authors}"
   ],
   "contact": {
-    "homepage": "https://github.com/ebicep/ChatPlus/",
-    "sources": "https://github.com/ebicep/ChatPlus/",
-    "issues": "https://github.com/ebicep/ChatPlus/issues/"
+    "homepage": "https://github.com/InFiniityxSweety/BattleChat/",
+    "sources": "https://github.com/InFiniityxSweety/BattleChat/",
+    "issues": "https://github.com/InFiniityxSweety/BattleChat/issues/"
   },
   "license": "GPL-3.0",
   "icon": "icon.png",

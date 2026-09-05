@@ -13,4 +13,4 @@ include("common")
 include("fabric")
 include("neoforge")
 
-rootProject.name = "ChatPlus"
+rootProject.name = "BattleChat"

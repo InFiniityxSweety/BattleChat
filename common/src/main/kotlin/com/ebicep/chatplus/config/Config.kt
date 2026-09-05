@@ -6,7 +6,6 @@ package com.ebicep.chatplus.config
 
 import com.ebicep.chatplus.ChatPlus
 import com.ebicep.chatplus.ChatPlusPlatformInit
-import com.ebicep.chatplus.MOD_ID
 import com.ebicep.chatplus.config.migration.MigrationManager
 import com.ebicep.chatplus.config.serializers.KeySerializer
 import com.ebicep.chatplus.config.serializers.KeyWithModifier
@@ -32,16 +31,16 @@ import java.io.File
 import kotlin.math.max
 
 const val CONFIG_VERSION = "2.7.0"
-const val CONFIG_NAME = "${MOD_ID}-v$CONFIG_VERSION.json"
+const val CONFIG_NAME = "battlechat-v$CONFIG_VERSION.json"
+const val CONFIG_DIRECTORY_NAME = "battlechat"
 val json = Json {
     encodeDefaults = true
     ignoreUnknownKeys = true
     prettyPrint = true
 }
 val configDirectoryPath: String
-    get() = ConfigDirectory.getConfigDirectory().toString() + "/chatplus"
+    get() = ConfigDirectory.getConfigDirectory().resolve(CONFIG_DIRECTORY_NAME).toString()
 var queueUpdateConfig = false
-
 
 object Config {
     var values = ConfigVariables()
@@ -56,27 +55,30 @@ object Config {
     fun save() {
         val configDirectory = File(configDirectoryPath)
         if (!configDirectory.exists()) {
-            configDirectory.mkdir()
+            configDirectory.mkdirs()
         }
         val configFile = File(configDirectory, CONFIG_NAME)
         configFile.writeText(json.encodeToString(ConfigVariables.serializer(), values))
     }
 
     fun load() {
-        ChatPlus.LOGGER.info("Config Directory: ${ConfigDirectory.getConfigDirectory().toAbsolutePath().normalize()}/chatplus")
+        val configRoot = ConfigDirectory.getConfigDirectory().toAbsolutePath().normalize()
+        ChatPlus.LOGGER.info("BattleChat Config Directory: ${configRoot.resolve(CONFIG_DIRECTORY_NAME)}")
         val configDirectory = File(configDirectoryPath)
         if (!configDirectory.exists()) {
-            configDirectory.mkdir()
+            configDirectory.mkdirs()
         }
         val configFile = File(configDirectory, CONFIG_NAME)
         if (!configFile.exists()) {
-            ChatPlus.LOGGER.info("No config file found, checking migration")
-            if (!MigrationManager.tryMigration(configDirectory, configFile)) {
-                ChatPlus.LOGGER.info("No migration found, creating new config")
+            ChatPlus.LOGGER.info("No BattleChat config file found, checking ChatPlus import/migration")
+            val migrated = MigrationManager.tryLegacyChatPlusMigration(configRoot.toFile(), configFile) ||
+                    MigrationManager.tryMigration(configDirectory, configFile)
+            if (!migrated) {
+                ChatPlus.LOGGER.info("No migration found, creating new BattleChat config")
                 configFile.createNewFile()
                 configFile.writeText(json.encodeToString(ConfigVariables.serializer(), values))
             } else {
-                ChatPlus.LOGGER.info("Reading migrated config")
+                ChatPlus.LOGGER.info("Reading migrated BattleChat config")
                 values = json.decodeFromString(ConfigVariables.serializer(), configFile.readText())
             }
         } else {
@@ -85,7 +87,7 @@ object Config {
         correctValues()
         loadValues()
         loaded = true
-        ChatPlus.LOGGER.info("Config Loaded")
+        ChatPlus.LOGGER.info("BattleChat Config Loaded")
     }
 
     private fun loadValues() {
@@ -113,13 +115,14 @@ object Config {
         if (values.chatWindows.isEmpty()) {
             values.chatWindows.add(createDefaultWindow())
         }
-        LanguageManager.findLanguageFromName(values.translateTo).let { if (it == null) values.translateTo = "Auto Detect" }
+        LanguageManager.findLanguageFromName(values.translateTo).let {
+            if (it == null || it.googleCode == "auto") values.translateTo = "German"
+        }
         LanguageManager.findLanguageFromName(values.translateSelf).let { if (it == null) values.translateSelf = "Auto Detect" }
         LanguageManager.findLanguageFromName(values.translateSpeak).let { if (it == null) values.translateSpeak = "English" }
         LanguageManager.findLanguageFromName(values.speechToTextTranslateLang).let { if (it == null) values.speechToTextTranslateLang = "English" }
         save()
     }
-
 }
 
 @Serializable
@@ -192,7 +195,7 @@ data class ConfigVariables(
     var movableChatKey: KeyWithModifier = KeyWithModifier(InputConstants.getKey("key.keyboard.right.control"), 0),
     var movableChatColor: Int = Color(255, 255, 255, 200).rgb,
     var movableChatSelectedColor: Int = Color(0, 255, 0, 200).rgb,
-    var movableChatToggleTextBarElement: Boolean = false, // TODO add enabled
+    var movableChatToggleTextBarElement: Boolean = false,
     var allowWindowsOutsideScreen: Boolean = false,
     var inputBoxSettings: InputBoxSettings = InputBoxSettings(),
     // notes
@@ -244,7 +247,7 @@ data class ConfigVariables(
     var screenshotChatEnabled: Boolean = true,
     var screenshotChatScale: Float = 1f,
     var screenshotChatCopyToClipboard: Boolean = true,
-    var screenshotChatSaveToFile: Boolean = true, // TODO
+    var screenshotChatSaveToFile: Boolean = true,
     var screenshotChatAutoUpload: Boolean = true,
     var screenshotChatAutoUploadSettings: ScreenshotUploadSettings = ScreenshotUploadSettings(),
     var screenshotChatLinePriority: Int = 200,
@@ -263,7 +266,7 @@ data class ConfigVariables(
     var translatorTextBarElementEnabled: Boolean = true,
     var translatorRegexes: MutableList<MessageFilter> = mutableListOf(),
     var translateFrom: String = "Auto Detect",
-    var translateTo: String = "Auto Detect",
+    var translateTo: String = "German",
     var translateSelf: String = "Auto Detect",
     var translateSpeak: String = "English",
     var translateKeepOnAfterChatClose: Boolean = true,

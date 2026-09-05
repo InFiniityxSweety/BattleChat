@@ -63,6 +63,13 @@ object SelectChat {
             lastSelected = null
         }
         EventBus.register<ChatScreenMouseClickedEvent> {
+            // BattleChat reserves Ctrl + right click for Message Info diagnostics.
+            // Plain right click keeps the original ChatPlus selection behaviour.
+            if (it.button == 1 && Minecraft.getInstance().hasControlDown()) {
+                rightClicking = false
+                return@register
+            }
+
             rightClicking = it.button == 1
             if (!rightClicking) {
                 selectedMessages.clear()

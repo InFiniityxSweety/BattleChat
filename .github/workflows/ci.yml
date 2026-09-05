@@ -1,0 +1,43 @@
+name: BattleChat CI
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - 'battlechat/**'
+      - 'version/26.2'
+
+concurrency:
+  group: battlechat-ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up JDK 25
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '25'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Grant execute permission
+        run: chmod +x gradlew
+
+      - name: Build Fabric artifact
+        run: ./gradlew :fabric:shadowJar
+
+      - name: Upload Fabric build
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: battlechat-fabric-${{ github.sha }}
+          path: fabric/build/libs/*.jar
+          if-no-files-found: error
+          retention-days: 14
