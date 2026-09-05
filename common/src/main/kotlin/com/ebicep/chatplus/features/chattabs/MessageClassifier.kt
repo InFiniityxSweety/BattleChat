@@ -76,11 +76,12 @@ object MessageClassifier {
             return Classification(Kind.PLAYER, 100, "Minecraft GuiMessageSource is player chat")
         }
 
-        // ViaVersion/legacy servers commonly surface old player chat as SYSTEM.
-        // Try the conservative legacy classifier before accepting SYSTEM as final.
+        // ViaVersion/legacy servers commonly surface old player chat as a non-player
+        // source. Try the conservative legacy classifier before accepting it as server.
         classifyLegacy(component.string)?.let { return it }
 
-        return if (source == GuiMessageSource.SYSTEM) {
+        val sourceName = source.toString().uppercase()
+        return if (sourceName.contains("SYSTEM")) {
             Classification(Kind.SERVER, 100, "Minecraft GuiMessageSource is system and no legacy player-chat shape matched")
         } else {
             Classification(Kind.SERVER, 80, "no player-chat metadata or conservative legacy match")
