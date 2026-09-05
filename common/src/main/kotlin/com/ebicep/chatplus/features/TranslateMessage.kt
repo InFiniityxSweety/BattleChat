@@ -117,22 +117,9 @@ object TranslateMessage {
             it.dontSendMessage = true
             SelfTranslator(it.normalizeChatMessage, if (inputTranslatePrefix == null) "" else inputTranslatePrefix!!.value).start()
         }
-        EventBus.register<AddNewMessageEvent>({ -10 }) {
-            if (!isTranslateMessage(it.rawComponent)) handleTranslate(it.rawComponent)
-        }
-        ClientRawInputEvent.KEY_PRESSED.register { minecraft, _, keyEvent ->
-            if (ChatManager.isChatFocused()) return@register EventResult.pass()
-            if (keyEvent.key() != values.translateKey.key.value || keyEvent.modifiers() != values.translateKey.modifier.toInt()) return@register EventResult.pass()
-            if (minecraft.gui.screen() != null) return@register EventResult.pass()
-            languageSpeakEnabled = true
-            minecraft.gui.openChatScreen(ChatComponent.ChatMethod.MESSAGE)
-            EventResult.interruptTrue()
-        }
-        EventBus.register<ChatScreenInputEvent> {
-            if (it.checkRelease(values.translateToggleKey)) return@register
-            TranslateSpeakTextBarElement.toggleTranslateSpeak(it.screen)
-        }
 
+        // BattleChat deliberately does not auto-translate incoming chat. Incoming
+        // messages remain untouched until the user explicitly Ctrl+left-clicks one.
         var translateClickCooldown = 0L
         EventBus.register<ChatScreenMouseClickedEvent>({ 100 }) { event ->
             if (!values.translatorEnabled || !values.translateClickEnabled) return@register
@@ -164,18 +151,18 @@ object TranslateMessage {
                 ClickTranslator(messages, target).start()
             }
         }
-    }
 
-    private fun isTranslateMessage(component: Component): Boolean {
-        return component.contents is ComponentUtil.LiteralContentsIgnored &&
-                (component.contents as ComponentUtil.LiteralContentsIgnored).isType(ComponentUtil.LiteralIgnoredType.TRANSLATE)
-    }
-
-    private fun handleTranslate(component: Component) {
-        if (!values.translatorEnabled) return
-        LanguageManager.languageTo?.let {
-            val plain = TextTransform.normalizeForTranslation(ChatFormatting.stripFormatting(component.string)!!)
-            Translator(plain, LanguageManager.translateFrom, it).start()
+        ClientRawInputEvent.KEY_PRESSED.register { minecraft, _, keyEvent ->
+            if (ChatManager.isChatFocused()) return@register EventResult.pass()
+            if (keyEvent.key() != values.translateKey.key.value || keyEvent.modifiers() != values.translateKey.modifier.toInt()) return@register EventResult.pass()
+            if (minecraft.gui.screen() != null) return@register EventResult.pass()
+            languageSpeakEnabled = true
+            minecraft.gui.openChatScreen(ChatComponent.ChatMethod.MESSAGE)
+            EventResult.interruptTrue()
+        }
+        EventBus.register<ChatScreenInputEvent> {
+            if (it.checkRelease(values.translateToggleKey)) return@register
+            TranslateSpeakTextBarElement.toggleTranslateSpeak(it.screen)
         }
     }
 
