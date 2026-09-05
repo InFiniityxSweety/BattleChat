@@ -42,7 +42,6 @@ val configDirectoryPath: String
     get() = ConfigDirectory.getConfigDirectory().resolve(CONFIG_DIRECTORY_NAME).toString()
 var queueUpdateConfig = false
 
-
 object Config {
     var values = ConfigVariables()
         get() {
@@ -116,13 +115,14 @@ object Config {
         if (values.chatWindows.isEmpty()) {
             values.chatWindows.add(createDefaultWindow())
         }
-        LanguageManager.findLanguageFromName(values.translateTo).let { if (it == null) values.translateTo = "Auto Detect" }
+        LanguageManager.findLanguageFromName(values.translateTo).let {
+            if (it == null || it.googleCode == "auto") values.translateTo = "German"
+        }
         LanguageManager.findLanguageFromName(values.translateSelf).let { if (it == null) values.translateSelf = "Auto Detect" }
         LanguageManager.findLanguageFromName(values.translateSpeak).let { if (it == null) values.translateSpeak = "English" }
         LanguageManager.findLanguageFromName(values.speechToTextTranslateLang).let { if (it == null) values.speechToTextTranslateLang = "English" }
         save()
     }
-
 }
 
 @Serializable
@@ -195,7 +195,7 @@ data class ConfigVariables(
     var movableChatKey: KeyWithModifier = KeyWithModifier(InputConstants.getKey("key.keyboard.right.control"), 0),
     var movableChatColor: Int = Color(255, 255, 255, 200).rgb,
     var movableChatSelectedColor: Int = Color(0, 255, 0, 200).rgb,
-    var movableChatToggleTextBarElement: Boolean = false, // TODO add enabled
+    var movableChatToggleTextBarElement: Boolean = false,
     var allowWindowsOutsideScreen: Boolean = false,
     var inputBoxSettings: InputBoxSettings = InputBoxSettings(),
     // notes
@@ -247,7 +247,7 @@ data class ConfigVariables(
     var screenshotChatEnabled: Boolean = true,
     var screenshotChatScale: Float = 1f,
     var screenshotChatCopyToClipboard: Boolean = true,
-    var screenshotChatSaveToFile: Boolean = true, // TODO
+    var screenshotChatSaveToFile: Boolean = true,
     var screenshotChatAutoUpload: Boolean = true,
     var screenshotChatAutoUploadSettings: ScreenshotUploadSettings = ScreenshotUploadSettings(),
     var screenshotChatLinePriority: Int = 200,
@@ -266,7 +266,7 @@ data class ConfigVariables(
     var translatorTextBarElementEnabled: Boolean = true,
     var translatorRegexes: MutableList<MessageFilter> = mutableListOf(),
     var translateFrom: String = "Auto Detect",
-    var translateTo: String = "Auto Detect",
+    var translateTo: String = "German",
     var translateSelf: String = "Auto Detect",
     var translateSpeak: String = "English",
     var translateKeepOnAfterChatClose: Boolean = true,
