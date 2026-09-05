@@ -9,10 +9,11 @@ import java.net.URI
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 
-class GoogleRequester {
+class GoogleRequester(private val baseUrl: String = DEFAULT_BASE_URL) {
 
     companion object {
-        const val BASE_URL = "https://translate.googleapis.com/translate_a/single"
+        const val DEFAULT_BASE_URL = "https://translate.googleapis.com/translate_a/single"
+        const val FALLBACK_BASE_URL = "https://translate.google.com/translate_a/single"
     }
 
     fun translateAuto(message: String, to: Language?): RequestResult {
@@ -24,7 +25,7 @@ class GoogleRequester {
             ?: return RequestResult(2, "Failed to encode message", null, null)
 
         val requestUrl = buildString {
-            append(BASE_URL)
+            append(baseUrl)
             append("?client=gtx")
             append("&sl=").append(from.googleCode)
             append("&tl=").append(to.googleCode)
@@ -40,8 +41,8 @@ class GoogleRequester {
 
         return try {
             connection.requestMethod = "GET"
-            connection.connectTimeout = 4_000
-            connection.readTimeout = 8_000
+            connection.connectTimeout = 3_000
+            connection.readTimeout = 5_000
             connection.setRequestProperty("Accept", "application/json")
             connection.setRequestProperty("User-Agent", "BattleChat/0.1")
 
@@ -51,14 +52,15 @@ class GoogleRequester {
 
             when (status) {
                 200 -> processSuccessfulResponse(body, from, to)
-                429 -> RequestResult(429, "Access to Google Translate denied / rate limited", null, to)
+                429 -> RequestResult(429, "Google Translate rate limited this endpoint", null, to)
+                403 -> RequestResult(403, "Google Translate denied this endpoint", null, to)
                 else -> {
-                    ChatPlus.LOGGER.debug("Google translation endpoint returned {}: {}", status, body.take(250))
+                    ChatPlus.LOGGER.debug("Google translation endpoint {} returned {}: {}", baseUrl, status, body.take(250))
                     RequestResult(status, body.ifBlank { "Google translation API error" }, null, to)
                 }
             }
         } catch (exception: Exception) {
-            ChatPlus.LOGGER.debug("Google translation request failed", exception)
+            ChatPlus.LOGGER.debug("Google translation request to {} failed", baseUrl, exception)
             RequestResult(1, "Connection error: ${exception.message ?: exception.javaClass.simpleName}", null, to)
         } finally {
             connection.disconnect()
