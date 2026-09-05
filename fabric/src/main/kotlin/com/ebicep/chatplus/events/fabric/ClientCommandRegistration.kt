@@ -19,9 +19,9 @@ object ClientCommandRegistration {
 
     fun registerCommands() {
         ClientCommandRegistrationCallback.EVENT.register(ClientCommandRegistrationCallback { dispatcher: CommandDispatcher<FabricClientCommandSource>, _: CommandBuildContext? ->
-            // BattleChat public command names.
+            // BattleChat public command name. Avoid a generic /bc alias because it
+            // could shadow an unrelated server-side command on multiplayer servers.
             dispatcher.register(createCommand("battlechat"))
-            dispatcher.register(createCommand("bc"))
 
             // Keep the original ChatPlus aliases for imported configs / muscle memory.
             dispatcher.register(createCommand("chatplus"))
