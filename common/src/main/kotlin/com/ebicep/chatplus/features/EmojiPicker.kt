@@ -102,7 +102,7 @@ object EmojiPicker {
 
     init {
         load()
-        EventBus.register<AddTextBarElementEvent>({ -30 }) {
+        EventBus.register<AddTextBarElementEvent>({ 20 }) {
             it.elements.add(EmojiPickerTextBarElement(it.screen))
         }
     }
