@@ -26,7 +26,6 @@ import net.minecraft.client.multiplayer.chat.GuiMessageTag
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.HoverEvent
 
-
 object TranslateMessage {
 
     val TRANSLATE_PREFIX_INPUT_WIDTH: Int
@@ -36,20 +35,13 @@ object TranslateMessage {
 
     init {
         EventBus.register<AddTextBarElementEvent>({ 0 }) {
-            if (!values.translatorEnabled) {
-                return@register
-            }
-            if (!values.translatorTextBarElementEnabled) {
-                return@register
-            }
+            if (!values.translatorEnabled || !values.translatorTextBarElementEnabled) return@register
             val textBarElement = TranslateSpeakTextBarElement(it.screen)
             textBarElement.init()
             it.elements.add(textBarElement)
         }
         EventBus.register<ChatScreenInitPostEvent> {
-            if (!values.translatorEnabled) {
-                return@register
-            }
+            if (!values.translatorEnabled) return@register
             val screen = it.screen
 
             inputTranslatePrefix = null
@@ -75,25 +67,15 @@ object TranslateMessage {
             }
         }
         EventBus.register<ChatScreenCloseEvent> {
-            if (!values.translatorEnabled) {
-                return@register
-            }
-            if (languageSpeakEnabled && !values.translateKeepOnAfterChatClose) {
-                languageSpeakEnabled = false
-            }
+            if (!values.translatorEnabled) return@register
+            if (languageSpeakEnabled && !values.translateKeepOnAfterChatClose) languageSpeakEnabled = false
         }
         EventBus.register<FindToggleEvent> {
-            if (!values.translatorEnabled) {
-                return@register
-            }
-            if (languageSpeakEnabled) {
-                languageSpeakEnabled = false
-            }
+            if (!values.translatorEnabled) return@register
+            if (languageSpeakEnabled) languageSpeakEnabled = false
         }
         EventBus.register<ChatScreenMouseClickedEvent> {
-            if (!values.translatorEnabled) {
-                return@register
-            }
+            if (!values.translatorEnabled) return@register
             if (languageSpeakEnabled) {
                 it.returnFunction = inputTranslatePrefix != null &&
                         inputTranslatePrefix!!.isFocused &&
@@ -101,12 +83,7 @@ object TranslateMessage {
             }
         }
         EventBus.register<ChatScreenRenderEvent> {
-            if (!values.translatorEnabled) {
-                return@register
-            }
-            if (inputTranslatePrefix == null) {
-                return@register
-            }
+            if (!values.translatorEnabled || inputTranslatePrefix == null) return@register
             val screen = it.screen
             val guiGraphics = it.guiGraphics
             val height = screen.height
@@ -121,20 +98,11 @@ object TranslateMessage {
                 if (values.vanillaInputBox) height - 2 else inputBoxSettings.getCalculatedStartY() + MovableChat.InputBoxSettings.PADDED_INPUT_BOX_HEIGHT,
                 minecraft.options.getBackgroundColor(Int.MIN_VALUE)
             )
-            guiGraphics.outline(
-                startX,
-                startY,
-                TRANSLATE_PREFIX_INPUT_WIDTH,
-                EDIT_BOX_DISPLAY_HEIGHT,
-                0xFF55FF55.toInt()
-            )
+            guiGraphics.outline(startX, startY, TRANSLATE_PREFIX_INPUT_WIDTH, EDIT_BOX_DISPLAY_HEIGHT, 0xFF55FF55.toInt())
             val mouseX = it.mouseX
             val mouseY = it.mouseY
             inputTranslatePrefix!!.extractRenderState(guiGraphics, mouseX, mouseY, it.partialTick)
-            if (
-                mouseX in startX until startX + TRANSLATE_PREFIX_INPUT_WIDTH &&
-                mouseY in startY until startY + EDIT_BOX_HEIGHT
-            ) {
+            if (mouseX in startX until startX + TRANSLATE_PREFIX_INPUT_WIDTH && mouseY in startY until startY + EDIT_BOX_HEIGHT) {
                 guiGraphics.setTooltipForNextFrame(
                     minecraft.font,
                     Component.translatable("chatPlus.translator.translateSpeakPrefix.tooltip"),
@@ -144,56 +112,33 @@ object TranslateMessage {
             }
         }
         EventBus.register<ChatScreenSendMessagePostEvent> {
-            if (!values.translatorEnabled) {
-                return@register
-            }
-            if (!languageSpeakEnabled) {
-                return@register
-            }
-            // Commands must always pass through untouched, even while the
-            // outgoing translation toggle is enabled.
-            if (it.normalizeChatMessage.trimStart().startsWith("/")) {
-                return@register
-            }
+            if (!values.translatorEnabled || !languageSpeakEnabled) return@register
+            if (it.normalizeChatMessage.trimStart().startsWith("/")) return@register
             it.dontSendMessage = true
             SelfTranslator(it.normalizeChatMessage, if (inputTranslatePrefix == null) "" else inputTranslatePrefix!!.value).start()
         }
         EventBus.register<AddNewMessageEvent>({ -10 }) {
-            if (!isTranslateMessage(it.rawComponent)) {
-                handleTranslate(it.rawComponent)
-            }
+            if (!isTranslateMessage(it.rawComponent)) handleTranslate(it.rawComponent)
         }
         ClientRawInputEvent.KEY_PRESSED.register { minecraft, _, keyEvent ->
-            if (ChatManager.isChatFocused()) {
-                return@register EventResult.pass()
-            }
-            if (keyEvent.key() != values.translateKey.key.value || keyEvent.modifiers() != values.translateKey.modifier.toInt()) {
-                return@register EventResult.pass()
-            }
-            if (minecraft.gui.screen() != null) {
-                return@register EventResult.pass()
-            }
+            if (ChatManager.isChatFocused()) return@register EventResult.pass()
+            if (keyEvent.key() != values.translateKey.key.value || keyEvent.modifiers() != values.translateKey.modifier.toInt()) return@register EventResult.pass()
+            if (minecraft.gui.screen() != null) return@register EventResult.pass()
             languageSpeakEnabled = true
             minecraft.gui.openChatScreen(ChatComponent.ChatMethod.MESSAGE)
             EventResult.interruptTrue()
         }
         EventBus.register<ChatScreenInputEvent> {
-            if (it.checkRelease(values.translateToggleKey)) {
-                return@register
-            }
+            if (it.checkRelease(values.translateToggleKey)) return@register
             TranslateSpeakTextBarElement.toggleTranslateSpeak(it.screen)
         }
+
         var translateClickCooldown = 0L
         EventBus.register<ChatScreenMouseClickedEvent>({ 100 }) { event ->
-            if (!values.translatorEnabled || !values.translateClickEnabled) {
-                return@register
-            }
-            if (event.button != 0 || !Minecraft.getInstance().hasControlDown()) {
-                return@register
-            }
-            if (System.currentTimeMillis() - translateClickCooldown < 1_000) {
-                return@register
-            }
+            if (!values.translatorEnabled || !values.translateClickEnabled) return@register
+            if (event.button != 0 || !Minecraft.getInstance().hasControlDown()) return@register
+            if (System.currentTimeMillis() - translateClickCooldown < 1_000) return@register
+
             ChatManager.globalSelectedTab.getHoveredOverMessageLine(event.mouseX, event.mouseY)?.let { message ->
                 val selectedMessages = SelectChat.getAllSelectedMessages()
                 val messages: List<ChatTab.ChatPlusGuiMessage> = if (selectedMessages.contains(message)) {
@@ -202,8 +147,6 @@ object TranslateMessage {
                     listOf(message.linkedMessage)
                 }
 
-                // Incoming translation is always source=auto. Auto Detect is not a
-                // meaningful target language, so fall back to German for BattleChat.
                 val target = LanguageManager.languageTo
                     ?.takeUnless { language -> language.googleCode == "auto" }
                     ?: LanguageManager.findLanguageFromName("German")
@@ -229,21 +172,13 @@ object TranslateMessage {
     }
 
     private fun handleTranslate(component: Component) {
-        if (!values.translatorEnabled) {
-            return
-        }
+        if (!values.translatorEnabled) return
         LanguageManager.languageTo?.let {
-            Translator(ChatFormatting.stripFormatting(component.string)!!, LanguageManager.translateFrom, it).start()
+            val plain = TextTransform.normalizeForTranslation(ChatFormatting.stripFormatting(component.string)!!)
+            Translator(plain, LanguageManager.translateFrom, it).start()
         }
     }
 
-    /**
-     * Manual Ctrl+click translation.
-     *
-     * Each selected message is translated independently. The old ChatPlus implementation
-     * concatenated selected lines with a section-sign delimiter and expected the provider
-     * to preserve that delimiter, which is fragile and can make otherwise valid requests fail.
-     */
     class ClickTranslator(
         private val lines: List<ChatTab.ChatPlusGuiMessage>,
         private val to: Language,
@@ -254,17 +189,20 @@ object TranslateMessage {
 
             lines.forEach { line ->
                 val original = ChatFormatting.stripFormatting(line.guiMessage.content.string)?.trim().orEmpty()
-                if (original.isBlank()) {
-                    return@forEach
-                }
+                if (original.isBlank()) return@forEach
 
-                val translated = TranslationManager.translate(original, null, to)
+                // Unicode styles such as Enchantment/SGA, Fraktur, Circled, etc.
+                // are normalized back to readable text before language detection.
+                val plain = TextTransform.normalizeForTranslation(original).trim()
+                if (plain.isBlank()) return@forEach
+
+                val translated = TranslationManager.translate(plain, null, to)
                 if (translated == null) {
                     failures++
                     return@forEach
                 }
 
-                if (translated.translatedText.trim().equals(original, ignoreCase = true)) {
+                if (translated.translatedText.trim().equals(plain, ignoreCase = true)) {
                     Minecraft.getInstance().execute {
                         ChatPlus.sendMessage(
                             ComponentUtil.translatable(
@@ -301,13 +239,14 @@ object TranslateMessage {
             }
 
             if (failures > 0) {
+                val details = TranslationManager.lastFailureSummary.take(180)
                 Minecraft.getInstance().execute {
                     ChatPlus.sendMessage(
                         Component.literal(
-                            if (failures == 1) {
-                                "Translation failed. Please try again in a moment."
-                            } else {
-                                "$failures translations failed. Please try again in a moment."
+                            buildString {
+                                append(if (failures == 1) "Translation failed." else "$failures translations failed.")
+                                if (details.isNotBlank()) append(" [$details]")
+                                append(" Please try again.")
                             }
                         ).withStyle(ChatFormatting.RED)
                     )
@@ -315,5 +254,4 @@ object TranslateMessage {
             }
         }
     }
-
 }
