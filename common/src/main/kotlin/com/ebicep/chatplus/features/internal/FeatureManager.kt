@@ -14,6 +14,7 @@ object FeatureManager {
         MovableChat
         HoverHighlight
         TextBarElements
+        EmojiPicker
         CompactMessages
         FilterMessages
         ChatTabs
@@ -44,5 +45,4 @@ object FeatureManager {
         InputBoxNormalizeInput
 //        AlternatingColorBackground
     }
-
 }
