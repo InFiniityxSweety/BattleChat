@@ -20,6 +20,7 @@ object FeatureManager {
         ChatTabs
         TranslateMessage
         TextTransform
+        MessageInfo
         AlignMessage
         ScreenshotChat
         SpeechToText
