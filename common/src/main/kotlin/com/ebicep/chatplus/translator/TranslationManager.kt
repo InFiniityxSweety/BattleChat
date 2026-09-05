@@ -8,6 +8,10 @@ import java.util.concurrent.ConcurrentHashMap
  *
  * Providers are isolated from each other, transient failures are retried once,
  * cooldowns are deliberately short, and successful translations are cached.
+ *
+ * The chain intentionally mixes independent backends. Two Google domains alone
+ * are not useful when Google rate-limits the player's public IP, and the public
+ * LibreTranslate mirrors can independently require keys or be offline.
  */
 object TranslationManager {
 
@@ -28,16 +32,40 @@ object TranslationManager {
 
     private val providers: List<Provider> by lazy {
         listOf(
+            // Fast primary provider. If this IP is rate limited, immediately move
+            // to independent services instead of hammering another Google domain.
             Provider("google-api") { text, from, to ->
                 val requester = GoogleRequester(GoogleRequester.DEFAULT_BASE_URL)
                 if (from == null || from.googleCode == "auto") requester.translateAuto(text, to)
                 else requester.performTranslationRequest(text, from, to)
             },
+
+            // Lingva public instances expose a simple keyless REST API. Multiple
+            // separately hosted instances protect us from one host being down.
+            Provider("lingva-dr460") { text, from, to ->
+                LingvaRequester("https://translate.dr460nf1r3.org").performTranslationRequest(text, from, to)
+            },
+            Provider("lingva-garuda") { text, from, to ->
+                LingvaRequester("https://lingva.garudalinux.org").performTranslationRequest(text, from, to)
+            },
+            Provider("lingva-jae") { text, from, to ->
+                LingvaRequester("https://translate.jae.fi").performTranslationRequest(text, from, to)
+            },
+
+            // Independent translation memory / machine-translation service.
+            Provider("mymemory") { text, from, to ->
+                MyMemoryRequester().performTranslationRequest(text, from, to)
+            },
+
+            // Keep the alternate Google endpoint as a later fallback. It often
+            // shares rate limits with the primary endpoint, so it should not block
+            // access to independent providers.
             Provider("google-web") { text, from, to ->
                 val requester = GoogleRequester(GoogleRequester.FALLBACK_BASE_URL)
                 if (from == null || from.googleCode == "auto") requester.translateAuto(text, to)
                 else requester.performTranslationRequest(text, from, to)
             },
+
             Provider("libretranslate-cutie") { text, from, to ->
                 LibreTranslateRequester("https://translate.cutie.dating").performTranslationRequest(text, from, to)
             },
