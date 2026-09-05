@@ -50,7 +50,7 @@ class GoogleRequester {
             val body = stream?.bufferedReader(StandardCharsets.UTF_8)?.use { it.readText() }.orEmpty()
 
             when (status) {
-                200 -> processSuccessfulResponse(body, to)
+                200 -> processSuccessfulResponse(body, from, to)
                 429 -> RequestResult(429, "Access to Google Translate denied / rate limited", null, to)
                 else -> {
                     ChatPlus.LOGGER.debug("Google translation endpoint returned {}: {}", status, body.take(250))
@@ -73,16 +73,18 @@ class GoogleRequester {
         }
     }
 
-    private fun processSuccessfulResponse(body: String, targetLanguage: Language): RequestResult {
+    private fun processSuccessfulResponse(body: String, requestedSource: Language, targetLanguage: Language): RequestResult {
         return try {
             val gson: Gson = GsonBuilder().setLenient().create()
             val json: JsonArray = gson.fromJson(body, JsonArray::class.java)
-            val detectedSource = LanguageManager.findLanguageFromGoogle(json[2].asString)
+            val detectedCode = runCatching { json[2].asString }.getOrNull()
+            val detectedSource = detectedCode?.let(LanguageManager::findLanguageFromGoogle)
+                ?: requestedSource.takeUnless { it.googleCode == "auto" }
             val translatedText = json[0].asJsonArray
                 .joinToString("") { it.asJsonArray[0].asString }
 
-            if (detectedSource == null) {
-                RequestResult(500, "Failed to determine source language", null, targetLanguage)
+            if (translatedText.isBlank()) {
+                RequestResult(500, "Google returned an empty translation", detectedSource, targetLanguage)
             } else {
                 RequestResult(200, translatedText, detectedSource, targetLanguage)
             }
