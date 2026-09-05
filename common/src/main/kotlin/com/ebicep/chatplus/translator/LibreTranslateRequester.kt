@@ -19,7 +19,7 @@ class LibreTranslateRequester(private val baseUrl: String) {
         .build()
 
     fun performTranslationRequest(message: String, from: Language?, to: Language): RequestResult {
-        val source = from?.googleCode ?: "auto"
+        val source = from?.googleCode?.takeUnless { it == "auto" } ?: "auto"
         val payload = JsonObject().apply {
             addProperty("q", message)
             addProperty("source", source)
@@ -33,6 +33,7 @@ class LibreTranslateRequester(private val baseUrl: String) {
                 .timeout(Duration.ofSeconds(8))
                 .header("Content-Type", "application/json")
                 .header("Accept", "application/json")
+                .header("User-Agent", "BattleChat/0.1")
                 .POST(HttpRequest.BodyPublishers.ofString(gson.toJson(payload)))
                 .build()
         } catch (exception: Exception) {
@@ -53,11 +54,13 @@ class LibreTranslateRequester(private val baseUrl: String) {
                 ?: source.takeUnless { it == "auto" }
 
             val detectedLanguage = detectedCode?.let(LanguageManager::findLanguageFromGoogle)
+                ?: from?.takeUnless { it.googleCode == "auto" }
+
             if (translatedText.isBlank()) {
                 RequestResult(500, "LibreTranslate returned an empty translation", detectedLanguage, to)
-            } else if (detectedLanguage == null) {
-                RequestResult(500, "LibreTranslate did not return a supported source language", null, to)
             } else {
+                // Some public LibreTranslate instances do not include detectedLanguage.
+                // The translated text is still valid and should not be discarded.
                 RequestResult(200, translatedText, detectedLanguage, to)
             }
         } catch (exception: Exception) {
