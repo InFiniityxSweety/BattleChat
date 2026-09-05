@@ -27,10 +27,16 @@ object MessageClassifier {
         val reason: String,
     )
 
+    private data class PlayerCandidate(
+        val name: String,
+        val start: Int,
+    )
+
     private val playerToken = Regex("[A-Za-z0-9_]{3,16}")
     private val levelPrefix = Regex("\\[\\d{1,4}]\\s*")
-    private val explicitChatDelimiter = Regex("^\\s*(?::|»|›|>)\\s*")
+    private val explicitChatDelimiter = Regex("^\\s*(?::|»|›|>)\\s*.+")
     private val angleChatSuffix = Regex("^\\s*>\\s*.+")
+    private val bracketedChatSuffix = Regex("^\\s*(?:\\[[^\\]\\r\\n]{1,32}]\\s*)+.+")
 
     private val obviousSystemContinuation = listOf(
         " joined",
@@ -51,6 +57,10 @@ object MessageClassifier {
         " was slain",
         " was shot",
         " was killed",
+        " won ",
+        " received ",
+        " earned ",
+        " reached ",
     )
 
     fun classify(
@@ -62,17 +72,15 @@ object MessageClassifier {
             return Classification(Kind.PLAYER, 100, "message has a player chat signature")
         }
 
-        val sourceName = source.toString().uppercase()
-        if (sourceName.contains("PLAYER")) {
+        if (source == GuiMessageSource.PLAYER) {
             return Classification(Kind.PLAYER, 100, "Minecraft GuiMessageSource is player chat")
         }
 
-        val legacy = classifyLegacy(component.string)
-        if (legacy != null) {
-            return legacy
-        }
+        // ViaVersion/legacy servers commonly surface old player chat as SYSTEM.
+        // Try the conservative legacy classifier before accepting SYSTEM as final.
+        classifyLegacy(component.string)?.let { return it }
 
-        return if (sourceName.contains("SYSTEM")) {
+        return if (source == GuiMessageSource.SYSTEM) {
             Classification(Kind.SERVER, 100, "Minecraft GuiMessageSource is system and no legacy player-chat shape matched")
         } else {
             Classification(Kind.SERVER, 80, "no player-chat metadata or conservative legacy match")
@@ -86,44 +94,55 @@ object MessageClassifier {
         }
 
         val connection = Minecraft.getInstance().connection ?: return null
-        var matchedPlayer: String? = null
-        var playerStart = -1
-
-        playerToken.findAll(text).forEach { match ->
-            if (matchedPlayer != null) {
-                return@forEach
+        val candidates = playerToken.findAll(text).mapNotNull { match ->
+            if (connection.getPlayerInfo(match.value) == null) {
+                null
+            } else {
+                PlayerCandidate(match.value, match.range.first)
             }
-            if (connection.getPlayerInfo(match.value) != null) {
-                matchedPlayer = match.value
-                playerStart = match.range.first
-            }
-        }
+        }.toList()
 
-        val name = matchedPlayer ?: return null
-        val afterName = text.substring(playerStart + name.length)
-        val afterLower = afterName.lowercase()
-
-        if (afterName.isBlank()) {
+        if (candidates.isEmpty()) {
             return null
         }
 
-        if (obviousSystemContinuation.any { afterLower.startsWith(it) }) {
-            return null
-        }
+        // Prefer strong chat shapes over simply taking the first online player name
+        // found in a server/plugin message.
+        for (candidate in candidates) {
+            val afterName = text.substring(candidate.start + candidate.name.length)
+            if (afterName.isBlank()) {
+                continue
+            }
 
-        if (explicitChatDelimiter.containsMatchIn(afterName)) {
-            return Classification(Kind.PLAYER, 92, "legacy message contains online player '$name' followed by a chat delimiter")
-        }
+            val afterLower = afterName.lowercase()
+            if (obviousSystemContinuation.any { afterLower.startsWith(it) }) {
+                continue
+            }
 
-        val beforeName = text.substring(0, playerStart)
-        if (beforeName.trimEnd().endsWith("<") && angleChatSuffix.containsMatchIn(afterName)) {
-            return Classification(Kind.PLAYER, 92, "legacy <player> chat format matched for '$name'")
-        }
+            if (explicitChatDelimiter.matches(afterName)) {
+                return Classification(
+                    Kind.PLAYER,
+                    95,
+                    "legacy message contains online player '${candidate.name}' followed by a chat delimiter"
+                )
+            }
 
-        // BattleCraft and many legacy networks prepend a numeric level before a
-        // rank/name. This also covers extra clan/queue tags after the name.
-        if (levelPrefix.containsMatchIn(beforeName) && afterName.trim().length >= 2) {
-            return Classification(Kind.PLAYER, 88, "legacy ranked chat contains level prefix and online player '$name'")
+            val beforeName = text.substring(0, candidate.start)
+            if (beforeName.trimEnd().endsWith("<") && angleChatSuffix.matches(afterName)) {
+                return Classification(Kind.PLAYER, 95, "legacy <player> chat format matched for '${candidate.name}'")
+            }
+
+            // BattleCraft MineWars currently uses e.g.
+            // [6] Owner PlayerName [Epic] message
+            // while other modes commonly use a ':' delimiter. Requiring a bracketed
+            // suffix here avoids treating arbitrary level/rank server announcements as chat.
+            if (levelPrefix.containsMatchIn(beforeName) && bracketedChatSuffix.matches(afterName)) {
+                return Classification(
+                    Kind.PLAYER,
+                    90,
+                    "legacy ranked chat contains a level prefix, online player '${candidate.name}', and a post-name tag"
+                )
+            }
         }
 
         return null
