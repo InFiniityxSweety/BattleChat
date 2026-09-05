@@ -40,14 +40,11 @@ dependencies {
         exclude(group = "net.fabricmc.fabric-api")
     }
 
-    // Fabric Kotlin
     implementation("net.fabricmc:fabric-language-kotlin:${rootProject.property("fabric_kotlin_version")}")
-    // Mod Menu
     implementation("com.terraformersmc:modmenu:${project.property("modmenu_version")}")
 
     shadow("net.java.dev.jna:jna:5.14.0")
     shadow("com.alphacephei:vosk:0.3.45")
-    // MixinExtras: provided by Loom + mixinextras-common compileOnly in root project
 }
 
 tasks.processResources {
@@ -59,12 +56,10 @@ tasks.processResources {
             mapOf(
                 "group" to rootProject.property("maven_group"),
                 "version" to project.version,
-
                 "mod_id" to rootProject.property("mod_id"),
                 "min_minecraft_version" to rootProject.property("min_minecraft_version"),
                 "fabric_kotlin_version" to rootProject.property("fabric_kotlin_version"),
                 "cloth_config_version" to rootProject.property("cloth_config_version"),
-
                 "mod_name" to rootProject.property("mod_name"),
                 "mod_description" to rootProject.property("mod_description"),
                 "mod_authors" to rootProject.property("mod_authors"),
@@ -111,38 +106,41 @@ publishMods {
 
     val mcVersions = "${rootProject.property("supported_minecraft_version")}".split(",")
 
+    // Never reuse ChatPlus' upstream project IDs. BattleChat publishing is enabled
+    // only when both our own destination ID and its token are explicitly supplied.
     val cfToken = System.getenv("CF_TOKEN")
-    if (cfToken != null) {
-        println("(${project.name}) CF_TOKEN found, publishing to CurseForge")
+    val cfProjectId = System.getenv("BATTLECHAT_CF_PROJECT_ID")
+    if (!cfToken.isNullOrBlank() && !cfProjectId.isNullOrBlank()) {
+        println("(${project.name}) BattleChat CurseForge destination configured")
         curseforge {
             accessToken.set(cfToken)
-            projectId.set("1023333")
+            projectId.set(cfProjectId)
             minecraftVersions.addAll(mcVersions)
             client.set(true)
             requires("cloth-config", "fabric-language-kotlin", "fabric-api")
             optional("modmenu")
         }
     } else {
-        println("(${project.name}) CF_TOKEN not found, not publishing to CurseForge")
+        println("(${project.name}) BattleChat CurseForge destination not configured; skipping")
     }
 
     val mrToken = System.getenv("MODRINTH_TOKEN")
-    if (mrToken != null) {
-        println("(${project.name}) MODRINTH_TOKEN found, publishing to Modrinth")
+    val mrProjectId = System.getenv("BATTLECHAT_MODRINTH_PROJECT_ID")
+    if (!mrToken.isNullOrBlank() && !mrProjectId.isNullOrBlank()) {
+        println("(${project.name}) BattleChat Modrinth destination configured")
         modrinth {
             accessToken.set(mrToken)
-            projectId.set("cJlZ132G")
+            projectId.set(mrProjectId)
             minecraftVersions.addAll(mcVersions)
             environment.set(CLIENT_ONLY)
             requires("9s6osm5g", "Ha28R6CL", "P7dR8mSH")
             optional("mOgUt4GM")
         }
     } else {
-        println("(${project.name}) MODRINTH_TOKEN not found, not publishing to Modrinth")
+        println("(${project.name}) BattleChat Modrinth destination not configured; skipping")
     }
 }
 
-// Implement mcgradleconventions loader attribute
 val loaderAttribute: Attribute<String> =
     Attribute.of("io.github.mcgradleconventions.loader", String::class.java)
 
