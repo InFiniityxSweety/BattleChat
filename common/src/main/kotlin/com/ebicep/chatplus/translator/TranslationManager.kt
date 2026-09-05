@@ -23,7 +23,7 @@ object TranslationManager {
         listOf(
             Provider("google") { text, from, to ->
                 val requester = GoogleRequester()
-                if (from == null) requester.translateAuto(text, to)
+                if (from == null || from.googleCode == "auto") requester.translateAuto(text, to)
                 else requester.performTranslationRequest(text, from, to)
             },
             Provider("libretranslate-cutie") { text, from, to ->
@@ -36,6 +36,11 @@ object TranslationManager {
     }
 
     fun translate(text: String, from: Language?, to: Language): TranslateResult? {
+        if (to.googleCode == "auto") {
+            ChatPlus.LOGGER.warn("Refusing translation request with Auto Detect as target language")
+            return null
+        }
+
         val now = System.currentTimeMillis()
         val failures = mutableListOf<String>()
 
@@ -57,7 +62,10 @@ object TranslationManager {
                 RequestResult(1, throwable.message ?: "Unexpected provider error", null, to)
             }
 
-            if (result.code == 200 && result.from != null && result.message.isNotBlank()) {
+            // The translated text is the important part. Some free providers return
+            // valid translations but omit/rename the detected source language. Do not
+            // throw away a good translation just because source-language metadata is missing.
+            if (result.code == 200 && result.message.isNotBlank()) {
                 cooldownUntil.remove(provider.id)
                 ChatPlus.LOGGER.debug("Translation succeeded through provider {}", provider.id)
                 return TranslateResult(result.message.trim(), result.from)
