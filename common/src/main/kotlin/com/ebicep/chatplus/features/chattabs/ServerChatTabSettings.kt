@@ -51,16 +51,16 @@ open class ServerChatTabSettings : MessageFilterFormatted {
 
     constructor(pattern: String, formatted: Boolean) : super(pattern, formatted)
 
-    fun matchesSource(component: Component, source: GuiMessageSource, signature: MessageSignature?): Boolean {
-        if (messageSourceMode == MessageSourceMode.ANY) {
-            return true
-        }
-        val classification = MessageClassifier.classify(component, source, signature)
+    fun matchesSource(classification: MessageClassifier.Classification): Boolean {
         return when (messageSourceMode) {
             MessageSourceMode.ANY -> true
             MessageSourceMode.PLAYER -> classification.kind == MessageClassifier.Kind.PLAYER
             MessageSourceMode.SERVER -> classification.kind == MessageClassifier.Kind.SERVER
         }
+    }
+
+    fun matchesSource(component: Component, source: GuiMessageSource, signature: MessageSignature?): Boolean {
+        return matchesSource(MessageClassifier.classify(component, source, signature))
     }
 
     fun applyBattleChatNameDefault() {
