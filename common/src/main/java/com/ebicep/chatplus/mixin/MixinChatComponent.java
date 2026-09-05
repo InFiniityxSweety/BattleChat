@@ -5,6 +5,7 @@ import com.ebicep.chatplus.config.Config;
 import com.ebicep.chatplus.events.EventBus;
 import com.ebicep.chatplus.features.chattabs.AddNewMessageEvent;
 import com.ebicep.chatplus.features.chattabs.ChatTab;
+import com.ebicep.chatplus.features.chattabs.MessageClassifier;
 import com.ebicep.chatplus.features.chattabs.SkipNewMessageEvent;
 import com.ebicep.chatplus.features.chatwindows.ChatWindowsManager;
 import com.ebicep.chatplus.hud.ChatManager;
@@ -64,6 +65,16 @@ public class MixinChatComponent {
         tag = message.tag();
         List<ChatTab> addMessagesTo = new ArrayList<>();
 
+        MessageClassifier.Classification classification = MessageClassifier.INSTANCE.classify(contents, source, signature);
+        ChatPlus.INSTANCE.debugLog(
+                "BattleChat classification: " + classification.getKind()
+                        + " (" + classification.getConfidence() + "%)"
+                        + " | " + classification.getReason()
+                        + " | source=" + source
+                        + " | signed=" + (signature != null)
+                        + " | text=" + contents.getString()
+        );
+
         Integer lastPriority = null;
         for (ChatTab chatTab : ChatManager.INSTANCE.getGlobalSortedTabs()) {
             int priority = chatTab.getPriority();
@@ -76,7 +87,7 @@ public class MixinChatComponent {
             // Existing tabs remain ANY by default. Tabs named Chat/Server are upgraded
             // automatically so imported ChatPlus configs immediately gain semantic routing.
             chatTab.getCurrentSettings().applyBattleChatNameDefault();
-            if (!chatTab.getCurrentSettings().matchesSource(contents, source, signature)) {
+            if (!chatTab.getCurrentSettings().matchesSource(classification)) {
                 continue;
             }
 
