@@ -150,6 +150,11 @@ object TranslateMessage {
             if (!languageSpeakEnabled) {
                 return@register
             }
+            // Commands must always pass through untouched, even while the
+            // outgoing translation toggle is enabled.
+            if (it.normalizeChatMessage.trimStart().startsWith("/")) {
+                return@register
+            }
             it.dontSendMessage = true
             SelfTranslator(it.normalizeChatMessage, if (inputTranslatePrefix == null) "" else inputTranslatePrefix!!.value).start()
         }

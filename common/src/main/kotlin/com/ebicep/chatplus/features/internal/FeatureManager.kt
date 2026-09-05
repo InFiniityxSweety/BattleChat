@@ -18,6 +18,7 @@ object FeatureManager {
         FilterMessages
         ChatTabs
         TranslateMessage
+        TextTransform
         AlignMessage
         ScreenshotChat
         SpeechToText

@@ -1,6 +1,7 @@
 package com.ebicep.chatplus.translator
 
 import com.ebicep.chatplus.ChatPlus
+import com.ebicep.chatplus.features.TextTransform
 import com.ebicep.chatplus.hud.ChatPlusScreen
 import net.minecraft.ChatFormatting
 import net.minecraft.network.chat.Component
@@ -25,7 +26,7 @@ class SelfTranslator(val toTranslate: String, val prefix: String) : Thread() {
             } else {
                 "$prefix "
             }
-            val text = pre + translateResult.translatedText
+            val text = pre + TextTransform.transformForSend(translateResult.translatedText)
             ChatPlusScreen.sendChatMessage(message = text)
         }
     }
