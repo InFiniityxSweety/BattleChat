@@ -29,6 +29,8 @@ class Editor(
     val pressEdit: (Button) -> Unit,
     val pressDelete: (Button) -> Unit,
     val canDelete: () -> Boolean,
+    val messageSourceMode: (() -> MessageSourceMode)? = null,
+    val cycleMessageSourceMode: (() -> Unit)? = null,
 ) : Screen(Component.translatable(titleComponent())) {
 
     companion object {
@@ -37,16 +39,24 @@ class Editor(
                 previousScreen,
                 { "chatPlus.gui.tabEditor" },
                 { "( ${chatTab.name} ) " },
-                { button ->
+                { _ ->
                     chatTab.chatWindow.tabSettings.cloneTab(chatTab)
                     Minecraft.getInstance().setScreenAndShow(previousScreen)
                 },
-                { button -> Minecraft.getInstance().setScreenAndShow(getTabEditorScreen(previousScreen, chatTab)) },
-                { button ->
+                { _ -> Minecraft.getInstance().setScreenAndShow(getTabEditorScreen(previousScreen, chatTab)) },
+                { _ ->
                     chatTab.chatWindow.tabSettings.removeTab(chatTab)
                     Minecraft.getInstance().setScreenAndShow(previousScreen)
                 },
-                { chatTab.chatWindow.tabSettings.tabs.size > 1 }
+                { chatTab.chatWindow.tabSettings.tabs.size > 1 },
+                { chatTab.currentSettings.messageSourceMode },
+                {
+                    val current = chatTab.currentSettings.messageSourceMode
+                    val modes = MessageSourceMode.entries
+                    chatTab.currentSettings.messageSourceMode = modes[(current.ordinal + 1) % modes.size]
+                    Config.save()
+                    resetGlobalSortedTabs()
+                },
             )
         }
 
@@ -55,7 +65,7 @@ class Editor(
                 previousScreen,
                 { "chatPlus.gui.windowEditor" },
                 { "( ${chatWindow.tabSettings.tabs.joinToString(", ") { it.name }} )" },
-                { button ->
+                { _ ->
                     val oldRenderer = chatWindow.renderer
 
                     val newWindow = chatWindow.clone()
@@ -76,8 +86,8 @@ class Editor(
                     resetGlobalSortedTabs()
                     Minecraft.getInstance().setScreenAndShow(previousScreen)
                 },
-                { button -> Minecraft.getInstance().setScreenAndShow(getWindowEditorScreen(previousScreen, chatWindow)) },
-                { button ->
+                { _ -> Minecraft.getInstance().setScreenAndShow(getWindowEditorScreen(previousScreen, chatWindow)) },
+                { _ ->
                     val windows = Config.values.chatWindows.toMutableList()
                     windows.remove(chatWindow)
                     Config.values.chatWindows = windows
@@ -85,6 +95,14 @@ class Editor(
                 },
                 { Config.values.chatWindows.size > 1 }
             )
+        }
+
+        private fun sourceModeName(mode: MessageSourceMode): String {
+            return when (mode) {
+                MessageSourceMode.ANY -> "Any"
+                MessageSourceMode.PLAYER -> "Player"
+                MessageSourceMode.SERVER -> "Server"
+            }
         }
     }
 
@@ -108,6 +126,18 @@ class Editor(
                 Button.OnPress { pressEdit(it) }
             ).width(200).build()
         )
+
+        if (messageSourceMode != null && cycleMessageSourceMode != null) {
+            rowHelper.addChild(
+                Button.builder(
+                    Component.literal("Message Source: ${sourceModeName(messageSourceMode.invoke())}"),
+                    Button.OnPress { button ->
+                        cycleMessageSourceMode.invoke()
+                        button.message = Component.literal("Message Source: ${sourceModeName(messageSourceMode.invoke())}")
+                    }
+                ).width(200).build()
+            )
+        }
 
         deleteButton = Button.builder(
             Component.translatable("chatPlus.gui.delete"),
